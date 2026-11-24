@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Saisie\MouvementEcriture;
 use App\Models\Saisie\Journal;
-use App\Models\Saisie\LigneEcriture;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Comptabilite\EcritureGuard;
+use Illuminate\Support\Facades\DB;
 
 class MouvementEcritureController extends Controller
 {
@@ -21,6 +21,10 @@ class MouvementEcritureController extends Controller
         return MouvementEcriture::findOrFail($id);
     }
 
+    /**
+     * Création d'une pièce : date dans l'exercice ouvert, numéro séquentiel
+     * par journal et par année ({CODE}{AAAA}-{NNNN}).
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -28,25 +32,18 @@ class MouvementEcritureController extends Controller
             'Id_Journal' => 'required|exists:journals,Id_Journal',
         ]);
 
-        $year = date('Y', strtotime($request->Date_mouvement));
+        EcritureGuard::exerciceOuvertPour($request->Date_mouvement);
 
-        // Récupérer le dernier numéro pour ce journal et cette année
-        $lastNumero = MouvementEcriture::where('Id_Journal', $request->Id_Journal)
-            ->whereYear('Date_mouvement', $year)
-            ->max('Id_Mouvement_ecriture'); // ou Numero_piece_int si tu crées un champ int
+        $mouvement = DB::transaction(function () use ($request) {
+            $journal = Journal::findOrFail($request->Id_Journal);
+            $annee = (int) date('Y', strtotime($request->Date_mouvement));
 
-        $nextNumero = $lastNumero ? $lastNumero + 1 : 1;
-
-        // Générer le numéro formaté : VE2025-0001
-        $journalCode = Journal::find($request->Id_Journal)->Code;
-        $numeroPiece = $journalCode . $year . '-' . str_pad($nextNumero, 4, '0', STR_PAD_LEFT);
-
-        // Créer le mouvement
-        $mouvement = MouvementEcriture::create([
-            'Date_mouvement' => $request->Date_mouvement,
-            'Id_Journal' => $request->Id_Journal,
-            'Numero_piece' => $numeroPiece,
-        ]);
+            return MouvementEcriture::create([
+                'Date_mouvement' => $request->Date_mouvement,
+                'Id_Journal' => $journal->Id_Journal,
+                'Numero_piece' => EcritureGuard::prochainNumeroPiece($journal, $annee),
+            ]);
+        });
 
         return response()->json([
             'message' => 'Mouvement enregistré avec succès',
@@ -54,49 +51,48 @@ class MouvementEcritureController extends Controller
         ]);
     }
 
+    /**
+     * Modification de l'en-tête d'une pièce non validée (date, journal).
+     */
     public function update(Request $request, $id)
     {
-        $mouvement = MouvementEcriture::findOrFail($id);
-        $mouvement->update($request->all());
+        $request->validate([
+            'Date_mouvement' => 'sometimes|required|date',
+            'Id_Journal' => 'sometimes|required|exists:journals,Id_Journal',
+        ]);
 
-        return $mouvement;
+        $mouvement = MouvementEcriture::with('lignes')->findOrFail($id);
+        EcritureGuard::assertPieceModifiable($mouvement);
+
+        $data = $request->only(['Date_mouvement', 'Id_Journal']);
+        if (isset($data['Date_mouvement'])) {
+            EcritureGuard::exerciceOuvertPour($data['Date_mouvement']);
+        }
+
+        DB::transaction(function () use ($mouvement, $data) {
+            $mouvement->update($data);
+            // Les lignes suivent le journal de leur pièce
+            if (isset($data['Id_Journal'])) {
+                $mouvement->lignes()->update(['Id_Journal' => $data['Id_Journal']]);
+            }
+        });
+
+        return $mouvement->fresh();
     }
 
+    /**
+     * Suppression d'une pièce non validée et de ses lignes.
+     */
     public function destroy($id)
     {
-        $mouvement = MouvementEcriture::findOrFail($id);
-        $mouvement->delete();
+        $mouvement = MouvementEcriture::with('lignes')->findOrFail($id);
+        EcritureGuard::assertPieceModifiable($mouvement);
+
+        DB::transaction(function () use ($mouvement) {
+            $mouvement->lignes()->delete();
+            $mouvement->delete();
+        });
 
         return response()->json(['message' => 'Mouvement supprimé']);
-    }
-
-    public function valider($id)
-    {
-        $mouvement = MouvementEcriture::findOrFail($id);
-
-        if ($mouvement->valide) {
-            return response()->json(['message' => 'Ce mouvement est déjà validé'], 400);
-        }
-
-        // Récupérer toutes les lignes d'écriture associées au mouvement
-        $lignes = LigneEcriture::where('Id_Mouvement_ecriture', $id)->get();
-
-        foreach ($lignes as $ligne) {
-            if ($ligne->statut !== 'valide') {
-                $ligne->update([
-                    'statut' => 'valide',
-                    'date_validation' => now(),
-                    'valide_par' => Auth::id(),
-                ]);
-            }
-        }
-
-        // Valider le mouvement lui-même
-        $mouvement->update(['valide' => true]);
-
-        return response()->json([
-            'message' => 'Mouvement et toutes ses écritures validés avec succès',
-            'data' => $mouvement
-        ]);
     }
 }

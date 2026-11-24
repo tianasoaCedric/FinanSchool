@@ -1,7 +1,9 @@
 <?php
 
-require __DIR__ . '/notificationsAnalyse.php';
-require __DIR__ . '/notifications.php';
+// require_once : notifications.php déclare une classe ; un second chargement
+// (tests qui redémarrent l'application) provoquait « Cannot declare class ».
+require_once __DIR__ . '/notificationsAnalyse.php';
+require_once __DIR__ . '/notifications.php';
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;

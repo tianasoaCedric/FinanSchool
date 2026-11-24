@@ -37,41 +37,45 @@
       </form>
     </template>
 
-    <template #table-hint>Cliquez sur une classe pour voir le détail</template>
+    <template #table-hint>Écritures validées · soldes d'ouverture repris des à-nouveaux · cliquez sur une classe pour le détail</template>
 
-    <table class="fs-table">
+    <table class="fs-table balance-table">
       <thead>
         <tr>
-          <th>Compte</th>
-          <th class="text-right">Débit</th>
-          <th class="text-right">Crédit</th>
+          <th rowspan="2">Compte</th>
+          <th colspan="2" class="text-center">Soldes d'ouverture</th>
+          <th colspan="2" class="text-center">Mouvements de la période</th>
+          <th colspan="2" class="text-center">Soldes de fin</th>
+        </tr>
+        <tr>
+          <template v-for="n in 3" :key="n">
+            <th class="text-right">Débit</th>
+            <th class="text-right">Crédit</th>
+          </template>
         </tr>
       </thead>
       <tbody>
         <template v-for="(mainAccount, mainCode) in groupedComptes" :key="mainCode">
-          <tr class="main-account-row">
-            <td @click="toggleAccount(mainCode)">
+          <tr class="main-account-row" tabindex="0" @click="toggleAccount(mainCode)" @keydown.enter="toggleAccount(mainCode)">
+            <td>
               <i :class="mainAccount.expanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
               Classe {{ mainCode }} — {{ mainAccount.libelle }}
             </td>
-            <td class="text-right">{{ formatNumber(Math.abs(mainAccount.total_debit)) }}</td>
-            <td class="text-right">{{ formatNumber(Math.abs(mainAccount.total_credit)) }}</td>
+            <td v-for="col in COLONNES" :key="col" class="text-right num">{{ vide(mainAccount[col]) }}</td>
           </tr>
           <template v-if="mainAccount.expanded">
             <tr v-for="(subAccount, index) in mainAccount.subAccounts" :key="`${mainCode}-${index}`" class="sub-account-row">
               <td>{{ subAccount.code_sous_compte }} — {{ subAccount.libelle_sous_compte }}</td>
-              <td class="text-right">{{ subAccount.solde_final >= 0 ? formatNumber(subAccount.solde_final) : '' }}</td>
-              <td class="text-right">{{ subAccount.solde_final < 0 ? formatNumber(Math.abs(subAccount.solde_final)) : '' }}</td>
+              <td v-for="col in COLONNES" :key="col" class="text-right num">{{ vide(subAccount[col]) }}</td>
             </tr>
           </template>
         </template>
         <tr v-if="!Object.keys(groupedComptes).length">
-          <td colspan="3" class="fs-empty">Aucune donnée disponible</td>
+          <td colspan="7" class="fs-empty">Aucune donnée disponible</td>
         </tr>
         <tr v-else class="total-row">
           <td>Totaux</td>
-          <td class="text-right">{{ formatNumber(totalDebit) }}</td>
-          <td class="text-right">{{ formatNumber(totalCredit) }}</td>
+          <td v-for="col in COLONNES" :key="col" class="text-right num">{{ formatNumber(totaux[col]) }}</td>
         </tr>
       </tbody>
     </table>
@@ -128,6 +132,19 @@ const getClasseLibelle = (classe) => ({
   '7': 'Produits'
 })[classe] || 'Classe inconnue';
 
+// Balance à 6 colonnes (PCG) : ouverture, mouvements, soldes de fin — débit / crédit
+const COLONNES = ['ouv_d', 'ouv_c', 'mvt_d', 'mvt_c', 'sol_d', 'sol_c'];
+const vide = n => (Math.abs(n) < 0.005 ? '' : formatNumber(n));
+const colonnesDe = (c) => {
+  const ouv = parseFloat(c.ouverture) || 0;
+  const fin = parseFloat(c.solde_final) || 0;
+  return {
+    ouv_d: ouv > 0 ? ouv : 0, ouv_c: ouv < 0 ? -ouv : 0,
+    mvt_d: parseFloat(c.total_debit) || 0, mvt_c: parseFloat(c.total_credit) || 0,
+    sol_d: fin > 0 ? fin : 0, sol_c: fin < 0 ? -fin : 0,
+  };
+};
+
 const groupedComptes = computed(() => {
   const grouped = {};
   comptes.value.forEach((compte) => {
@@ -135,25 +152,25 @@ const groupedComptes = computed(() => {
     if (!grouped[mainCode]) {
       grouped[mainCode] = {
         libelle: getClasseLibelle(mainCode),
-        total_debit: 0,
-        total_credit: 0,
+        ...Object.fromEntries(COLONNES.map(c => [c, 0])),
         expanded: expandedAccounts.value.has(mainCode),
         subAccounts: []
       };
     }
+    const cols = colonnesDe(compte);
     grouped[mainCode].subAccounts.push({
       code_sous_compte: compte.code_sous_compte,
       libelle_sous_compte: compte.libelle_sous_compte,
-      solde_final: parseFloat(compte.solde_final) || 0
+      ...cols,
     });
-    if ((parseFloat(compte.solde_final) || 0) >= 0) {
-      grouped[mainCode].total_debit += parseFloat(compte.solde_final) || 0;
-    } else {
-      grouped[mainCode].total_credit += Math.abs(parseFloat(compte.solde_final)) || 0;
-    }
+    COLONNES.forEach(c => { grouped[mainCode][c] += cols[c]; });
   });
   return grouped;
 });
+
+const totaux = computed(() => Object.fromEntries(COLONNES.map(c => [
+  c, Object.values(groupedComptes.value).reduce((s, g) => s + g[c], 0),
+])));
 
 // Infos de l'exercice sélectionné (période, statut) affichées dans l'en-tête
 const exerciceInfo = computed(() => {
@@ -161,13 +178,6 @@ const exerciceInfo = computed(() => {
   return ex ? { annee_fiscale: ex.Annee_fiscale, date_debut: ex.Date_debut, date_fin: ex.Date_fin, statut: ex.Statut } : null;
 });
 
-const totalDebit = computed(() =>
-  Object.values(groupedComptes.value).reduce((sum, acc) => sum + (acc.total_debit || 0), 0)
-);
-
-const totalCredit = computed(() =>
-  Object.values(groupedComptes.value).reduce((sum, acc) => sum + (acc.total_credit || 0), 0)
-);
 
 const toggleAccount = (accountCode) => {
   if (expandedAccounts.value.has(accountCode)) {
@@ -280,36 +290,19 @@ const exportToExcel = async () => {
 
   const emptyRow = [''];
   const headers = [
-    ['Compte', 'Libellé', 'Débit', 'Crédit']
+    ['Compte', 'Libellé', 'Ouverture débit', 'Ouverture crédit', 'Mouvements débit', 'Mouvements crédit', 'Solde débit', 'Solde crédit']
   ];
+  const valeurs = o => COLONNES.map(c => (Math.abs(o[c]) < 0.005 ? '' : Math.round(o[c] * 100) / 100));
 
   // Construction des lignes du tableau
   const dataRows = [];
   Object.entries(groupedComptes.value).forEach(([mainCode, mainAccount]) => {
-    // Compte principal
-    dataRows.push([
-      `${mainCode} - ${mainAccount.libelle}`,
-      '',
-      mainAccount.total_debit,
-      mainAccount.total_credit
-    ]);
-    // Sous-comptes
+    dataRows.push([`${mainCode} - ${mainAccount.libelle}`, '', ...valeurs(mainAccount)]);
     mainAccount.subAccounts.forEach(subAccount => {
-      dataRows.push([
-        subAccount.code_sous_compte,
-        subAccount.libelle_sous_compte,
-        subAccount.solde_final >= 0 ? subAccount.solde_final : '',
-        subAccount.solde_final < 0 ? Math.abs(subAccount.solde_final) : ''
-      ]);
+      dataRows.push([subAccount.code_sous_compte, subAccount.libelle_sous_compte, ...valeurs(subAccount)]);
     });
   });
-  // Ligne des totaux
-  dataRows.push([
-    "TOTAUX",
-    "",
-    totalDebit.value,
-    totalCredit.value
-  ]);
+  dataRows.push(["TOTAUX", "", ...valeurs(totaux.value)]);
 
   // Création de la feuille Excel
   const ws = XLSX.utils.aoa_to_sheet([]);
@@ -322,12 +315,12 @@ const exportToExcel = async () => {
 
   // Largeurs colonnes
   ws['!cols'] = [
-    { wch: 25 }, { wch: 35 }, { wch: 18 }, { wch: 18 }
+    { wch: 25 }, { wch: 35 }, ...Array(6).fill({ wch: 17 })
   ];
   // Fusion de cellules pour titres/en-têtes
   ws['!merges'] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // fusion titre
-    ...[1,2,3,4,5,6,7,8,9,10].map(i => ({ s: { r: i, c: 0 }, e: { r: i, c: 3 } })) // infos
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // fusion titre
+    ...[1,2,3,4,5,6,7,8,9,10].map(i => ({ s: { r: i, c: 0 }, e: { r: i, c: 7 } })) // infos
   ];
 
   // Styles Excel Avancé
@@ -353,7 +346,7 @@ const exportToExcel = async () => {
     };
   }
   // En-tête du tableau
-  ['A11', 'B11', 'C11', 'D11'].forEach(cell => {
+  ['A11', 'B11', 'C11', 'D11', 'E11', 'F11', 'G11', 'H11'].forEach(cell => {
     if (ws[cell]) ws[cell].s = {
       font: { bold: true, sz: 12, color: { rgb: "FFFFFF" } },
       fill: { fgColor: { rgb: "1C45BD" } },
@@ -371,7 +364,7 @@ const exportToExcel = async () => {
   const firstDataRow = 12;
   for (let i = 0; i < dataRows.length; ++i) {
     const rowIdx = firstDataRow + i;
-    ['A','B','C','D'].forEach((col, j) => {
+    ['A','B','C','D','E','F','G','H'].forEach((col, j) => {
       const cell = `${col}${rowIdx}`;
       if (!ws[cell]) return;
       if (i === dataRows.length - 1 || (dataRows[i][0] && /^\d - /.test(dataRows[i][0]))) {
@@ -445,35 +438,36 @@ const exportToPDF = async () => {
           <div style="margin: 3px 0;"><strong>Date édition:</strong> ${now.toLocaleDateString('fr-FR')} ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
         </div>
       </div>
-      <table style="width:725px; border-collapse: collapse; margin-top: 15px;">
+      <table style="width:1060px; border-collapse: collapse; margin-top: 15px;">
         <thead>
-          <tr style="background: linear-gradient(135deg, #1c45bd 0%, #1c45bd 100%); color: white;">
-            <th style="padding: 9px 3px; font-size: 11px; border: 1px solid #2980b9; text-align: left;">Compte</th>
-            <th style="padding: 9px 3px; font-size: 11px; border: 1px solid #2980b9; text-align: right;">Débit</th>
-            <th style="padding: 9px 3px; font-size: 11px; border: 1px solid #2980b9; text-align: right;">Crédit</th>
+          <tr style="background: #1c45bd; color: white;">
+            <th rowspan="2" style="padding: 8px 3px; font-size: 10px; border: 1px solid #2980b9; text-align: left;">Compte</th>
+            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Soldes d'ouverture</th>
+            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Mouvements</th>
+            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Soldes de fin</th>
+          </tr>
+          <tr style="background: #1c45bd; color: white;">
+            ${['Débit', 'Crédit', 'Débit', 'Crédit', 'Débit', 'Crédit'].map(t => `<th style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9; text-align: right;">${t}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
           ${Object.entries(groupedComptes.value).map(([mainCode, mainAccount]) => `
             <tr style="font-weight: bold; background-color: #f4f8fd;">
-              <td style="padding:8px; font-size:11px; border:1px solid #eee;">${mainCode} - ${mainAccount.libelle}</td>
-              <td style="padding:8px; font-size:11px; border:1px solid #eee;text-align:right;">${formatNumber(mainAccount.total_debit)}</td>
-              <td style="padding:8px; font-size:11px; border:1px solid #eee;text-align:right;">${formatNumber(mainAccount.total_credit)}</td>
+              <td style="padding:7px; font-size:10px; border:1px solid #eee;">${mainCode} - ${mainAccount.libelle}</td>
+              ${COLONNES.map(c => `<td style="padding:7px; font-size:10px; border:1px solid #eee; text-align:right;">${vide(mainAccount[c])}</td>`).join('')}
             </tr>
             ${mainAccount.subAccounts.map(sub =>
               `<tr>
-                <td style="padding:7px 8px 7px 32px; font-size:10px; border:1px solid #f5f7fa;">${sub.code_sous_compte} - ${sub.libelle_sous_compte}</td>
-                <td style="padding:7px; font-size:10px; border:1px solid #f5f7fa; text-align:right;">${sub.solde_final >= 0 ? formatNumber(sub.solde_final) : ''}</td>
-                <td style="padding:7px; font-size:10px; border:1px solid #f5f7fa; text-align:right;">${sub.solde_final < 0 ? formatNumber(Math.abs(sub.solde_final)) : ''}</td>
+                <td style="padding:6px 6px 6px 22px; font-size:9px; border:1px solid #f5f7fa;">${sub.code_sous_compte} - ${sub.libelle_sous_compte}</td>
+                ${COLONNES.map(c => `<td style="padding:6px; font-size:9px; border:1px solid #f5f7fa; text-align:right;">${vide(sub[c])}</td>`).join('')}
               </tr>`
             ).join('')}
           `).join('')}
         </tbody>
         <tfoot>
-          <tr style="background: linear-gradient(135deg, #2980b9 0%, #3498db 100%); color: white; font-weight: bold;">
-            <td style="padding:10px; font-size: 12px; text-align:right; border:1px solid #2980b9;">TOTAUX :</td>
-            <td style="padding:10px; font-size: 12px; text-align:right; border:1px solid #2980b9;">${formatNumber(totalDebit.value)}</td>
-            <td style="padding:10px; font-size: 12px; text-align:right; border:1px solid #2980b9;">${formatNumber(totalCredit.value)}</td>
+          <tr style="background: #2980b9; color: white; font-weight: bold;">
+            <td style="padding:8px; font-size: 10px; text-align:right; border:1px solid #2980b9;">TOTAUX :</td>
+            ${COLONNES.map(c => `<td style="padding:8px; font-size: 10px; text-align:right; border:1px solid #2980b9;">${formatNumber(totaux.value[c])}</td>`).join('')}
           </tr>
         </tfoot>
       </table>
@@ -485,7 +479,7 @@ const exportToPDF = async () => {
 
   const element = document.createElement('div');
   element.innerHTML = htmlContent;
-  element.style.width = '210mm';
+  element.style.width = '297mm';
   document.body.appendChild(element);
   await html2pdf()
     .set({
@@ -493,7 +487,7 @@ const exportToPDF = async () => {
       filename: `Balance_Generale_${now.toISOString().split("T")[0]}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     })
     .from(element)
     .save();

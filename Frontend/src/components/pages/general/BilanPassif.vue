@@ -211,7 +211,7 @@ const fetchBilanPassif = async () => {
 // ✅ Affiche la valeur absolue (comme dans le compte de résultat)
 const formatMontant = n => {
   if (n === null || n === undefined) return "";
-  return Math.abs(Number(n)).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(n).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
 

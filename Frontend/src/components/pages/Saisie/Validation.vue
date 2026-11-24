@@ -87,6 +87,20 @@
     </div>
     <div class="modal-body">
       <p>{{ successModalMessage }}</p>
+      <div v-if="piecesIgnorees.length" class="pieces-ignorees">
+        <p class="pieces-ignorees__titre">
+          <UiBadge tone="warning">{{ piecesIgnorees.length }}</UiBadge>
+          pièce(s) non validée(s) — à corriger dans la saisie :
+        </p>
+        <ul>
+          <li v-for="p in piecesIgnorees.slice(0, 20)" :key="p.numero">
+            <strong>{{ p.numero }}</strong> : {{ p.motif }}
+          </li>
+        </ul>
+        <p v-if="piecesIgnorees.length > 20" class="pieces-ignorees__plus">
+          … et {{ piecesIgnorees.length - 20 }} autre(s).
+        </p>
+      </div>
       <div class="modal-footer">
         <UiButton variant="primary" @click="showSuccessModal = false">OK</UiButton>
       </div>
@@ -134,6 +148,7 @@ const showChat = ref(false);
 const exerciceCourant = ref({});
 const showSuccessModal = ref(false)
 const successModalMessage = ref('')
+const piecesIgnorees = ref([])
 const showErrorModal = ref(false)
 const errorModalMessage = ref('')
 
@@ -188,9 +203,12 @@ function changePage(page) {
 async function validerToutes() {
   validating.value = true;
   try {
-    await axios.post(`${API_BASE}/lignes/valider-toutes`);
+    // Le serveur valide pièce par pièce : seules les pièces équilibrées et
+    // correctes sont validées, les autres sont renvoyées avec leur motif.
+    const { data } = await axios.post(`${API_BASE}/lignes/valider-toutes`);
+    piecesIgnorees.value = data.pieces_ignorees || [];
+    successModalMessage.value = data.message || "Validation terminée.";
     showSuccessModal.value = true;
-    successModalMessage.value = "Toutes les écritures ont été validées avec succès !";
     await fetchRapport();
     await fetchEcrituresNonValidees();
   } catch(e) {
@@ -232,6 +250,19 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.pieces-ignorees {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--fs-surface-2);
+  border: 1px solid var(--fs-border);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.pieces-ignorees__titre { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-weight: 600; color: var(--fs-text); }
+.pieces-ignorees ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--fs-text-2); }
+.pieces-ignorees li { margin: 4px 0; }
+.pieces-ignorees__plus { margin: 8px 0 0; font-size: 13px; color: var(--fs-muted); }
 .dashboard-container {
   display: flex;
   min-height: 100vh;

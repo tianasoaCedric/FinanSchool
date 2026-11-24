@@ -440,7 +440,7 @@ const exportToExcel = async () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(gl, index) in paginatedGrandLivres" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in">
+                  <tr v-for="(gl, index) in paginatedGrandLivres" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
                     <td>{{ formatDate(gl.date_mouvement) }}</td>
                     <td>{{ gl.numero_piece }}</td>
                     <td>{{ gl.libelle_ecriture }}</td>
@@ -507,7 +507,7 @@ const exportToExcel = async () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="(gl, index) in sousCompteGroup.entries" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in">
+                        <tr v-for="(gl, index) in sousCompteGroup.entries" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
                           <td>{{ formatDate(gl.date_mouvement) }}</td>
                           <td>{{ gl.numero_piece }}</td>
                           <td>{{ gl.libelle_ecriture }}</td>
@@ -571,6 +571,8 @@ const exportToExcel = async () => {
 
 
 <style scoped>
+/* Ligne « Report à nouveau » (solde d'ouverture du compte) */
+.gl-report td { font-weight: 600; font-style: italic; background: var(--fs-row-subtitle, var(--fs-surface-2)); }
 .dashboard-container {
   display: flex;
   min-height: 100vh;

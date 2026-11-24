@@ -19,7 +19,7 @@
         <tr>
           <th>Capitaux propres</th>
           <th class="text-right">Capital</th>
-          <th class="text-right">Primes &amp; réserves</th>
+          <th class="text-right">Primes, réserves et écarts</th>
           <th class="text-right">Résultat</th>
           <th class="text-right">Report à nouveau</th>
           <th class="text-right">Total</th>
@@ -160,7 +160,7 @@ const fetchVariationsCapitaux = async () => {
     }
   } catch (error) {
     console.error("Erreur chargement variations capitaux:", error);
-    alert("Erreur lors du chargement des données. Vérifiez que vous avez bien 3 exercices consécutifs.");
+    alert("Erreur lors du chargement des données.");
   } finally {
     loading.value = false;
   }
@@ -169,8 +169,8 @@ const fetchVariationsCapitaux = async () => {
 // ================= MODIFICATION ICI (SUPPRESSION DU SIGNE MOINS) =================
 const formatMontant = n => {
   if (n === null || n === undefined) return "";
-  // Math.abs() transforme le nombre en positif (enlève le signe moins)
-  return Math.abs(Number(n)).toLocaleString("fr-FR", { minimumFractionDigits: 2 });
+  // montants affichés avec leur signe
+  return Number(n).toLocaleString("fr-FR", { minimumFractionDigits: 2 });
 };
 
 const formatDate = d => {
@@ -399,7 +399,7 @@ const exportToExcel = () => {
           // Couleur rouge si négatif ET ON ENLÈVE LE SIGNE DANS LA CELLULE
           if(ws[cell].v < 0) {
             ws[cell].s.font.color = { rgb: "dc2626" };
-            ws[cell].v = Math.abs(ws[cell].v); // Le nombre devient positif dans Excel
+            // montants signés conservés (une perte reste négative)
           }
         }
       }

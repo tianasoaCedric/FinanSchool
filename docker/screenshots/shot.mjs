@@ -56,8 +56,13 @@ for (const spec of paths) {
   await page.goto(`http://localhost:5173${p}`, { waitUntil: 'networkidle', timeout: 60000 }).catch(e => errors.push(String(e)));
   await page.waitForTimeout(1200);
   for (const sel of clicks) {
-    await page.locator(sel).first().click({ timeout: 10000 }).catch(e => errors.push(`clic ${sel}: ${e.message.split('\n')[0]}`));
-    await page.waitForTimeout(1500);
+    // "choisir=Libellé" : sélectionne une option dans la liste d'exercice
+    const choix = sel.match(/^choisir=(.+)$/);
+    const action = choix
+      ? page.locator('.fs-toolbar select').first().selectOption({ label: choix[1] })
+      : page.locator(sel).first().click({ timeout: 10000 });
+    await action.catch(e => errors.push(`${sel}: ${e.message.split('\n')[0]}`));
+    await page.waitForTimeout(1800);
   }
   const name = (spec.replace(/[^\w-]+/g, '_').replace(/^_|_$/g, '') || 'root').slice(0, 80) + `.${theme}.png`;
   await page.screenshot({ path: `${outDir}/${name}`, fullPage: false });

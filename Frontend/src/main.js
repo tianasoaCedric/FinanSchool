@@ -10,6 +10,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import UiButton from './components/ui/UiButton.vue'
 import UiBadge from './components/ui/UiBadge.vue'
+import { installerIntercepteursHttp } from './config/http'
+
+// Jeton envoyé à chaque appel API ; retour à la connexion si la session expire
+installerIntercepteursHttp(router);
 
 const app = createApp(App)
   .use(createPinia())

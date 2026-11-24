@@ -25,12 +25,15 @@ const routes = [
   { path: "/ecritures-journal/:id", name: "EcritureJournal", component: () => import("@/components/pages/configuration/EcritureJournal.vue"), props: true },
 
   // Saisie
-  { path: "/ecriture", name: "Ecriture", component: () => import("@/components/pages/Saisie/Ecriture.vue") },
+  { path: "/ecriture", name: "Ecriture", component: () => import("@/components/pages/Saisie/PieceForm.vue") },
+  { path: "/ecriture/:id(\\d+)", name: "Piece", component: () => import("@/components/pages/Saisie/PieceForm.vue") },
+  { path: "/pieces", name: "Pieces", component: () => import("@/components/pages/Saisie/PiecesList.vue") },
   { path: "/liste-grand-livre", name: "ListeGrandLivre", component: () => import("@/components/pages/Saisie/ListeGrandLivre.vue") },
   { path: "/grand-livres/:codeCompte", name: "GrandLivre", component: () => import("@/components/pages/Saisie/GrandLivre.vue"), props: true },
   { path: "/liste-ecriture", name: "ListeEcriture", component: () => import("@/components/pages/Saisie/ListeEcriture.vue") },
   { path: "/validation", name: "Validation", component: () => import("@/components/pages/Saisie/Validation.vue") },
   { path: "/import", name: "Import", component: () => import("@/components/pages/import/Import.vue") },
+  { path: "/cloture", name: "Cloture", component: () => import("@/components/pages/Saisie/ClotureExercice.vue") },
 
   // Analytique
   { path: "/type-centre", name: "TypeCentre", component: () => import("@/components/pages/configAnalytique/TypeCentre.vue") },

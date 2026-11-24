@@ -196,7 +196,7 @@ const fetchFluxTresorerie = async () => {
 
 const formatMontant = n => {
   if (n === null || n === undefined) return "";
-  const absValue = Math.abs(Number(n));
+  const absValue = Number(n);
   return absValue.toLocaleString("fr-FR", { minimumFractionDigits: 2 });
 };
 
@@ -340,8 +340,8 @@ const exportToExcel = () => {
   const dataRows = listeComplete.value.map(l => [
     l.label,
     l.note || "",
-    l.montantN !== null && l.montantN !== undefined ? Math.abs(Number(l.montantN)) : '',
-    l.montantN1 !== null && l.montantN1 !== undefined ? Math.abs(Number(l.montantN1)) : ''
+    l.montantN !== null && l.montantN !== undefined ? Number(l.montantN) : '',
+    l.montantN1 !== null && l.montantN1 !== undefined ? Number(l.montantN1) : ''
   ]);
 
   // Sheet création

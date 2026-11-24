@@ -179,13 +179,14 @@ const fetchResultats = async () => {
       resN1 = data;
     }
 
+    // Les sous-totaux et le total sont indiqués par le serveur (isSubtotal / isTotal)
     listeComplete.value = resN.map((ligneN, idx) => ({
       label: ligneN.label,
-      note: "",
+      note: ligneN.note || "",
       montantN: ligneN.montant,
       montantN1: resN1[idx] ? resN1[idx].montant : 0,
-      isTotal: isLigneTotal(ligneN.label),
-      isSubtotal: isLigneSubtotal(ligneN.label),
+      isTotal: ligneN.isTotal ?? isLigneTotal(ligneN.label),
+      isSubtotal: ligneN.isSubtotal ?? isLigneSubtotal(ligneN.label),
       isSection: isLigneSection(ligneN.label)
     }));
   } catch (error) {
@@ -228,7 +229,7 @@ const isLigneSection = (label) => {
 
 const formatMontantAbsolu = n => {
   if (!n && n !== 0) return "";
-  return Math.abs(Number(n)).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(n).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
 const formatDate = d => {
@@ -369,8 +370,8 @@ const exportToExcel = () => {
   const dataRows = listeComplete.value.map(l => [
     l.label,
     l.note || "",
-    l.montantN !== null && l.montantN !== undefined ? Math.abs(Number(l.montantN)) : '',
-    l.montantN1 !== null && l.montantN1 !== undefined ? Math.abs(Number(l.montantN1)) : ''
+    l.montantN !== null && l.montantN !== undefined ? Number(l.montantN) : '',
+    l.montantN1 !== null && l.montantN1 !== undefined ? Number(l.montantN1) : ''
   ]);
 
   // Sheet création

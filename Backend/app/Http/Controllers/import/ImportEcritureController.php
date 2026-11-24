@@ -12,6 +12,8 @@ use App\Models\Saisie\Journal;
 use App\Models\PlanCompte\SousCompte;
 use Illuminate\Support\Facades\Auth;
 use App\Models\import\ImportHistory;
+use App\Models\exercice\ExerciceComptable;
+use App\Services\Comptabilite\EcritureGuard;
 use Exception;
 use App\Console\Commands\NotificationImport;
 
@@ -192,70 +194,63 @@ class ImportEcritureController extends Controller
         }
         fclose($handle);
 
-        // ÉTAPE 1: VALIDATION COMPLÈTE AVANT INSERTION
+        // ÉTAPE 1 : contrôle de chaque ligne
         $errors = $this->validateData($data);
-        
-        // Si erreurs détectées, on arrête tout de suite
         if (!empty($errors)) {
-            return [
-                'mouvements' => 0,
-                'lignes' => 0,
-                'errors' => $errors
-            ];
+            return ['mouvements' => 0, 'lignes' => 0, 'errors' => $errors];
         }
 
-        // ÉTAPE 2: INSERTION (seulement si aucune erreur)
-        $groupedData = collect($data)->filter(function($row) {
-            return !empty($row[0]) && !empty($row[1]) && !empty($row[6]);
-        })->groupBy(function ($row) {
-            return $row[0].'|'.($row[5] ?? 'NO_REF').'|'.$row[6];
-        });
+        // ÉTAPE 2 : regroupement en pièces, puis contrôle de l'équilibre de chacune
+        $pieces = $this->regrouperEnPieces($data);
+        foreach ($pieces as $piece) {
+            $totalDebit = round(array_sum(array_column($piece['lignes'], 'debit')), 2);
+            $totalCredit = round(array_sum(array_column($piece['lignes'], 'credit')), 2);
+            $lignesFichier = implode(', ', array_column($piece['lignes'], 'numero'));
+            $libelle = "Pièce du " . date('d/m/Y', strtotime($piece['date']))
+                . ($piece['reference'] !== '' ? " réf. {$piece['reference']}" : '')
+                . " (lignes {$lignesFichier})";
 
+            if (count($piece['lignes']) < 2) {
+                $errors[] = "{$libelle} : une pièce doit comporter au moins deux lignes";
+            } elseif (abs($totalDebit - $totalCredit) >= EcritureGuard::TOLERANCE) {
+                $errors[] = sprintf('%s : débit %s ≠ crédit %s', $libelle,
+                    number_format($totalDebit, 2, ',', ' '), number_format($totalCredit, 2, ',', ' '));
+            }
+        }
+        if (!empty($errors)) {
+            return ['mouvements' => 0, 'lignes' => 0, 'errors' => $errors];
+        }
+
+        // ÉTAPE 3 : insertion (la transaction est ouverte par import())
+        $journaux = Journal::all()->keyBy('Code');
+        $sousComptes = SousCompte::pluck('Id_Sous_compte', 'Code_sous_compte');
         $mouvementCount = 0;
         $ligneCount = 0;
 
-        foreach ($groupedData as $key => $lignes) {
-            $premiereLigne = $lignes->first();
-
-            $sousCompte = SousCompte::where('Code_sous_compte', $premiereLigne[1])->first();
-            $dateFormatted = $this->parseDate($premiereLigne[0]);
-            $codeJournal = $premiereLigne[6];
-            $journal = Journal::where('Code', $codeJournal)->first();
-
-            $year = date('Y', strtotime($dateFormatted));
-            $lastNumero = MouvementEcriture::where('Id_Journal', $journal->Id_Journal)
-                ->whereYear('Date_mouvement', $year)
-                ->max('Id_Mouvement_ecriture');
-            $nextNumero = $lastNumero ? $lastNumero + 1 : 1;
-            $numeroPiece = $journal->Code . $year . '-' . str_pad($nextNumero, 4, '0', STR_PAD_LEFT);
-
+        foreach ($pieces as $piece) {
+            $journal = $journaux[$piece['journal']];
             $mouvement = MouvementEcriture::create([
-                'Date_mouvement' => $dateFormatted,
-                'Numero_piece'   => $numeroPiece,
+                'Date_mouvement' => $piece['date'],
+                'Numero_piece'   => EcritureGuard::prochainNumeroPiece($journal, (int) date('Y', strtotime($piece['date']))),
                 'Id_Journal'     => $journal->Id_Journal,
-                'created_by'     => Auth::id(),
+                // Référence de la pièce justificative (exigée à la validation)
+                'Reference'      => $piece['reference'] !== '' ? $piece['reference'] : null,
             ]);
-
             $mouvementCount++;
 
-            foreach ($lignes as $row) {
-                $sousCompteLigne = SousCompte::where('Code_sous_compte', $row[1])->first();
-                $debit = floatval($row[3] ?? 0);
-                $credit = floatval($row[4] ?? 0);
-
+            foreach ($piece['lignes'] as $ligne) {
                 LigneEcriture::create([
-                    'Libelle'                => $row[2],
-                    'Debit'                  => $debit,
-                    'Credit'                 => $credit,
-                    'Reference'              => $row[5] ?? null,
+                    'Libelle'                => $ligne['libelle'],
+                    'Debit'                  => $ligne['debit'],
+                    'Credit'                 => $ligne['credit'],
+                    'Reference'              => $piece['reference'] !== '' ? $piece['reference'] : null,
                     'Quantite'               => null,
                     'Id_Mode_paiement'       => null,
                     'Id_Mouvement_ecriture'  => $mouvement->Id_Mouvement_ecriture,
                     'Id_Journal'             => $journal->Id_Journal,
-                    'Id_Sous_compte'         => $sousCompteLigne->Id_Sous_compte,
-                    'statut'                 => 'brouillon',
+                    'Id_Sous_compte'         => $sousComptes[$ligne['sous_compte']],
+                    'statut'                 => EcritureGuard::STATUT_BROUILLON,
                 ]);
-
                 $ligneCount++;
             }
         }
@@ -268,17 +263,80 @@ class ImportEcritureController extends Controller
     }
 
     /**
-     * Valide toutes les données AVANT insertion
+     * Regroupe les lignes du fichier en pièces comptables.
+     *  - avec une référence : même date + même référence + même journal ;
+     *  - sans référence : lignes consécutives de même date et même journal, une
+     *    nouvelle pièce commençant dès que la précédente est équilibrée (évite de
+     *    fusionner toute une journée en une seule pièce).
+     */
+    private function regrouperEnPieces(array $data): array
+    {
+        $pieces = [];
+        $index = [];       // clé => position dans $pieces (lignes avec référence)
+        $blocOuvert = [];  // date|journal => position de la pièce sans référence en cours
+
+        foreach ($data as $i => $row) {
+            if ($this->ligneVide($row)) {
+                continue;
+            }
+            $date = $this->parseDate(trim($row[0]));
+            $journal = trim($row[6]);
+            $reference = trim($row[5] ?? '');
+            $ligne = [
+                'numero' => $i + 2, // +1 pour l'en-tête, +1 car les lignes commencent à 1
+                'sous_compte' => trim($row[1]),
+                'libelle' => trim($row[2] ?? ''),
+                'debit' => $this->parseMontant($row[3] ?? ''),
+                'credit' => $this->parseMontant($row[4] ?? ''),
+            ];
+
+            if ($reference !== '') {
+                $cle = "{$date}|{$reference}|{$journal}";
+                if (!isset($index[$cle])) {
+                    $index[$cle] = count($pieces);
+                    $pieces[] = ['date' => $date, 'journal' => $journal, 'reference' => $reference, 'lignes' => []];
+                }
+                $pieces[$index[$cle]]['lignes'][] = $ligne;
+                continue;
+            }
+
+            $cle = "{$date}|{$journal}";
+            $pos = $blocOuvert[$cle] ?? null;
+            if ($pos !== null) {
+                $lignes = $pieces[$pos]['lignes'];
+                $equilibree = count($lignes) >= 2
+                    && abs(array_sum(array_column($lignes, 'debit')) - array_sum(array_column($lignes, 'credit'))) < EcritureGuard::TOLERANCE;
+                if ($equilibree) {
+                    $pos = null;
+                }
+            }
+            if ($pos === null) {
+                $pos = count($pieces);
+                $blocOuvert[$cle] = $pos;
+                $pieces[] = ['date' => $date, 'journal' => $journal, 'reference' => '', 'lignes' => []];
+            }
+            $pieces[$pos]['lignes'][] = $ligne;
+        }
+
+        return $pieces;
+    }
+
+    /**
+     * Valide chaque ligne AVANT insertion.
      */
     private function validateData($data)
     {
         $errors = [];
-        $lineNumber = 1; // Pour tracer la ligne d'erreur
+        $codesSousComptes = SousCompte::pluck('Id_Sous_compte', 'Code_sous_compte');
+        $codesJournaux = Journal::pluck('Id_Journal', 'Code');
 
-        foreach ($data as $row) {
-            $lineNumber++;
+        foreach ($data as $i => $row) {
+            $lineNumber = $i + 2;
+            if ($this->ligneVide($row)) {
+                continue;
+            }
 
-            // Vérifier colonnes obligatoires
+            // Colonnes obligatoires
             if (empty($row[0])) {
                 $errors[] = "Ligne {$lineNumber}: Date manquante";
             }
@@ -289,29 +347,61 @@ class ImportEcritureController extends Controller
                 $errors[] = "Ligne {$lineNumber}: Code journal manquant";
             }
 
-            // Vérifier format date
-            if (!empty($row[0]) && !$this->parseDate($row[0])) {
+            // Date et exercice
+            $date = !empty($row[0]) ? $this->parseDate(trim($row[0])) : false;
+            if (!empty($row[0]) && !$date) {
                 $errors[] = "Ligne {$lineNumber}: Format de date invalide ({$row[0]})";
-            }
-
-            // Vérifier existence sous-compte
-            if (!empty($row[1])) {
-                $sousCompte = SousCompte::where('Code_sous_compte', $row[1])->first();
-                if (!$sousCompte) {
-                    $errors[] = "Ligne {$lineNumber}: Sous-compte {$row[1]} introuvable";
+            } elseif ($date) {
+                // Exercice ouvert et mois non clôturé
+                if ($motif = EcritureGuard::motifDateFermee($date)) {
+                    $errors[] = "Ligne {$lineNumber}: {$motif}";
                 }
             }
 
-            // Vérifier existence journal
-            if (!empty($row[6])) {
-                $journal = Journal::where('Code', $row[6])->first();
-                if (!$journal) {
-                    $errors[] = "Ligne {$lineNumber}: Journal {$row[6]} introuvable";
-                }
+            // Sous-compte et journal
+            if (!empty($row[1]) && !isset($codesSousComptes[trim($row[1])])) {
+                $errors[] = "Ligne {$lineNumber}: Sous-compte {$row[1]} introuvable";
+            }
+            if (!empty($row[6]) && !isset($codesJournaux[trim($row[6])])) {
+                $errors[] = "Ligne {$lineNumber}: Journal {$row[6]} introuvable";
+            }
+
+            // Montants : positifs, un seul côté renseigné
+            $debit = $this->parseMontant($row[3] ?? '');
+            $credit = $this->parseMontant($row[4] ?? '');
+            if ($debit === null || $credit === null) {
+                $errors[] = "Ligne {$lineNumber}: montant illisible (débit « " . ($row[3] ?? '') . " », crédit « " . ($row[4] ?? '') . " »)";
+            } elseif ($debit < 0 || $credit < 0) {
+                $errors[] = "Ligne {$lineNumber}: les montants doivent être positifs";
+            } elseif (($debit > 0) === ($credit > 0)) {
+                $errors[] = "Ligne {$lineNumber}: renseigner soit le débit, soit le crédit (un seul des deux)";
             }
         }
 
         return $errors;
+    }
+
+    private function ligneVide($row): bool
+    {
+        return !is_array($row) || count(array_filter($row, fn ($v) => trim((string) $v) !== '')) === 0;
+    }
+
+    /**
+     * Lit un montant au format français ou international : "1 234,56", "1234.56",
+     * "1,234.56". Vide => 0. Retourne null si illisible.
+     */
+    private function parseMontant($valeur): ?float
+    {
+        $v = str_replace(["\u{00A0}", "\u{202F}", ' '], '', trim((string) $valeur));
+        if ($v === '') {
+            return 0.0;
+        }
+        if (str_contains($v, ',') && str_contains($v, '.')) {
+            $v = str_replace(',', '', $v);        // 1,234.56
+        } else {
+            $v = str_replace(',', '.', $v);       // 1234,56
+        }
+        return is_numeric($v) ? round((float) $v, 2) : null;
     }
 
     private function parseDate($dateString)

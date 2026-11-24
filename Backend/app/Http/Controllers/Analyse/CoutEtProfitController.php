@@ -38,7 +38,7 @@ public function AnalyseCoutEtProfit(Request $request)
         ->join('affectationanalytique as aa', 'le.Id_Sous_compte', '=', 'aa.Id_Sous_compte')
         ->join('centreanalytique as ca', 'aa.id_centre', '=', 'ca.id_centre')
         ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
-        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])
+        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE)
         ->select(
             'le.Debit',
             'le.Credit', 
@@ -227,7 +227,7 @@ public function AnalyseParAffectationFiltree(Request $request)
         $queryVentiles = DB::table('ligne_ecritures as le')
             ->join('affectationanalytique as aa', 'le.Id_Sous_compte', '=', 'aa.Id_Sous_compte')
             ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
-            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
             
         if ($idType) {
             $queryVentiles->where('aa.id_type', $idType);
@@ -310,7 +310,7 @@ public function AnalyseParAffectationFiltree(Request $request)
             ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
             ->join('sous_comptes as sc', 'le.Id_Sous_compte', '=', 'sc.Id_Sous_compte')
             ->join('code_analytique as co', 'aa.id_code', '=', 'co.id_code')
-            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
 
         // Si id_centre = 0, on veut les non affectés seulement
         if ($idCentre == 0) {
@@ -320,7 +320,7 @@ public function AnalyseParAffectationFiltree(Request $request)
             $ventilesData = DB::table('ligne_ecritures as le')
                 ->join('affectationanalytique as aa', 'le.Id_Sous_compte', '=', 'aa.Id_Sous_compte')
                 ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
-                ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+                ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
                 
             if ($idType) {
                 $ventilesData->where('aa.id_type', $idType);
@@ -474,7 +474,7 @@ private function getSousComptesNonAffectesDetails($idtype, $dateStart, $dateEnd,
         $montantTotal = DB::table('ligne_ecritures as le')
             ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
             ->where('le.Id_Sous_compte', $sousCompte->Id_Sous_compte)
-            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])
+            ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE)
             ->sum(DB::raw('ABS(le."Debit" - le."Credit")'));
         
         if ($montantTotal > 0) {
@@ -500,7 +500,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
         ->join('code_analytique as co', 'aa.id_code', '=', 'co.id_code')
         ->join('centreanalytique as ca', 'aa.id_centre', '=', 'ca.id_centre')
         ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
-        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])
+        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE)
         ->select(
             'sc.Code_sous_compte',
             'sc.Libelle as libelle_sous_compte',
@@ -1098,7 +1098,7 @@ public function classementSousCompte(Request $request)
         ->join('centreanalytique as ca', 'aa.id_centre', '=', 'ca.id_centre')
         ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
         ->join('sous_comptes as sc', 'le.Id_Sous_compte', '=', 'sc.Id_Sous_compte')
-        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
 
     if ($idCentre) $query->where('ca.id_centre', $idCentre);
     if ($idSousCompte) $query->where('sc.Id_Sous_compte', $idSousCompte);
@@ -1156,7 +1156,7 @@ public function classementSousCompteLocal($idType,$dateStart,$dateEnd,$idCentre,
         ->join('centreanalytique as ca', 'aa.id_centre', '=', 'ca.id_centre')
         ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
         ->join('sous_comptes as sc', 'le.Id_Sous_compte', '=', 'sc.Id_Sous_compte')
-        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
 
     // Filtrer par centre si fourni
     if ($idCentre) {

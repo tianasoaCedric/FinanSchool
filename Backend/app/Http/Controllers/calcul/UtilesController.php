@@ -247,7 +247,8 @@ public static function SommeCodeAnalytique($dateStart, $dateEnd, $code)
         ->join('affectationanalytique as aa', 'le.Id_Sous_compte', '=', 'aa.Id_Sous_compte')
         ->join('code_analytique as co', 'aa.id_code', '=', 'co.id_code')
         ->join('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
-        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd]);
+        ->whereBetween('me.Date_mouvement', [$dateStart, $dateEnd])
+        ->where('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE);
 
     if (!empty($code)) {
         $query->where('co.code', $code);

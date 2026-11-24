@@ -3,7 +3,6 @@
 namespace App\Models\exercice;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class ExerciceComptable extends Model
 {
@@ -14,20 +13,56 @@ class ExerciceComptable extends Model
         'Date_debut',
         'Date_fin',
         'Statut',
-        'Annee_fiscale'
+        'Annee_fiscale',
+        'cloture_le',
+        'cloture_par',
+        'id_piece_an',
+        'id_piece_cloture',
+        'resultat_cloture',
+        'ouvert_par_a_nouveaux',
+        'periode_cloturee_au',
+        'id_piece_affectation',
     ];
 
     protected $casts = [
         'Date_debut' => 'date',
         'Date_fin' => 'date',
+        'cloture_le' => 'datetime',
+        'resultat_cloture' => 'float',
+        'ouvert_par_a_nouveaux' => 'boolean',
+        'periode_cloturee_au' => 'date',
     ];
 
     /**
-     * Récupère l'exercice actuellement ouvert
+     * Exercice ouvert de référence pour la saisie courante. Deux exercices
+     * consécutifs peuvent être ouverts (N en travaux d'inventaire, N+1 en
+     * saisie courante) : c'est le plus récent qui est renvoyé.
      */
     public static function getExerciceOuvert()
     {
-        return self::where('Statut', 'OUVERT')->first();
+        return self::where('Statut', 'OUVERT')->orderByDesc('Annee_fiscale')->first();
+    }
+
+    /**
+     * Motif de refus d'ouverture, ou null. Règles :
+     *  - aucun exercice postérieur (ou celui-ci) clôturé définitivement : ses
+     *    écritures ont servi aux à-nouveaux ;
+     *  - au plus deux exercices ouverts, et consécutifs (N et N+1).
+     */
+    public function motifRefusOuverture(): ?string
+    {
+        $bloquant = self::where('Annee_fiscale', '>=', $this->Annee_fiscale)
+            ->whereNotNull('cloture_le')->orderBy('Annee_fiscale')->first();
+        if ($bloquant) {
+            return "L'exercice {$bloquant->Annee_fiscale} est clôturé définitivement : annulez d'abord sa clôture.";
+        }
+        $annees = self::where('Statut', 'OUVERT')->pluck('Annee_fiscale')
+            ->push($this->Annee_fiscale)->map(fn ($a) => (int) $a)->unique();
+        if ($annees->max() - $annees->min() > 1) {
+            return 'Deux exercices consécutifs au plus peuvent être ouverts (N en travaux de clôture et N+1). '
+                . 'Clôturez d\'abord l\'exercice ' . $annees->min() . '.';
+        }
+        return null;
     }
 
     /**
@@ -48,24 +83,25 @@ class ExerciceComptable extends Model
         return self::orderBy('Annee_fiscale', 'desc')->get();
     }
 
-    /**
-     * Vérifie si l'exercice est ouvert
-     */
     public function isOuvert()
     {
         return $this->Statut === 'OUVERT';
     }
 
-    /**
-     * Vérifie si l'exercice est clôturé
-     */
     public function isCloture()
     {
         return $this->Statut === 'CLOTURE';
     }
 
+    /** Exercice clôturé par la procédure complète (écriture de clôture et à-nouveaux). */
+    public function isClotureDefinitive(): bool
+    {
+        return $this->isCloture() && $this->cloture_le !== null;
+    }
+
     /**
-     * Fermer l'exercice
+     * Fermer l'exercice (changement de statut uniquement).
+     * La clôture comptable complète passe par App\Services\Comptabilite\ClotureService.
      */
     public function cloturer()
     {
@@ -74,13 +110,12 @@ class ExerciceComptable extends Model
     }
 
     /**
-     * Ouvrir l'exercice
+     * Ouvrir l'exercice (changement de statut). Les règles d'ouverture sont
+     * contrôlées par motifRefusOuverture() côté contrôleur ; la clôture ouvre
+     * N+1 sans fermer d'autre exercice.
      */
     public function ouvrir()
     {
-        // Fermer tous les autres exercices ouverts
-        self::where('Statut', 'OUVERT')->update(['Statut' => 'CLOTURE']);
-        
         $this->Statut = 'OUVERT';
         $this->save();
     }

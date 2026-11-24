@@ -1,5 +1,6 @@
 <?php
 
+// Routes du module Analyse : inchangées (fichier séparé)
 require __DIR__ . '/apiAnalyse.php';
 
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use App\Http\Controllers\Saisie\ModePaiementController;
 use App\Http\Controllers\Saisie\JournalController;
 use App\Http\Controllers\Saisie\MouvementEcritureController;
 use App\Http\Controllers\Saisie\LigneEcritureController;
+use App\Http\Controllers\Saisie\PieceController;
+use App\Http\Controllers\Saisie\ModeleEcritureController;
 use App\Http\Controllers\Saisie\DeviseController;
 use App\Http\Controllers\Saisie\GrandLivreController;
 use App\Http\Controllers\general\BalanceController;
@@ -37,201 +40,165 @@ use App\Http\Controllers\ChatBot\ChatController;
 use App\Http\Controllers\notifications\NotificationController;
 use App\Http\Controllers\notifications\NotificationsController;
 use App\Http\Controllers\notifications\EvenementController;
-
+use App\Http\Controllers\Simulation\SimulationController;
+use App\Http\Controllers\exercice\ClotureController;
 
 Route::middleware('api')->group(function () {
+
+    // =====================================================================
+    // Routes publiques : authentification et utilitaires
+    // =====================================================================
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/request-verification', [AuthController::class, 'requestVerification']);
+    Route::post('/verify-code', [AuthController::class, 'verifyCode']);
+    Route::post('/register', [AuthController::class, 'register']);
+
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
+        ->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
+    Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])
+        ->name('password.reset');
+
+    Route::get('/errors/{id}', [AuthController::class, 'getErrorMessage']);
+    Route::get('/test', fn () => response()->json(['message' => 'API is working']));
+    Route::post('/example', fn (Request $request) => response()->json(['message' => 'POST request received']));
 
     Route::post('/chat/sending', [ChatsController::class, 'sendMessage']);
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
     Route::get('/chat/history/{sessionId}', [ChatsController::class, 'getChatHistory']);
 
-    Route::post('/example', function (Request $request) {
-        return response()->json(['message' => 'POST request received']);
-    });
-
-    Route::get('/errors/{id}', [AuthController::class, 'getErrorMessage']);
-
-    Route::get('/test', function () {
-        return response()->json(['message' => 'API is working']);
-    });
-
-    Route::post('/login', [AuthController::class, 'login']);
+    // =====================================================================
+    // Routes protégées : utilisateur connecté obligatoire
+    // =====================================================================
     Route::middleware('auth:sanctum')->group(function () {
+
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/mouvements', [LigneEcritureController::class, 'createMouvement']);
-        Route::delete('/mouvements/{mouvementId}', [LigneEcritureController::class, 'deleteMouvement']);
+
+        // ---- Plan comptable et référentiels ----
+        Route::apiResource('comptes', CompteController::class);
+        Route::apiResource('sous-comptes', SousCompteController::class);
+        Route::apiResource('rubriques', RubriqueController::class);
+        Route::apiResource('classes', ClasseController::class);
+
+        Route::get('/devises', [DeviseController::class, 'index'])->name('devises.index');
+        Route::post('/devises', [DeviseController::class, 'store'])->name('devises.store');
+        Route::get('/devises/{id}', [DeviseController::class, 'show'])->name('devises.show');
+        Route::put('/devises/{id}', [DeviseController::class, 'update'])->name('devises.update');
+        Route::delete('/devises/{id}', [DeviseController::class, 'destroy'])->name('devises.destroy');
+
+        Route::apiResource('type-journals', TypeJournalController::class);
+        Route::apiResource('mode-paiements', ModePaiementController::class);
+        Route::get('journals/{id}/ecritures', [JournalController::class, 'ecritures']);
+        Route::apiResource('journals', JournalController::class);
+
+        // ---- Saisie par pièce complète et modèles d'écriture ----
+        Route::get('/pieces/{id}/justificatif', [PieceController::class, 'justificatif']);
+        Route::post('/pieces/{id}/contrepasser', [PieceController::class, 'contrepasser']);
+        Route::apiResource('pieces', PieceController::class);
+        Route::apiResource('modeles-ecriture', ModeleEcritureController::class)->except(['show']);
+
+        // ---- Pièces (mouvements) ----
+        Route::get('/mouvements-complets', [LigneEcritureController::class, 'getMouvementsComplets']);
+        Route::delete('/mouvements/{id}', [LigneEcritureController::class, 'deleteMouvement']);
+        Route::post('/mouvements/{id}/solder', [LigneEcritureController::class, 'solderMouvement']);
+        Route::post('/mouvements/{id}/valider', [LigneEcritureController::class, 'validerMouvementComplet']);
+        Route::post('/mouvements/{id}/valider-complet', [LigneEcritureController::class, 'validerMouvementComplet']);
+        Route::apiResource('mouvements', MouvementEcritureController::class)->except(['destroy']);
+
+        // ---- Lignes d'écriture et validation ----
+        Route::post('/lignes/valider-toutes', [LigneEcritureController::class, 'validerToutesLesEcritures']);
+        Route::post('/lignes/valider-periode', [LigneEcritureController::class, 'validerEcrituresPeriode']);
+        Route::get('/lignes/rapport-validation', [LigneEcritureController::class, 'getRapportValidation']);
+        Route::put('/lignes/batch-update', [LigneEcritureController::class, 'batchUpdate']);
+        Route::post('/lignes-batch', [LigneEcritureController::class, 'saveLignesBatch']);
+        Route::post('lignes/{id}/valider', [LigneEcritureController::class, 'valider']);
+        Route::apiResource('lignes', LigneEcritureController::class);
+
+        Route::get('/ecritures', [LigneEcritureController::class, 'indexWithRelations']);
+        Route::get('/sous-comptes/search', [LigneEcritureController::class, 'searchSousComptes']);
+        Route::get('/search-sous-comptes', [LigneEcritureController::class, 'searchSousComptes']);
+        Route::get('/options-formulaires', [LigneEcritureController::class, 'getOptions']);
+
+        // ---- Import ----
+        Route::get('/ecritures/imports/historique', [ImportEcritureController::class, 'historique']);
+        Route::post('/ecritures/import', [ImportEcritureController::class, 'import']);
+        Route::post('/ecritures/import/validate', [ImportEcritureController::class, 'validateImport']);
+
+        // ---- Grand livre et balance ----
+        Route::get('/grand-livre', [GrandLivreController::class, 'index']);
+        Route::get('/grand-livre/compte/{codeCompte}', [GrandLivreController::class, 'getByCompte']);
+        Route::get('/grand-livre/{codeCompte}/{codeSousCompte?}', [GrandLivreController::class, 'show']);
+        Route::get('/compte/{codeCompte}/ecritures', [GrandLivreController::class, 'getEcrituresCompte']);
+        Route::get('/compte/{codeCompte}/ecritures-simple', [GrandLivreController::class, 'getEcrituresCompteSimple']);
+
+        Route::get('/balance-generale', [BalanceController::class, 'index']);
+        Route::get('/balance-generale/{codeSousCompte}', [BalanceController::class, 'show']);
+
+        // ---- Catégories de comptes ----
+        Route::apiResource('/intervalle-comptes-categorie', IntervalleComptesCategorieController::class);
+        Route::apiResource('/compte-categories', ComptesCategorieController::class);
+        Route::post('/assigner-toutes-automatiquement', [ComptesCategorieController::class, 'assignerToutesCategoriesAutomatiquement']);
+        Route::get('/somme-categorie', [UtilesController::class, 'getSommeParCategorie']);
+
+        // ---- Exercices comptables ----
+        Route::prefix('exercices')->group(function () {
+            Route::get('/', [ExerciceComptableController::class, 'index']);
+            Route::get('/ouvert', [ExerciceComptableController::class, 'getExerciceOuvert']);
+            Route::get('/courant', [ExerciceComptableController::class, 'getExerciceCourant']);
+            Route::get('/verifier/courant', [ExerciceComptableController::class, 'verifierExerciceCourant']);
+            Route::post('/ouvrir-suivant', [ClotureController::class, 'ouvrirSuivant']);
+            Route::get('/{id}', [ExerciceComptableController::class, 'show']);
+            Route::get('/{id}/dates', [ExerciceComptableController::class, 'getDates']);
+            Route::post('/{id}/ouvrir', [ExerciceComptableController::class, 'ouvrir']);
+            // Clôture (lot 4) : écriture 6/7 → 12, à-nouveaux N+1, verrouillage
+            Route::get('/{id}/cloture', [ClotureController::class, 'preparation']);
+            Route::post('/{id}/cloturer', [ClotureController::class, 'cloturer']);
+            Route::post('/{id}/annuler-cloture', [ClotureController::class, 'annuler']);
+            Route::get('/{id}/dotations', [ClotureController::class, 'dotations']);
+            Route::post('/{id}/dotations', [ClotureController::class, 'genererDotations']);
+            // Organisation comptable (lot 5) : clôture mensuelle, affectation du résultat
+            Route::get('/{id}/periodes', [ClotureController::class, 'periodes']);
+            Route::post('/{id}/periodes/cloturer', [ClotureController::class, 'cloturerPeriode']);
+            Route::get('/{id}/affectation', [ClotureController::class, 'affectation']);
+            Route::post('/{id}/affectation', [ClotureController::class, 'affecter']);
+        });
+
+        // ---- États financiers ----
+        Route::get('/compte-resultat/nature', [CompteResultatNatureController::class, 'index']);
+        Route::get('/compte-resultat/fonction', [CompteResultatFonctionController::class, 'index']);
+        Route::get('/bilan/actif', [BilanActifController::class, 'index']);
+        Route::get('/bilan/passif', [BilanPassifController::class, 'index']);
+        Route::get('/flux-tresorerie', [FluxTresorerieController::class, 'index']);
+        Route::get('/variations-capitaux', [VariationsCapitauxController::class, 'index']);
+        Route::get('/etats-financiers/controles', [\App\Http\Controllers\general\ControlesEtatsController::class, 'index']);
+
+        // ---- Tableau de bord ----
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/evolution-ca', [DashboardController::class, 'evolutionCA']);
+            Route::get('/evolution-tresorerie', [DashboardController::class, 'evolutionTresorerie']);
+            Route::get('/composition-bilan', [DashboardController::class, 'compositionBilan']);
+            Route::get('/decomposition-resultat', [DashboardController::class, 'decompositionResultat']);
+            Route::get('/resume', [DashboardController::class, 'resumeDashboard']);
+        });
+
+        // ---- Immobilisations et amortissements ----
+        Route::get('/taux-amortissement', [AmortissementController::class, 'getTaux']);
+        Route::apiResource('amortissement', AmortissementController::class);
+
+        // ---- Notifications ----
+        Route::apiResource('evenements', EvenementController::class);
+        Route::apiResource('notifications', NotificationController::class)->except(['index']);
+        Route::get('/notifications', [NotificationsController::class, 'index']);
+        Route::patch('/notifications/{id}/read', [NotificationsController::class, 'markAsRead']);
+
+        // ---- Simulations budgétaires ----
+        Route::prefix('simulations')->group(function () {
+            Route::get('/', [SimulationController::class, 'index']);
+            Route::post('/', [SimulationController::class, 'store']);
+            Route::get('/historical', [SimulationController::class, 'getHistoricalData']);
+            Route::get('/{id}', [SimulationController::class, 'show']);
+            Route::delete('/{id}', [SimulationController::class, 'destroy']);
+        });
     });
-
-    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
-        ->name('password.reset');
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
-
-    Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])
-        ->name('password.reset');
-
-    Route::post('/request-verification', [AuthController::class, 'requestVerification']);
-    Route::post('/verify-code', [AuthController::class, 'verifyCode']);
-    Route::post('/register', [AuthController::class, 'register']);
-
-    // crud plan de compte
-    Route::apiResource('comptes', CompteController::class);
-    Route::apiResource('sous-comptes', SousCompteController::class);
-    Route::apiResource('rubriques', RubriqueController::class);
-    Route::apiResource('classes', ClasseController::class);
-
-
-    Route::get('/devises', [DeviseController::class, 'index'])->name('devises.index');
-    Route::post('/devises', [DeviseController::class, 'store'])->name('devises.store');
-    Route::get('/devises/{id}', [DeviseController::class, 'show'])->name('devises.show');
-    Route::put('/devises/{id}', [DeviseController::class, 'update'])->name('devises.update');
-    Route::delete('/devises/{id}', [DeviseController::class, 'destroy'])->name('devises.destroy');
-
-    // crud saisie
-    Route::apiResource('type-journals', TypeJournalController::class);
-    Route::apiResource('mode-paiements', ModePaiementController::class);
-    Route::get('journals/{id}/ecritures', [JournalController::class, 'ecritures']);
-    Route::apiResource('journals', JournalController::class);
-    Route::apiResource('mouvements', MouvementEcritureController::class);
-    // Route::post('mouvements/{id}/valider', [MouvementEcritureController::class, 'valider']);
-    Route::apiResource('devises', DeviseController::class);
-    // Validation globale
-    Route::post('/lignes/valider-toutes', [LigneEcritureController::class, 'validerToutesLesEcritures']);
-
-    // Validation par période
-    Route::post('/lignes/valider-periode', [LigneEcritureController::class, 'validerEcrituresPeriode']);
-
-    // Rapport avant validation
-    Route::get('/lignes/rapport-validation', [LigneEcritureController::class, 'getRapportValidation']);
-
-    Route::apiResource('lignes', LigneEcritureController::class);
-    Route::post('lignes/{id}/valider', [LigneEcritureController::class, 'valider']);
-
-    Route::post('/mouvements/{id}/solder', [LigneEcritureController::class, 'solderMouvement']);
-
-
-    Route::get('/mouvements-complets', [LigneEcritureController::class, 'getMouvementsComplets']);
-    Route::post('/mouvements/{id}/valider', [LigneEcritureController::class, 'validerMouvementComplet']);
-    Route::delete('/mouvements/{id}', [LigneEcritureController::class, 'deleteMouvement']);
-    Route::get('/sous-comptes/search', [LigneEcritureController::class, 'searchSousComptes']);
-
-
-
-    // Routes pour les performances améliorées {Ecritures et Mouvements}
-    // routes/api.php
-    Route::get('/ecritures', [LigneEcritureController::class, 'indexWithRelations']);
-    Route::get('/mouvements-complets', [LigneEcritureController::class, 'getMouvementsComplets']);
-    Route::get('/search-sous-comptes', [LigneEcritureController::class, 'searchSousComptes']);
-    Route::put('/lignes/batch-update', [LigneEcritureController::class, 'batchUpdate']);
-    Route::post('/lignes-batch', [LigneEcritureController::class, 'saveLignesBatch']);
-    Route::post('/mouvements/{id}/valider-complet', [LigneEcritureController::class, 'validerMouvementComplet']);
-    Route::get('/options-formulaires', [LigneEcritureController::class, 'getOptions']);
-
-    // Routes pour la gestion des mouvements
-
-
-    // Routes pour la gestion des lignes d'écriture
-    Route::apiResource('lignes', LigneEcritureController::class);
-
-    Route::get('/grand-livre', [GrandLivreController::class, 'index']);
-    Route::get('/grand-livre/compte/{codeCompte}', [GrandLivreController::class, 'getByCompte']);
-    Route::get('/grand-livre/{codeCompte}/{codeSousCompte?}', [GrandLivreController::class, 'show']);
-
-    // Nouvelles routes pour les écritures d'un seul compte
-    Route::get('/compte/{codeCompte}/ecritures', [GrandLivreController::class, 'getEcrituresCompte']);
-    Route::get('/compte/{codeCompte}/ecritures-simple', [GrandLivreController::class, 'getEcrituresCompteSimple']);
-
-    Route::get('/balance-generale', [BalanceController::class, 'index']);
-    Route::get('/balance-generale/{codeSousCompte}', [BalanceController::class, 'show']);
-
-    Route::apiResource('/intervalle-comptes-categorie', IntervalleComptesCategorieController::class);
-
-    Route::apiResource('/compte-categories', ComptesCategorieController::class);
-    Route::post('/assigner-toutes-automatiquement', [ComptesCategorieController::class, 'assignerToutesCategoriesAutomatiquement']);
-    Route::get('/somme-categorie', [UtilesController::class, 'getSommeParCategorie']);
-
-    // routes/api.php
-    Route::get('/compte-resultat/nature', [CompteResultatNatureController::class, 'index']);
-    // routes/api.php
-    Route::get('/compte-resultat/fonction', [CompteResultatFonctionController::class, 'index']);
-
-
-
-    Route::prefix('exercices')->group(function () {
-        Route::get('/', [ExerciceComptableController::class, 'index']);
-        Route::get('/ouvert', [ExerciceComptableController::class, 'getExerciceOuvert']);
-        Route::get('/courant', [ExerciceComptableController::class, 'getExerciceCourant']);
-        Route::get('/verifier/courant', [ExerciceComptableController::class, 'verifierExerciceCourant']);
-        Route::get('/{id}', [ExerciceComptableController::class, 'show']);
-        Route::get('/{id}/dates', [ExerciceComptableController::class, 'getDates']);
-        Route::post('/{id}/ouvrir', [ExerciceComptableController::class, 'ouvrir']);
-        Route::post('/{id}/cloturer', [ExerciceComptableController::class, 'cloturer']);
-    });
-
-
-
-    Route::get('/bilan/actif', [BilanActifController::class, 'index']);
-    Route::get('/bilan/passif', [BilanPassifController::class, 'index']);
-    Route::get('/flux-tresorerie', [FluxTresorerieController::class, 'index']);
-    Route::get('/variations-capitaux', [VariationsCapitauxController::class, 'index']);
-
-    Route::get('/ecritures/imports/historique', [ImportEcritureController::class, 'historique']);
-    Route::post('/ecritures/import', [ImportEcritureController::class, 'import']);
-    Route::post('/ecritures/import/validate', [ImportEcritureController::class, 'validateImport']);
-
-
-
-    // routes/api.php
-
-    Route::prefix('dashboard')->group(function () {
-        // 1. Évolution du Chiffre d'Affaires (CA) par mois
-        Route::get('/evolution-ca', [DashboardController::class, 'evolutionCA']);
-
-        // 2. Évolution de la Trésorerie par mois
-        Route::get('/evolution-tresorerie', [DashboardController::class, 'evolutionTresorerie']);
-
-        // 3. Composition du Bilan
-        Route::get('/composition-bilan', [DashboardController::class, 'compositionBilan']);
-
-        // 4. Décomposition du résultat
-        Route::get('/decomposition-resultat', [DashboardController::class, 'decompositionResultat']);
-        Route::get('/resume', [DashboardController::class, 'resumeDashboard']);
-
-    });
-
-
-
-    // routes/api.php
-
-
-
-    // Liste des immobilisations (avec amortissement exercice courant)
-    Route::get('/amortissement', [AmortissementController::class, 'index']);
-    Route::apiResource('amortissement', AmortissementController::class);
-    // Création d'une immobilisation
-    Route::post('/amortissement', [AmortissementController::class, 'store']);
-
-    // Détail d'une immobilisation (avec calcul d'amortissement)
-    Route::get('/amortissement/{id}', [AmortissementController::class, 'show']);
-
-    // Liste des taux d'amortissement
-    Route::get('/taux-amortissement', [AmortissementController::class, 'getTaux']);
-
-
-    Route::apiResource('evenements', EvenementController::class);
-    Route::apiResource('notifications', NotificationController::class);
-
-    // Routes supplémentaires pour les notifications
-    Route::get('/notifications', [NotificationsController::class, 'index']);
-    Route::patch('/notifications/{id}/read', [NotificationsController::class, 'markAsRead']);
-    // routes/api.php
-
-    Route::prefix('simulations')->group(function () {
-        Route::get('/', [App\Http\Controllers\Simulation\SimulationController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\Simulation\SimulationController::class, 'store']);
-        Route::get('/historical', [App\Http\Controllers\Simulation\SimulationController::class, 'getHistoricalData']);
-        Route::get('/{id}', [App\Http\Controllers\Simulation\SimulationController::class, 'show']);
-        Route::delete('/{id}', [App\Http\Controllers\Simulation\SimulationController::class, 'destroy']);
-    });
-
 });

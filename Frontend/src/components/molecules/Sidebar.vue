@@ -74,8 +74,9 @@ const menu = [
       {
         label: 'Écritures', icon: 'bi-pencil-square',
         children: [
-          { label: 'Saisie d\'écriture', to: '/ecriture' },
-          { label: 'Toutes les écritures', to: '/liste-ecriture' },
+          { label: 'Nouvelle pièce', to: '/ecriture' },
+          { label: 'Pièces', to: '/pieces', match: ['/ecriture/'] },
+          { label: 'Toutes les lignes', to: '/liste-ecriture' },
           { label: 'Validation', to: '/validation' },
         ],
       },
@@ -88,6 +89,7 @@ const menu = [
       },
       { label: 'Grand livre', icon: 'bi-journals', to: '/liste-grand-livre', match: ['/grand-livres/'] },
       { label: 'Import d\'écritures', icon: 'bi-cloud-arrow-up', to: '/import' },
+      { label: 'Clôtures', icon: 'bi-lock', to: '/cloture' },
     ],
   },
   {

@@ -54,7 +54,7 @@ class ExerciceComptableController extends Controller
     }
 
     /**
-     * Ouvre un exercice (ferme automatiquement les autres)
+     * Ouvre un exercice (N et N+1 peuvent être ouverts ensemble)
      * POST /api/exercices/{id}/ouvrir
      */
     public function ouvrir($id)
@@ -67,6 +67,12 @@ class ExerciceComptableController extends Controller
             ], 404);
         }
 
+        // Une clôture définitive ne se défait que par « annuler la clôture » ;
+        // au plus deux exercices consécutifs ouverts (voir le modèle).
+        if ($motif = $exercice->motifRefusOuverture()) {
+            return response()->json(['message' => $motif], 422);
+        }
+
         $exercice->ouvrir();
 
         return response()->json([
@@ -75,33 +81,7 @@ class ExerciceComptableController extends Controller
         ]);
     }
 
-    /**
-     * Clôture un exercice
-     * POST /api/exercices/{id}/cloturer
-     */
-    public function cloturer($id)
-    {
-        $exercice = ExerciceComptable::find($id);
-        
-        if (!$exercice) {
-            return response()->json([
-                'error' => 'Exercice non trouvé'
-            ], 404);
-        }
-
-        if ($exercice->isCloture()) {
-            return response()->json([
-                'error' => 'Exercice déjà clôturé'
-            ], 400);
-        }
-
-        $exercice->cloturer();
-
-        return response()->json([
-            'message' => 'Exercice clôturé avec succès',
-            'exercice' => $exercice
-        ]);
-    }
+    // Clôture : voir ClotureController (POST /api/exercices/{id}/cloturer).
 
     /**
      * Récupère les dates de l'exercice pour filtrage
@@ -127,17 +107,16 @@ class ExerciceComptableController extends Controller
     }
 
     /**
-     * Vérifie et synchronise l'exercice courant basé sur la date actuelle
-     * Si l'exercice courant est fermé, il l'ouvre et ferme les autres
+     * Indique l'exercice couvrant la date du jour et son statut.
+     * Lecture seule : ouvrir ou clôturer un exercice est une décision explicite
+     * (POST /exercices/{id}/ouvrir ou /cloturer), jamais un effet de bord d'un GET.
      * GET /api/exercices/verifier/courant
      */
     public function verifierExerciceCourant()
     {
         $dateActuelle = Carbon::now();
-        
-        // Trouver l'exercice qui contient la date actuelle
         $exerciceCourant = ExerciceComptable::getExerciceByDate($dateActuelle);
-        
+
         if (!$exerciceCourant) {
             return response()->json([
                 'error' => 'Aucun exercice trouvé pour la date actuelle',
@@ -145,28 +124,13 @@ class ExerciceComptableController extends Controller
             ], 404);
         }
 
-        // Vérifier si l'exercice courant est fermé
-        if ($exerciceCourant->isCloture()) {
-            // Fermer tous les autres exercices
-            ExerciceComptable::where('Id_Exercice_comptable', '!=', $exerciceCourant->Id_Exercice_comptable)
-                ->update(['Statut' => 'CLOTURE']);
-            
-            // Ouvrir l'exercice courant
-            $exerciceCourant->ouvrir();
-            
-            return response()->json([
-                'message' => 'Exercice courant était fermé, il a été ouvert automatiquement',
-                'action' => 'OUVERTURE_AUTOMATIQUE',
-                'exercice' => $exerciceCourant,
-                'date_actuelle' => $dateActuelle->format('Y-m-d')
-            ]);
-        }
-
-        // L'exercice courant est déjà ouvert
         return response()->json([
-            'message' => 'Exercice courant est déjà ouvert',
+            'message' => $exerciceCourant->isOuvert()
+                ? "L'exercice de la date du jour est ouvert"
+                : "L'exercice de la date du jour est clôturé",
             'action' => 'AUCUNE_ACTION',
             'exercice' => $exerciceCourant,
+            'exercice_ouvert' => ExerciceComptable::getExerciceOuvert(),
             'date_actuelle' => $dateActuelle->format('Y-m-d')
         ]);
     }

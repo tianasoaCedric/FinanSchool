@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\general;
 
 use App\Http\Controllers\Controller;
+use App\Models\exercice\ExerciceComptable;
 use App\Models\general\Balance;
+use App\Services\Comptabilite\LivresComptables;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class BalanceController extends Controller
 {
@@ -25,41 +27,32 @@ class BalanceController extends Controller
 
         //     return response()->json($balance);
         // }
-    // 🧾 Liste complète de la balance générale
+    /**
+     * Balance générale (PCG 2005) : par sous-compte, solde d'ouverture
+     * (à-nouveaux), mouvements de la période et solde de fin. Écritures
+     * validées uniquement. Voir LivresComptables.
+     * GET /api/balance-generale?date_debut&date_fin&classe_compte
+     */
     public function index(Request $request)
-{
-    $query = DB::table('vue_balance_generale')
-        ->select(
-            'code_compte',
-            'libelle_compte',
-            'code_sous_compte',
-            'libelle_sous_compte',
-            DB::raw('SUM(total_debit) as total_debit'),
-            DB::raw('SUM(total_credit) as total_credit'),
-            DB::raw('SUM(solde_final) as solde_final')
-        );
+    {
+        $request->validate([
+            'date_debut' => 'nullable|date',
+            'date_fin' => 'nullable|date',
+            'classe_compte' => 'nullable|string|max:2',
+        ]);
+        [$debut, $fin] = self::periode($request);
 
-    // Filtrer jusqu'à la date de fin
-    if ($request->date_fin) {
-        $query->where('date_mouvement', '<=', $request->date_fin);
+        return response()->json((new LivresComptables())->balance($debut, $fin, $request->classe_compte ?: null));
     }
 
-    // Filtrer depuis la date de début (optionnel)
-    if ($request->date_debut) {
-        $query->where('date_mouvement', '>=', $request->date_debut);
+    /** Période demandée, sinon celle de l'exercice ouvert le plus récent (ou du dernier exercice). */
+    public static function periode(Request $request): array
+    {
+        $ex = ExerciceComptable::getExerciceOuvert() ?? ExerciceComptable::orderByDesc('Annee_fiscale')->first();
+        $debut = $request->date_debut ?: ($ex ? Carbon::parse($ex->Date_debut)->toDateString() : now()->startOfYear()->toDateString());
+        $fin = $request->date_fin ?: ($ex ? Carbon::parse($ex->Date_fin)->toDateString() : now()->endOfYear()->toDateString());
+        return [$debut, $fin];
     }
-
-    // Filtrer par classe de compte
-    if ($request->classe_compte) {
-        $query->where('code_compte', 'like', $request->classe_compte . '%');
-    }
-
-    $query->groupBy('code_compte', 'libelle_compte', 'code_sous_compte', 'libelle_sous_compte')
-          ->orderBy('code_compte')
-          ->orderBy('code_sous_compte');
-
-    return response()->json($query->get());
-}
 
 
 

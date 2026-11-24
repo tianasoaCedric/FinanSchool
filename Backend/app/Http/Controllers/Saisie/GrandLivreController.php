@@ -4,27 +4,27 @@ namespace App\Http\Controllers\Saisie;
 
 use App\Models\Saisie\GrandLivre;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\general\BalanceController;
+use App\Services\Comptabilite\LivresComptables;
 use Illuminate\Http\Request;
 
 class GrandLivreController extends Controller
 {
     /**
-     * Display a listing of the grand livre data, with optional date filters.
+     * Grand livre (PCG 2005) : écritures validées de la période, précédées pour
+     * chaque compte d'une ligne « Report à nouveau » (solde d'ouverture).
+     * GET /api/grand-livre?date_debut&date_fin&code_compte
      */
     public function index(Request $request)
     {
-        $query = GrandLivre::query();
+        $request->validate([
+            'date_debut' => 'nullable|date',
+            'date_fin' => 'nullable|date',
+            'code_compte' => 'nullable|string|max:20',
+        ]);
+        [$debut, $fin] = BalanceController::periode($request);
 
-        if ($request->has('date_debut') && $request->has('date_fin')) {
-            $query->whereBetween('date_mouvement', [$request->date_debut, $request->date_fin]);
-        }
-
-        $grandLivreData = $query->orderBy('code_compte')
-            ->orderBy('code_sous_compte')
-            ->orderBy('date_mouvement')
-            ->get();
-
-        return response()->json($grandLivreData);
+        return response()->json((new LivresComptables())->grandLivre($debut, $fin, $request->code_compte ?: null));
     }
 
     /**

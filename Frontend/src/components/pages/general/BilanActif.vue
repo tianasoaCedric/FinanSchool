@@ -221,7 +221,7 @@ const fetchBilanActif = async () => {
 
 const formatMontant = n => {
   if (n === null || n === undefined) return "";
-  return Math.abs(Number(n)).toLocaleString("fr-FR", { minimumFractionDigits: 2 });
+  return Number(n).toLocaleString("fr-FR", { minimumFractionDigits: 2 });
 };
 const formatDate = d => {
   if (!d) return "";

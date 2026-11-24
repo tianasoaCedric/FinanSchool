@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\PlanCompte\Amortissement; // adapt if model named Amortissement
 use App\Models\PlanCompte\SousCompte;
 use App\Models\PlanCompte\TauxAmortissement;
+use App\Models\exercice\ExerciceComptable;
+use App\Services\Comptabilite\DotationsService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -13,34 +15,20 @@ class AmortissementController extends Controller
     // GET /api/amortissement
     public function index(Request $request)
     {
-        $exercice = $request->input('exercice', now()->year);
-        $dateFinExercice = Carbon::create($exercice, 12, 31);
+        // Même calcul que les dotations comptabilisées (prorata temporis au jour)
+        $annee = (int) $request->input('exercice', ExerciceComptable::getExerciceOuvert()?->Annee_fiscale ?? now()->year);
+        $exercice = ExerciceComptable::where('Annee_fiscale', $annee)->first()
+            ?? new ExerciceComptable(['Annee_fiscale' => $annee, 'Date_debut' => "{$annee}-01-01", 'Date_fin' => "{$annee}-12-31"]);
+        $plan = collect((new DotationsService())->calcul($exercice)['immobilisations'])->keyBy('id');
 
         $immos = Amortissement::with(['tauxAmortissement', 'sousCompte'])->get();
 
-        $result = $immos->map(function($immo) use ($exercice, $dateFinExercice) {
-            $dateDebut = $immo->date_debut_utilisation ?? $immo->date_acquisition;
-            $dateDebut = Carbon::parse($dateDebut);
-
+        $result = $immos->map(function($immo) use ($plan) {
             $taux = $immo->tauxAmortissement->taux;
             $valeurBrute = $immo->valeur_brute;
-
-            // S'assurer que la date de début n'est pas après la date de fin exercice
-        if ($dateDebut->year == $exercice && $dateDebut <= $dateFinExercice) {
-            // Calculer le prorata en mois (mois stricts, peu importe jour)
-            $mois = ($dateFinExercice->month - $dateDebut->month) + 1;
-            $montant = $valeurBrute * ($taux / 100) * ($mois / 12);
-        } elseif ($dateDebut->year < $exercice) {
-            $montant = $valeurBrute * ($taux / 100);
-        } else {
-            $montant = 0;
-        }
-
-
-            $nb_exercices = max(0, $exercice - $dateDebut->year);
-            $cumul = ($valeurBrute * ($taux/100)) * ($nb_exercices)
-                + ($dateDebut->year == $exercice ? $montant : 0);
-            $cumul = min($cumul, $valeurBrute);
+            $p = $plan[$immo->id] ?? null;
+            // Immobilisation hors classe 2 (non amortissable) : pas de plan
+            $cumul = $p ? $p['cumul_anterieur'] + $p['dotation'] : 0;
 
             return [
                 'id' => $immo->id,
@@ -51,6 +39,8 @@ class AmortissementController extends Controller
                 'date_acquisition' => $immo->date_acquisition,
                 'date_debut_utilisation' => $immo->date_debut_utilisation,
                 'cumul_amortissement' => round($cumul,2),
+                'dotation_exercice' => $p['dotation'] ?? 0,
+                'vnc' => $p['vnc_fin'] ?? (float) $valeurBrute,
             ];
         });
 

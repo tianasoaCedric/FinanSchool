@@ -77,6 +77,8 @@ class SimulationController extends Controller
             ->join('sous_comptes as sc', 'le.Id_Sous_compte', '=', 'sc.Id_Sous_compte')
             // Optionnel: leftJoin pour éviter de perdre des lignes si le mouvement est mal lié
             ->leftJoin('mouvement_ecritures as me', 'le.Id_Mouvement_ecriture', '=', 'me.Id_Mouvement_ecriture')
+            // Les écritures de clôture (6/7 → 12) annuleraient l'historique des charges et produits
+            ->where(fn ($q) => $q->whereNull('me.type_piece')->orWhere('me.type_piece', '!=', \App\Models\Saisie\MouvementEcriture::TYPE_CLOTURE))
             ->where(function ($q) {
                 $q->where('sc.Code_sous_compte', 'like', '6%')
                     ->orWhere('sc.Code_sous_compte', 'like', '7%');
