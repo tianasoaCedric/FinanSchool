@@ -14,9 +14,9 @@
           </option>
         </select>
       </label>
-      <router-link to="/ecriture" class="fs-btn fs-btn--primary">
+      <UiButton variant="primary" to="/ecriture">
         <i class="bi bi-plus-lg"></i> Nouvelle écriture
-      </router-link>
+      </UiButton>
     </template>
 
     <!-- Indicateurs clés -->

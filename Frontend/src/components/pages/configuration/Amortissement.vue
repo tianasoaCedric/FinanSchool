@@ -179,9 +179,9 @@ onMounted(async () => {
               Fin exercice : <span style="color: #0a608f;">{{ formatDate(exerciceDate) }}</span>
             </div>
           </div>
-          <button @click="openCreateModal" class="btn btn-primary mb-4">
+          <UiButton variant="primary" @click="openCreateModal" class="mb-4">
             Nouvelle immobilisation
-          </button>
+          </UiButton>
           <div class="table-container" style="margin-top: 20px;">
             <table class="table table-bordered table-striped">
               <thead>
@@ -204,34 +204,27 @@ onMounted(async () => {
                   <td>{{ immo.date_debut_utilisation }}</td>
                   <td>{{ immo.cumul_amortissement }}</td>
                   <td class="d-flex gap-2">
-                    <button @click="openEditModal(immo)" class="btn btn-primary text-base">
+                    <UiButton variant="soft-primary" @click="openEditModal(immo)" size="sm">
                       Modifier
-                    </button>
-                    <button @click="deleteImmobilisation(immo.id)" class="btn btn-error text-base" style="height: 40px; margin-top: 10px;">
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteImmobilisation(immo.id)" size="sm">
                       Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <button @click="prevPage" :disabled="currentPage === 1" class="btn btn-ghost btn-sm text-base"><i class="bi bi-chevron-left"></i></button>
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn"
-              :class="{'btn-primary': currentPage === page, 'btn-ghost': currentPage !== page}"
-              aria-label="Page {{ page }}"
-            >{{ page }}</button>
-            <button @click="nextPage" :disabled="currentPage === totalPages" class="btn btn-ghost btn-sm text-base"><i class="bi bi-chevron-right"></i></button>
+            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" size="sm"><i class="bi bi-chevron-left"></i></UiButton>
+            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">{{ page }}</UiButton>
+            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" size="sm"><i class="bi bi-chevron-right"></i></UiButton>
           </div>
           <div v-if="showModal" class="modal-overlay">
             <div class="modal">
               <div class="modal-header">
                 <h2 class="modal-title">{{ isEditing ? 'Modifier l\'immobilisation' : 'Nouvelle immobilisation' }}</h2>
-                <button @click="showModal = false" class="modal-close">×</button>
+                <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
               </div>
               <form @submit.prevent="saveImmobilisation" class="modal-body">
                 <div class="form-group">
@@ -267,8 +260,8 @@ onMounted(async () => {
                   <input type="date" v-model="form.date_debut_utilisation" class="form-input w-full" />
                 </div>
                 <div class="modal-footer">
-                  <button type="button" @click="showModal = false" class="btn btn-ghost">Annuler</button>
-                  <button type="submit" class="btn btn-primary">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</button>
+                  <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+                  <UiButton variant="primary" type="submit">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
                 </div>
               </form>
             </div>

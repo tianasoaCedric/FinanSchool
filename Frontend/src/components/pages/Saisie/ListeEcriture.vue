@@ -65,10 +65,10 @@
             </div>
             
             <div class="flex gap-2 ml-auto">
-              <button @click="resetFilters" type="button" class="btn btn-ghost">Réinitialiser</button>
-              <button type="submit" class="btn btn-primary" :disabled="isLoading">
+              <UiButton variant="ghost" @click="resetFilters">Réinitialiser</UiButton>
+              <UiButton variant="primary" :disabled="isLoading" type="submit">
                  {{ isLoading ? '...' : 'Filtrer' }}
-              </button>
+              </UiButton>
             </div>
           </div>
         </form>
@@ -76,9 +76,9 @@
 
       <!-- Bouton Modif Groupée -->
       <div class="flex justify-end mb-4 items-center h-10">
-        <button v-if="selectedRows.length > 0" @click="editGroup" class="btn btn-success flex items-center gap-2 shadow-sm">
+        <UiButton variant="success" v-if="selectedRows.length > 0" @click="editGroup">
           <span>✏️</span> Modifier sélection ({{ selectedRows.length }})
-        </button>
+        </UiButton>
       </div>
 
       <!-- Tableau avec Skeleton Loader -->
@@ -127,11 +127,11 @@
                   <td class="text-right">{{ formatMontant(ligne.Credit) }}</td>
                   <td class="text-sm text-gray-500">{{ ligne.Reference }}</td>
                   <td class="text-center">
-                    <span v-if="ligne.statut === 'valide'" class="badge badge-success" style="font-size: 12px;">Validé</span>
-                    <span v-else class="badge badge-warning" style="font-size: 12px;">Brouillon</span>
+                    <UiBadge tone="success" v-if="ligne.statut === 'valide'">Validé</UiBadge>
+                    <UiBadge tone="warning" v-else>Brouillon</UiBadge>
                   </td>
                   <td class="text-right">
-                    <button v-if="ligne.statut !== 'valide'" @click="editLigne(ligne)" class="btn btn-xs btn-primary" style="margin-right: 20px;">Modifier</button>
+                    <UiButton variant="soft-primary" v-if="ligne.statut !== 'valide'" @click="editLigne(ligne)" size="sm" style="margin-right: 20px;">Modifier</UiButton>
                     <span v-else class="text-xs text-gray-400 italic">Verrouillé</span>
                   </td>
                 </tr>
@@ -146,9 +146,9 @@
 
       <!-- Pagination -->
       <div v-if="!isLoading && ecritures.data && ecritures.last_page > 1" class="mt-4 flex justify-center items-center gap-2" style="margin-left:500px;">
-        <button @click="changePage(ecritures.current_page-1)" :disabled="ecritures.current_page === 1" class="btn btn-sm btn-ghost">Précédent</button>
+        <UiButton variant="ghost" @click="changePage(ecritures.current_page-1)" :disabled="ecritures.current_page === 1" size="sm">Précédent</UiButton>
         <span class="mx-2 text-sm font-medium">Page {{ ecritures.current_page }} / {{ ecritures.last_page }}</span>
-        <button @click="changePage(ecritures.current_page+1)" :disabled="ecritures.current_page === ecritures.last_page" class="btn btn-sm btn-ghost">Suivant</button>
+        <UiButton variant="ghost" @click="changePage(ecritures.current_page+1)" :disabled="ecritures.current_page === ecritures.last_page" size="sm">Suivant</UiButton>
       </div>
 
       
@@ -158,7 +158,7 @@
       <div class="modal-card">
         <div class="flex justify-between items-center mb-6">
            <h2 class="text-xl font-semibold">Modifier l'écriture</h2>
-           <button @click="showEditModal=false" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+           <UiButton variant="ghost" @click="showEditModal=false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
         </div>
         
         <form @submit.prevent="updateLigneEdit">
@@ -200,8 +200,8 @@
           </div>
 
           <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
-            <button @click="showEditModal=false" type="button" class="btn btn-ghost">Annuler</button>
-            <button class="btn btn-success px-6" :disabled="loadingLists">Enregistrer</button>
+            <UiButton variant="ghost" @click="showEditModal=false">Annuler</UiButton>
+            <UiButton variant="success" :disabled="loadingLists" type="submit">Enregistrer</UiButton>
           </div>
         </form>
       </div>
@@ -212,7 +212,7 @@
       <div class="modal-card border-t-4 border-blue-600">
         <div class="flex justify-between items-center mb-6">
            <h2 class="text-xl font-semibold text-blue-800">Modification groupée ({{ selectedRows.length }})</h2>
-           <button @click="showGroupModal=false" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+           <UiButton variant="ghost" @click="showGroupModal=false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
         </div>
 
         <div class="bg-yellow-50 p-3 text-sm text-yellow-800 rounded mb-4">
@@ -257,8 +257,8 @@
           </div>
 
           <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
-            <button @click="showGroupModal=false" type="button" class="btn btn-ghost">Annuler</button>
-            <button class="btn btn-success px-6">Appliquer</button>
+            <UiButton variant="ghost" @click="showGroupModal=false">Annuler</UiButton>
+            <UiButton variant="success" type="submit">Appliquer</UiButton>
           </div>
         </form>
       </div>

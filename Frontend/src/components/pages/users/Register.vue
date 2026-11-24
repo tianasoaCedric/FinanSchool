@@ -4,7 +4,7 @@
     <div v-if="registered" class="fs-success-box">
       <i class="bi bi-check2"></i>
       <p style="margin: 0; font-weight: 600; color: var(--fs-text);">Félicitations, votre compte est créé !</p>
-      <router-link to="/" class="fs-btn fs-btn--primary fs-btn--block">Se connecter</router-link>
+      <UiButton variant="primary" to="/" block>Se connecter</UiButton>
     </div>
 
     <template v-else>
@@ -19,10 +19,9 @@
           <label for="reg-email">Adresse email</label>
           <input id="reg-email" v-model="email" type="email" class="fs-input" autocomplete="email" placeholder="nom@exemple.com" required />
         </div>
-        <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-          <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+        <UiButton variant="primary" :loading="loading" block type="submit">
           {{ loading ? 'Envoi du code…' : 'Recevoir un code de vérification' }}
-        </button>
+        </UiButton>
       </form>
 
       <!-- Étape 2 : code -->
@@ -44,12 +43,11 @@
             @keydown.backspace="focusPrev(index, $event)"
           />
         </div>
-        <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-          <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+        <UiButton variant="primary" :loading="loading" block type="submit">
           {{ loading ? 'Vérification…' : 'Vérifier le code' }}
-        </button>
+        </UiButton>
         <p class="fs-muted-text" style="margin-top: 4px;">
-          Rien reçu ? <button type="button" class="fs-link" :disabled="loading" @click="sendCode">Renvoyer le code</button>
+          Rien reçu ? <UiButton variant="link" :disabled="loading" @click="sendCode">Renvoyer le code</UiButton>
         </p>
       </form>
 
@@ -68,14 +66,13 @@
           <label for="reg-password2">Confirmer le mot de passe</label>
           <input id="reg-password2" v-model="password_confirmation" type="password" class="fs-input" autocomplete="new-password" required />
         </div>
-        <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-          <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+        <UiButton variant="primary" :loading="loading" block type="submit">
           {{ loading ? 'Création du compte…' : 'Créer mon compte' }}
-        </button>
+        </UiButton>
       </form>
 
       <p v-if="step === 1" class="fs-muted-text">
-        Déjà un compte ? <router-link to="/" class="fs-link">Se connecter</router-link>
+        Déjà un compte ? <UiButton variant="link" to="/">Se connecter</UiButton>
       </p>
     </template>
   </AuthLayout>

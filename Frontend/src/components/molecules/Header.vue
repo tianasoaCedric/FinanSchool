@@ -15,33 +15,33 @@
 
     <div class="hd-right">
       <!-- Mode clair / sombre -->
-      <button
-        type="button"
-        class="hd-icon-btn"
+      <UiButton
+        variant="ghost"
+        icon-only
+        :icon="theme === 'dark' ? 'bi-sun' : 'bi-moon-stars'"
         :title="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
         :aria-label="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
         @click="toggleTheme"
-      >
-        <i :class="theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars'"></i>
-      </button>
+      />
 
       <!-- Notifications -->
       <div class="hd-menu">
-        <button
-          type="button"
-          class="hd-icon-btn"
+        <UiButton
+          variant="ghost"
+          icon-only
+          icon="bi-bell"
+          class="hd-notif-btn"
           aria-label="Notifications"
           :aria-expanded="showNotifications"
           @click="showNotifications = !showNotifications; showProfile = false"
         >
-          <i class="bi bi-bell"></i>
           <span v-if="unreadCount > 0" class="hd-badge">{{ unreadCount }}</span>
-        </button>
+        </UiButton>
 
         <div v-show="showNotifications" class="hd-dropdown hd-dropdown--notif">
           <div class="hd-dropdown-head">
             <h3>Notifications</h3>
-            <button v-if="unreadCount > 0" type="button" class="hd-link-btn" @click="markAllAsRead">Tout marquer comme lu</button>
+            <UiButton v-if="unreadCount > 0" variant="link" size="sm" @click="markAllAsRead">Tout marquer comme lu</UiButton>
           </div>
           <div class="hd-notif-list">
             <p v-if="notifications.length === 0" class="hd-empty">
@@ -62,15 +62,16 @@
                 <p class="hd-notif-msg">{{ notification.message }}</p>
                 <p class="hd-notif-date">{{ formatDate(notification.created_at) }}</p>
               </div>
-              <button
-                type="button"
+              <UiButton
+                variant="ghost"
+                size="sm"
+                icon-only
+                icon="bi-x-lg"
                 class="hd-notif-close"
                 aria-label="Retirer de la liste"
                 title="Retirer de la liste"
                 @click.stop="removeFromList(notification.id)"
-              >
-                <i class="bi bi-x"></i>
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -275,22 +276,8 @@ export default {
 .hd-right { display: flex; align-items: center; gap: 8px; }
 .hd-menu { position: relative; }
 
-.hd-icon-btn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--hd-text-2);
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-.hd-icon-btn:hover { background: var(--hd-bg-2); color: var(--hd-text); border-color: var(--hd-border); }
-.hd-icon-btn:focus-visible, .hd-profile:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: 2px; }
+.hd-profile:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: 2px; }
+.hd-notif-btn { position: relative; font-size: 17px; }
 .hd-badge {
   position: absolute;
   top: 4px;
@@ -362,8 +349,6 @@ export default {
   border-bottom: 1px solid var(--hd-border);
 }
 .hd-dropdown-head h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--hd-text); }
-.hd-link-btn { border: 0; background: none; padding: 0; color: var(--hd-primary); font: 500 13px inherit; font-family: inherit; cursor: pointer; }
-.hd-link-btn:hover { text-decoration: underline; }
 
 .hd-notif-list { max-height: 420px; overflow-y: auto; }
 .hd-empty { margin: 0; padding: 32px 16px; text-align: center; color: var(--hd-muted); font-size: 14px; }
@@ -396,24 +381,9 @@ export default {
 .hd-notif-title { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; color: var(--hd-text); }
 .hd-notif-msg { margin: 0 0 4px; font-size: 13px; color: var(--hd-text-2); line-height: 1.4; }
 .hd-notif-date { margin: 0; font-size: 12px; color: var(--hd-muted); }
-.hd-notif-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--hd-muted);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s ease, background-color 0.15s ease;
-}
+/* Le style visuel vient de UiButton ; ici seulement la position et l'apparition au survol */
+.hd-notif-close { position: absolute; top: 6px; right: 6px; opacity: 0; }
 .hd-notif:hover .hd-notif-close, .hd-notif-close:focus-visible { opacity: 1; }
-.hd-notif-close:hover { background: var(--hd-border); color: var(--hd-text); }
 
 .hd-profile-card { display: flex; align-items: center; gap: 12px; padding: 10px 10px 14px; border-bottom: 1px solid var(--hd-border); margin-bottom: 6px; }
 .hd-profile-card-name { margin: 0; font-size: 14px; font-weight: 600; color: var(--hd-text); }

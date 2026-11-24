@@ -43,12 +43,12 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary">
+              <UiButton variant="primary" type="submit">
                 {{ isEditing ? "Mettre à jour" : "Ajouter" }}
-              </button>
-              <button v-if="isEditing" type="button" @click="cancelEdit" class="btn btn-outline">
+              </UiButton>
+              <UiButton v-if="isEditing" @click="cancelEdit">
                 Annuler
-              </button>
+              </UiButton>
             </div>
           </form>
 
@@ -73,9 +73,9 @@
                   <td class="p-4 text-base">{{ journal.type_journal?.Type || '-' }}</td>
                   <td class="p-4 text-base">{{ journal.sous_compte?.Libelle || '-' }}</td>
                   <td class="text-center">
-                    <button @click="editJournal(journal)" class="btn btn-primary text-base">Modifier</button>
-                    <button @click="deleteJournal(journal.Id_Journal)" class="btn btn-error text-base" style="height: 40px; margin-top: 10px; margin-left: 20px;">Desactiver</button>
-                    <button @click="viewEcritures(journal.Id_Journal)" class="btn btn-primary text-base" style="height: 40px; margin-top: 10px; margin-left: 20px;">Voir Écritures</button>
+                    <UiButton variant="soft-primary" @click="editJournal(journal)" size="sm">Modifier</UiButton>
+                    <UiButton variant="soft-danger" @click="deleteJournal(journal.Id_Journal)" size="sm" style="margin-left: 20px;">Desactiver</UiButton>
+                    <UiButton variant="soft-primary" @click="viewEcritures(journal.Id_Journal)" size="sm" style="margin-left: 20px;">Voir Écritures</UiButton>
                   </td>
                 </tr>
                 <tr v-else>

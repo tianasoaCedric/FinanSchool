@@ -200,37 +200,6 @@
 /* =====================================================================
    Composants du thème (préfixe fs-)
    ===================================================================== */
-.fs-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: var(--fs-radius-sm);
-  border: 1px solid var(--fs-border-strong);
-  background: var(--fs-surface);
-  color: var(--fs-text-2);
-  font: 500 14px/1 var(--fs-font);
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-  white-space: nowrap;
-}
-.fs-btn:hover { background: var(--fs-surface-2); border-color: var(--fs-muted); color: var(--fs-text); }
-.fs-btn:focus-visible { outline: 2px solid var(--fs-primary); outline-offset: 2px; }
-.fs-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.fs-btn .bi { font-size: 16px; }
-.fs-btn--primary {
-  background: var(--fs-primary);
-  border-color: var(--fs-primary);
-  color: var(--fs-on-primary);
-  box-shadow: 0 1px 2px rgba(28, 69, 189, 0.25);
-}
-.fs-btn--primary:hover { background: var(--fs-primary-hover); border-color: var(--fs-primary-hover); color: var(--fs-on-primary); }
-.fs-btn--icon { width: 40px; padding: 0; }
-.fs-btn--ghost { background: transparent; border-color: transparent; }
-.fs-btn--ghost:hover { background: var(--fs-surface-3); border-color: transparent; }
 
 .fs-card {
   background: var(--fs-surface);
@@ -301,21 +270,6 @@
 }
 .fs-field { display: flex; flex-direction: column; gap: 6px; }
 .fs-filters__actions { display: flex; gap: 10px; }
-
-.fs-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--fs-neutral-soft);
-  color: var(--fs-text-2);
-}
-.fs-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.fs-badge--success { background: var(--fs-success-soft); color: var(--fs-success); }
 
 /* Carte tableau */
 .fs-table-card { overflow: hidden; }
@@ -449,42 +403,6 @@
 .fs-content .card-footer { background: var(--fs-surface-2); border-top-color: var(--fs-border); }
 
 /* Boutons */
-.fs-content .btn {
-  height: 38px;
-  padding: 0 14px;
-  border-radius: var(--fs-radius-sm);
-  font: 500 14px/1 var(--fs-font);
-  gap: 8px;
-  box-shadow: none;
-  transform: none;
-}
-.fs-content .btn:hover { transform: none; }
-.fs-content .btn-sm { height: 32px; padding: 0 10px; font-size: 13px; }
-.fs-content .btn-primary {
-  background: var(--fs-primary);
-  border-color: var(--fs-primary);
-  color: var(--fs-on-primary);
-  margin-top: 0;
-}
-.fs-content .btn-primary:hover { background: var(--fs-primary-hover); border-color: var(--fs-primary-hover); }
-.fs-content .btn-outline,
-.fs-content .btn-secondary {
-  background: var(--fs-surface);
-  border: 1px solid var(--fs-border-strong);
-  color: var(--fs-text-2);
-}
-.fs-content .btn-outline:hover,
-.fs-content .btn-secondary:hover { background: var(--fs-surface-2); border-color: var(--fs-muted); color: var(--fs-text); }
-.fs-content .btn-outline-primary { background: transparent; border: 1px solid var(--fs-primary); color: var(--fs-primary-text); }
-.fs-content .btn-outline-primary:hover { background: var(--fs-primary-soft); color: var(--fs-primary-text); }
-.fs-content .btn-ghost { background: transparent; color: var(--fs-text-2); }
-.fs-content .btn-ghost:hover { background: var(--fs-surface-3); color: var(--fs-text); }
-.fs-content .btn-error,
-.fs-content .btn-danger { background: var(--fs-negative); border-color: var(--fs-negative); color: #fff; }
-.fs-content .btn-error:hover,
-.fs-content .btn-danger:hover { filter: brightness(1.08); }
-.fs-content .btn-success { background: var(--fs-success); border-color: var(--fs-success); color: #fff; }
-.fs-content .btn-warning { background: var(--fs-warning); border-color: var(--fs-warning); color: #fff; }
 
 /* Formulaires */
 .fs-content .form-label { color: var(--fs-text-2); font-size: 13px; font-weight: 500; }
@@ -546,12 +464,6 @@
 .fs-content .table-bordered td { border-color: var(--fs-border); border-left: 0; border-right: 0; }
 
 /* Badges */
-.fs-content .badge { border-radius: 999px; font-weight: 600; font-size: 12px; padding: 3px 10px; }
-.fs-content .badge-primary { background: var(--fs-primary-soft); color: var(--fs-primary-text); }
-.fs-content .badge-secondary { background: var(--fs-neutral-soft); color: var(--fs-text-2); }
-.fs-content .badge-success { background: var(--fs-success-soft); color: var(--fs-success); }
-.fs-content .badge-error, .fs-content .badge-danger { background: var(--fs-negative-soft); color: var(--fs-negative); }
-.fs-content .badge-warning { background: var(--fs-warning-soft); color: var(--fs-warning); }
 
 /* Fenêtres modales */
 .fs-page .modal-overlay { background: var(--fs-overlay); backdrop-filter: blur(2px); }
@@ -586,12 +498,14 @@
   .fs-main { margin-left: 0; padding: 16px; }
   .fs-title { font-size: 20px; }
   .fs-actions { width: 100%; }
-  .fs-actions .fs-btn:not(.fs-btn--icon) { flex: 1; }
+  
   .fs-toolbar__field, .fs-stat { border-right: 0; border-bottom: 1px solid var(--fs-border); flex-basis: 100%; }
   .fs-chat-btn { right: 16px; bottom: 16px; width: 46px; height: 46px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fs-page, .fs-btn, .fs-chat-btn, .fs-skeleton__row { transition: none; animation: none; }
+  .fs-page,
+.fs-chat-btn,
+.fs-skeleton__row { transition: none; animation: none; }
 }
 
 /* Empilement vertical des blocs d'une page */
@@ -695,22 +609,6 @@
 .fs-content > br, .fs-content .card-form > br, .fs-content .card-body > br { display: none; }
 
 /* Boutons d'action dans les tableaux : compacts et teintés */
-.fs-content .table td .btn,
-.fs-content table td .btn {
-  height: 30px;
-  padding: 0 10px;
-  margin: 2px 6px 2px 0;
-  font-size: 13px;
-  vertical-align: middle;
-}
-.fs-content table td .btn-primary { background: var(--fs-primary-soft); border-color: transparent; color: var(--fs-primary-text); }
-.fs-content table td .btn-primary:hover { background: var(--fs-primary); color: var(--fs-on-primary); }
-.fs-content table td .btn-error,
-.fs-content table td .btn-danger { background: var(--fs-negative-soft); border-color: transparent; color: var(--fs-negative); }
-.fs-content table td .btn-error:hover,
-.fs-content table td .btn-danger:hover { background: var(--fs-negative); color: #fff; filter: none; }
-.fs-content table td .btn-success { background: var(--fs-success-soft); border-color: transparent; color: var(--fs-success); }
-.fs-content table td .btn-success:hover { background: var(--fs-success); color: #fff; }
 
 /* Alertes */
 .fs-content .alert { border-radius: var(--fs-radius-sm); border: 1px solid transparent; }
@@ -739,12 +637,7 @@
 .fs-form .fs-field label { font-size: 13.5px; font-weight: 500; color: var(--fs-text-2); }
 .fs-form .fs-input { height: 44px; font-size: 15px; padding: 0 14px; }
 .fs-field__row { display: flex; align-items: center; justify-content: space-between; }
-.fs-btn--block { width: 100%; height: 44px; font-size: 15px; }
-.fs-btn .fs-spinner { width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: fs-spin 0.7s linear infinite; }
-@keyframes fs-spin { to { transform: rotate(360deg); } }
-.fs-link { color: var(--fs-primary-text); font-weight: 500; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
-.fs-link:hover { text-decoration: underline; }
-.fs-link:focus-visible { outline: 2px solid var(--fs-primary); outline-offset: 2px; border-radius: 4px; }
+
 .fs-muted-text { margin: 20px 0 0; text-align: center; font-size: 14px; color: var(--fs-muted); }
 .fs-alert {
   display: flex;

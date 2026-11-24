@@ -13,19 +13,18 @@
       <div class="fs-field">
         <div class="fs-field__row">
           <label for="login-password">Mot de passe</label>
-          <router-link to="/forgot-password" class="fs-link" style="font-size: 13px;">Mot de passe oublié ?</router-link>
+          <UiButton variant="link" to="/forgot-password">Mot de passe oublié ?</UiButton>
         </div>
         <input id="login-password" v-model="password" type="password" class="fs-input" autocomplete="current-password" required />
       </div>
 
-      <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-        <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+      <UiButton variant="primary" :loading="loading" block type="submit">
         {{ loading ? 'Connexion…' : 'Se connecter' }}
-      </button>
+      </UiButton>
     </form>
 
     <p class="fs-muted-text">
-      Pas encore de compte ? <router-link to="/signup" class="fs-link">Créer un compte</router-link>
+      Pas encore de compte ? <UiButton variant="link" to="/signup">Créer un compte</UiButton>
     </p>
   </AuthLayout>
 </template>

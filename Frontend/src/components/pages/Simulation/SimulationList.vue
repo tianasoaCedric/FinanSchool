@@ -7,9 +7,9 @@
     section="Outils"
   >
     <template #actions>
-      <button type="button" class="fs-btn fs-btn--primary" @click="openCreateModal">
+      <UiButton variant="primary" @click="openCreateModal">
         <i class="bi bi-plus-lg"></i> Nouvelle simulation
-      </button>
+      </UiButton>
     </template>
 
       <div class="page-animate">
@@ -43,9 +43,9 @@
           </div>
           <h3>Aucune simulation</h3>
           <p>Commencez par créer votre premier scénario de simulation budgétaire.</p>
-          <button @click="openCreateModal" class="btn btn-primary">
+          <UiButton variant="primary" @click="openCreateModal">
             <i class="bi bi-plus-lg me-2"></i>Créer un scénario
-          </button>
+          </UiButton>
         </div>
 
         <!-- Simulation Cards Grid -->
@@ -62,12 +62,12 @@
                 {{ new Date(sim.date_simulation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }}
               </div>
               <div class="sim-card-actions">
-                <button @click="viewSimulation(sim.id_simulation)" class="sim-action-btn view" title="Voir le détail">
+                <UiButton variant="soft-primary" @click="viewSimulation(sim.id_simulation)" title="Voir le détail" size="sm" icon-only>
                   <i class="bi bi-eye"></i>
-                </button>
-                <button @click="confirmDelete(sim.id_simulation)" class="sim-action-btn delete" title="Supprimer">
+                </UiButton>
+                <UiButton variant="soft-danger" @click="confirmDelete(sim.id_simulation)" title="Supprimer" size="sm" icon-only>
                   <i class="bi bi-trash3"></i>
-                </button>
+                </UiButton>
               </div>
             </div>
             <div class="sim-card-body">
@@ -114,9 +114,9 @@
                 <p class="modal-subtitle">Configurez vos hypothèses de croissance</p>
               </div>
             </div>
-            <button @click="showModal = false" class="modal-close-btn">
+            <UiButton variant="inverse" @click="showModal = false" aria-label="Fermer" icon-only>
               <i class="bi bi-x-lg"></i>
-            </button>
+            </UiButton>
           </div>
 
           <div class="modal-body p-6">
@@ -164,9 +164,9 @@
                   <tr v-for="(ligne, index) in newSim.lignes" :key="index" class="sim-table-row">
                     <td class="align-middle font-bold">{{ ligne.libelle }}</td>
                     <td class="align-middle text-center">
-                      <span :class="['type-badge', ligne.type === 'produit' ? 'type-produit' : 'type-charge']">
+                      <UiBadge :tone="ligne.type === 'produit' ? 'success' : 'danger'">
                         {{ ligne.type === 'produit' ? 'Produit' : 'Charge' }}
-                      </span>
+                      </UiBadge>
                     </td>
                     <td class="align-middle text-center">
                       <select v-model="ligne.nature_charge" class="nature-select">
@@ -203,12 +203,12 @@
           </div>
 
           <div class="modal-footer p-4">
-            <button @click="showModal = false" class="btn btn-ghost">Annuler</button>
-            <button @click="saveSimulation" class="btn btn-primary px-6" :disabled="saving || !newSim.nom_simulation">
+            <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+            <UiButton variant="primary" @click="saveSimulation" :disabled="saving || !newSim.nom_simulation">
               <i class="bi bi-check2-circle me-2" v-if="!saving"></i>
               <span v-if="saving" class="spinner spinner-sm me-2"></span>
               {{ saving ? 'Enregistrement...' : 'Enregistrer le Scénario' }}
-            </button>
+            </UiButton>
           </div>
         </div>
       </div>
@@ -221,7 +221,7 @@
           <div class="notif-icon success"><i class="bi bi-check-lg"></i></div>
           <h3 class="notif-title">Succès</h3>
           <p class="notif-message">{{ successModalMessage }}</p>
-          <button class="btn btn-primary w-full" @click="showSuccessModal = false">Fermer</button>
+          <UiButton variant="primary" @click="showSuccessModal = false" block>Fermer</UiButton>
         </div>
       </div>
     </transition>
@@ -239,12 +239,12 @@
               <span class="doc-topbar-ref">REF: #SIM-{{ selectedSimulation.id_simulation }}</span>
             </div>
             <div class="doc-topbar-actions">
-              <button @click="exportToPDF" class="doc-action-btn">
+              <UiButton @click="exportToPDF" size="sm">
                 <i class="bi bi-printer"></i> Imprimer
-              </button>
-              <button @click="showViewModal = false" class="doc-close-btn">
+              </UiButton>
+              <UiButton variant="ghost" @click="showViewModal = false" aria-label="Fermer" icon-only>
                 <i class="bi bi-x-lg"></i>
-              </button>
+              </UiButton>
             </div>
           </div>
 
@@ -254,7 +254,7 @@
               <div class="report-hero-bg"></div>
               <div class="report-hero-content">
                 <div class="report-hero-left">
-                  <div class="report-hero-badge">SIMULATION BUDGÉTAIRE</div>
+                  <UiBadge tone="primary" class="report-hero-badge">Simulation budgétaire</UiBadge>
                   <h1 class="report-hero-title">{{ selectedSimulation.nom_simulation }}</h1>
                   <p class="report-hero-date">
                     <i class="bi bi-calendar3 me-1"></i>
@@ -351,12 +351,12 @@
                       <div class="report-poste-name">{{ ligne.libelle }}</div>
                     </td>
                     <td class="align-middle text-center">
-                      <span :class="['type-badge', ligne.type === 'produit' ? 'type-produit' : 'type-charge']">
+                      <UiBadge :tone="ligne.type === 'produit' ? 'success' : 'danger'">
                         {{ ligne.type === 'produit' ? 'Recette' : 'Dépense' }}
-                      </span>
+                      </UiBadge>
                     </td>
                     <td class="align-middle text-center">
-                      <span class="nature-badge">{{ ligne.nature_charge === 'fixe' ? 'Fixe' : 'Variable' }}</span>
+                      <UiBadge tone="neutral">{{ ligne.nature_charge === 'fixe' ? 'Fixe' : 'Variable' }}</UiBadge>
                     </td>
                     <td class="align-middle text-right font-mono text-muted">
                       {{ Math.abs(parseFloat(ligne.moyenne_historique)).toLocaleString('fr-FR') }} Ar
@@ -407,7 +407,7 @@
           <div class="notif-icon error"><i class="bi bi-x-lg"></i></div>
           <h3 class="notif-title">Erreur</h3>
           <p class="notif-message">{{ errorModalMessage }}</p>
-          <button class="btn btn-primary w-full" @click="showErrorModal = false">Fermer</button>
+          <UiButton variant="primary" @click="showErrorModal = false" block>Fermer</UiButton>
         </div>
       </div>
     </transition>

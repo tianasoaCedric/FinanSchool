@@ -268,9 +268,9 @@ onMounted(async () => {
               />
             </div>
           </div>
-          <button @click="openCreateModal" class="btn btn-primary mb-4">
+          <UiButton variant="primary" @click="openCreateModal" class="mb-4">
             Nouveau compte
-          </button>
+          </UiButton>
           
           <div class="table-container" style="margin-top: 20px;">
             <table class="table table-bordered table-striped">
@@ -290,9 +290,9 @@ onMounted(async () => {
                   <td>{{ compte.rubrique?.classe?.Code }}</td>
                   <td>{{ compte.rubrique?.Libelle }}</td>
                   <td class="d-flex gap-2">
-                    <button  @click="viewGrandlivre(compte)" class="btn btn-primary text-base">
+                    <UiButton variant="soft-primary" @click="viewGrandlivre(compte)" size="sm">
                       Consulter
-                    </button>
+                    </UiButton>
                     
                   </td>
                 </tr>
@@ -301,32 +301,15 @@ onMounted(async () => {
           </div>
           <br>
           <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <button
-              @click="prevPage"
-              :disabled="currentPage === 1"
-              class="btn btn-ghost btn-sm text-base"
-              aria-label="Page précédente"
-            >
+            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
               <i class="bi bi-chevron-left"></i>
-            </button>
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn"
-              :class="{'btn-primary': currentPage === page, 'btn-ghost': currentPage !== page}"
-              aria-label="Page {{ page }}"
-            >
+            </UiButton>
+            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
               {{ page }}
-            </button>
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="btn btn-ghost btn-sm text-base"
-              aria-label="Page suivante"
-            >
+            </UiButton>
+            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
               <i class="bi bi-chevron-right"></i>
-            </button>
+            </UiButton>
           </div>
           <div v-if="showModal" class="modal-overlay">
             <div class="modal">
@@ -334,7 +317,7 @@ onMounted(async () => {
                 <h2 class="modal-title">
                   {{ isEditing ? 'Modifier le compte' : 'Nouveau compte' }}
                 </h2>
-                <button @click="showModal = false" class="modal-close">×</button>
+                <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
               </div>
               <form @submit.prevent="saveCompte" class="modal-body">
                 <div class="form-group">
@@ -386,12 +369,12 @@ onMounted(async () => {
                   />
                 </div>
                 <div class="modal-footer">
-                  <button type="button" @click="showModal = false" class="btn btn-ghost">
+                  <UiButton variant="ghost" @click="showModal = false">
                     Annuler
-                  </button>
-                  <button type="submit" class="btn btn-primary">
+                  </UiButton>
+                  <UiButton variant="primary" type="submit">
                     {{ isEditing ? 'Modifier' : 'Enregistrer' }}
-                  </button>
+                  </UiButton>
                 </div>
               </form>
             </div>

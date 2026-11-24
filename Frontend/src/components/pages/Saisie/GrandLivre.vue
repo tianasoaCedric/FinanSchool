@@ -371,15 +371,15 @@ const exportToExcel = async () => {
           <div class="d-flex justify-between items-center">
             
             <div class="d-flex gap-2">
-              <button v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportGrandLivre" class="btn btn-primary">
+              <UiButton variant="primary" v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportGrandLivre">
                 <i class="bi bi-file-pdf"></i> Exporter PDF
-              </button>
-              <button v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportToExcel" class="btn btn-success" style="height: 40px;margin-top: 10px;">
+              </UiButton>
+              <UiButton variant="success" v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportToExcel">
                 <i class="bi bi-file-excel"></i> Exporter Excel
-              </button>
-              <button v-if="isSingleCompte" @click="goBack" class="btn btn-ghost" style="height: 40px;margin-top: 10px;">
+              </UiButton>
+              <UiButton variant="ghost" v-if="isSingleCompte" @click="goBack">
                 <i class="bi bi-arrow-left"></i> Retour à la liste
-              </button>
+              </UiButton>
             </div>
           </div>
         </div>
@@ -396,14 +396,14 @@ const exportToExcel = async () => {
                 <input v-model="filters.date_fin" type="date" class="form-input w-full" />
               </div>
               <div class="form-group">
-                <button type="button" @click="applyDateFilter" class="btn btn-primary">
+                <UiButton variant="primary" @click="applyDateFilter">
                   <i class="bi bi-funnel"></i> Appliquer
-                </button>
+                </UiButton>
               </div>
               <div class="form-group">
-                <button type="button" @click="resetDateFilter" class="btn btn-ghost">
+                <UiButton variant="ghost" @click="resetDateFilter">
                   <i class="bi bi-x-circle"></i> Réinitialiser
-                </button>
+                </UiButton>
               </div>
             </div>
           </div>
@@ -541,34 +541,17 @@ const exportToExcel = async () => {
 
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination-container">
-            <button
-              @click="prevPage"
-              :disabled="currentPage === 1"
-              class="btn btn-ghost btn-sm"
-              aria-label="Page précédente"
-            >
+            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
               <i class="bi bi-chevron-left"></i> Précédent
-            </button>
+            </UiButton>
             <div class="pagination-pages">
-              <button
-                v-for="page in totalPages"
-                :key="page"
-                @click="goToPage(page)"
-                class="btn btn-sm"
-                :class="{ 'btn-primary': currentPage === page, 'btn-ghost': currentPage !== page }"
-                aria-label="Page {{ page }}"
-              >
+              <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
                 {{ page }}
-              </button>
+              </UiButton>
             </div>
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="btn btn-ghost btn-sm"
-              aria-label="Page suivante"
-            >
+            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
               Suivant <i class="bi bi-chevron-right"></i>
-            </button>
+            </UiButton>
           </div>
 
           <!-- Messages -->

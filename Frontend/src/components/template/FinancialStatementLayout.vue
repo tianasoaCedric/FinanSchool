@@ -10,12 +10,12 @@
     @back="$emit('back')"
   >
     <template #actions>
-      <button type="button" class="fs-btn" @click="$emit('export-excel')">
+      <UiButton @click="$emit('export-excel')">
         <i class="bi bi-file-earmark-spreadsheet"></i> Excel
-      </button>
-      <button type="button" class="fs-btn fs-btn--primary" @click="$emit('export-pdf')">
+      </UiButton>
+      <UiButton variant="primary" @click="$emit('export-pdf')">
         <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
-      </button>
+      </UiButton>
     </template>
 
     <div class="fs-stack">
@@ -38,7 +38,7 @@
           </div>
           <div class="fs-stat">
             <span class="fs-label">Statut</span>
-            <span class="fs-badge" :class="{ 'fs-badge--success': exerciceInfo.statut === 'OUVERT' }">{{ statutLabel }}</span>
+            <UiBadge :tone="exerciceInfo.statut === 'OUVERT' ? 'success' : 'neutral'" dot>{{ statutLabel }}</UiBadge>
           </div>
         </template>
       </section>

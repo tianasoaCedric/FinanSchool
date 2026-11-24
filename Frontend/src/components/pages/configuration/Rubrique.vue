@@ -193,9 +193,9 @@ onMounted(async () => {
               </select>
             </div>
 
-            <button @click="openCreateModal" class="btn btn-success text-base">
+            <UiButton variant="success" @click="openCreateModal">
               <i class="bi bi-plus-circle mr-1"></i> Nouvelle Rubrique
-            </button>
+            </UiButton>
           </div>
           <br>
           
@@ -215,12 +215,12 @@ onMounted(async () => {
                   <td class="p-4 text-base">{{ rubrique.Libelle }}</td>
                   <td class="p-4 text-base">{{ rubrique.classe?.Code }} - {{ rubrique.classe?.Libelle }}</td>
                   <td class="d-flex gap-2 p-4">
-                    <button @click="openEditModal(rubrique)" class="btn btn-primary text-base">
+                    <UiButton variant="soft-primary" @click="openEditModal(rubrique)" size="sm">
                       <i class="bi bi-pencil mr-1"></i> Modifier
-                    </button>
-                    <button @click="deleteRubrique(rubrique.Id_Rubrique)" class="btn btn-error text-base" style="height: 40px; margin-top: 10px;">
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteRubrique(rubrique.Id_Rubrique)" size="sm">
                       <i class="bi bi-trash mr-1"></i> Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>
@@ -228,32 +228,15 @@ onMounted(async () => {
           </div>
           <br>
           <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <button
-              @click="prevPage"
-              :disabled="currentPage === 1"
-              class="btn btn-ghost btn-sm text-base"
-              aria-label="Page précédente"
-            >
+            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
               <i class="bi bi-chevron-left"></i>
-            </button>
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn"
-              :class="{'btn-primary': currentPage === page, 'btn-ghost': currentPage !== page}"
-              aria-label="Page {{ page }}"
-            >
+            </UiButton>
+            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
               {{ page }}
-            </button>
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="btn btn-ghost btn-sm text-base"
-              aria-label="Page suivante"
-            >
+            </UiButton>
+            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
               <i class="bi bi-chevron-right"></i>
-            </button>
+            </UiButton>
           </div>
 
           <div v-if="showModal" class="modal-overlay">
@@ -262,7 +245,7 @@ onMounted(async () => {
                 <h2 class="modal-title text-2xl">
                   {{ isEditing ? 'Modifier Rubrique' : 'Nouvelle Rubrique' }}
                 </h2>
-                <button @click="showModal = false" class="modal-close text-base">&times;</button>
+                <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
               </div>
 
               <form @submit.prevent="saveRubrique" class="modal-body space-y-4">
@@ -325,12 +308,12 @@ onMounted(async () => {
                 </div>
 
                 <div class="modal-footer d-flex justify-end gap-2">
-                  <button type="button" @click="showModal = false" class="btn btn-ghost text-base">
+                  <UiButton variant="ghost" @click="showModal = false">
                     Annuler
-                  </button>
-                  <button type="submit" class="btn btn-primary text-base">
+                  </UiButton>
+                  <UiButton variant="primary" type="submit">
                     {{ isEditing ? 'Modifier' : 'Enregistrer' }}
-                  </button>
+                  </UiButton>
                 </div>
               </form>
             </div>

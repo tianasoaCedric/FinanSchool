@@ -33,14 +33,10 @@
                 </select>
               </div>
             </div>
-            <button 
-              type="submit" 
-              :disabled="isCreatingMouvement"
-              class="btn btn-primary mt-4"
-            >
+            <UiButton variant="primary" :disabled="isCreatingMouvement" class="mt-4" type="submit">
               <i class="bi bi-plus-circle me-2"></i>
               {{ isCreatingMouvement ? 'Création...' : 'Créer Mouvement' }}
-            </button>
+            </UiButton>
           </form>
 
           <!-- LOADER -->
@@ -55,7 +51,7 @@
             <div class="alert-content">
               <p class="alert-message">{{ errorMessage }}</p>
             </div>
-            <button @click="errorMessage = ''" class="alert-dismiss">&times;</button>
+            <UiButton variant="ghost" @click="errorMessage = ''" size="sm" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
           </div>
 
           <!-- MESSAGES DE SUCCÈS -->
@@ -64,7 +60,7 @@
             <div class="alert-content">
               <p class="alert-message">{{ successMessage }}</p>
             </div>
-            <button @click="successMessage = ''" class="alert-dismiss">&times;</button>
+            <UiButton variant="ghost" @click="successMessage = ''" size="sm" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
           </div>
 
           <!-- TABLEAU UNIQUE DES MOUVEMENTS ET LIGNES -->
@@ -91,41 +87,25 @@
       <td colspan="9" class="p-3">
         <div class="flex items-center flex-wrap gap-2">
           <span>{{ m.Numero_piece || `#${m.Id_Mouvement_ecriture}` }} - {{ formatDate(m.Date_mouvement) }} - {{ getJournalLibelle(m.Id_Journal) }}</span>
-          <span v-if="isEquilibre(m)" class="badge badge-success" style="margin-left: 10px; height: 28px;">
+          <UiBadge tone="success" v-if="isEquilibre(m)" style="margin-left: 10px;">
             <i class="bi bi-check-circle me-1" style="margin-right: 5px;"></i> Équilibré
-          </span>
-          <span v-else class="badge badge-error" style="margin-left: 10px; height: 28px;">
+          </UiBadge>
+          <UiBadge tone="danger" v-else style="margin-left: 10px;">
             <i class="bi bi-exclamation-triangle me-1" style="margin-right: 5px;"> </i> Non équilibré ({{ formatMontant(getDifference(m)) }})
-          </span>
-          <button 
-            v-if="isEquilibre(m) && !isMouvementValide(m)" 
-            @click="validerMouvement(m.Id_Mouvement_ecriture)"
-            :disabled="isValidating"
-            class="btn btn-sm btn-success"
-            style="margin-left: 10px;"
-          >
+          </UiBadge>
+          <UiButton variant="soft-success" v-if="isEquilibre(m) && !isMouvementValide(m)" @click="validerMouvement(m.Id_Mouvement_ecriture)" :disabled="isValidating" size="sm" style="margin-left: 10px;">
             <i class="bi bi-check-lg me-1"></i>
             {{ isValidating ? 'Validation...' : 'Valider' }}
-          </button>
-          <button
-            v-if="!isEquilibre(m)"
-            @click="solderMouvement(m.Id_Mouvement_ecriture)"
-            class="btn btn-sm btn-warning ml-2"
-            style="margin-left: 10px; height: 30px; text-align: center; padding-top: 4px; bottom: 4px; padding-right: 12px;"
-          >
+          </UiButton>
+          <UiButton variant="warning" v-if="!isEquilibre(m)" @click="solderMouvement(m.Id_Mouvement_ecriture)" size="sm" style="margin-left: 10px;">
             <i class="bi bi-balance-scale me-1"></i> Solder
-          </button>
-          <span v-if="isMouvementValide(m)" class="badge badge-primary">
+          </UiButton>
+          <UiBadge tone="primary" v-if="isMouvementValide(m)">
             <i class="bi bi-lock me-1"></i> Validé
-          </span>
-          <button 
-            @click="deleteMouvement(m.Id_Mouvement_ecriture)"
-            :disabled="isMouvementValide(m) || isDeletingMouvement"
-            class="btn btn-sm btn-error"
-            style="margin-left: 10px;"
-          >
+          </UiBadge>
+          <UiButton variant="soft-danger" @click="deleteMouvement(m.Id_Mouvement_ecriture)" :disabled="isMouvementValide(m) || isDeletingMouvement" size="sm" style="margin-left: 10px;">
             <i class="bi bi-trash"></i>
-          </button>
+          </UiButton>
 
         </div>
       </td>
@@ -268,14 +248,9 @@
       </td>
       <!-- Actions -->
       <td class="text-center" style="vertical-align: middle;">
-        <button
-            @click="askDeleteLigne(m.Id_Mouvement_ecriture, index)"
-            :disabled="isMouvementValide(m)"
-            class="btn btn-xs btn-ghost text-error"
-            style="width: 28px; height: 32px; font-size: 16px;"
-          >
+        <UiButton variant="soft-danger" @click="askDeleteLigne(m.Id_Mouvement_ecriture, index)" :disabled="isMouvementValide(m)" size="sm">
             <i class="bi bi-trash"></i>
-          </button>
+          </UiButton>
 
       </td>
    
@@ -287,13 +262,9 @@
         <span class="text-sm" style="font-size: 10px;">{{ m.Numero_piece || `#${m.Id_Mouvement_ecriture}` }}</span>
       </td>
       <td colspan="7">
-        <button
-          @click="addNewLigne(m.Id_Mouvement_ecriture)"
-          class="btn btn-ghost w-full text-primary font-semibold"
-          style="height: 32px; font-size: 15px;"
-        >
+        <UiButton variant="ghost" @click="addNewLigne(m.Id_Mouvement_ecriture)" size="sm" block>
           <i class="bi bi-plus-circle me-2"></i>Ajouter une ligne d'écriture
-        </button>
+        </UiButton>
       </td>
       <td></td>
     </tr>
@@ -352,7 +323,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Nouveau sous-compte</h2>
-      <button @click="showSousCompteModal = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showSousCompteModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <form @submit.prevent="saveSousCompte" class="modal-body">
       <div class="form-group">
@@ -401,13 +372,13 @@
         />
       </div>
       <div class="modal-footer">
-        <button type="button" @click="showSousCompteModal = false" class="btn btn-ghost">
+        <UiButton variant="ghost" @click="showSousCompteModal = false">
           Annuler
-        </button>
-        <button type="submit" class="btn btn-primary">
+        </UiButton>
+        <UiButton variant="primary" type="submit">
           <i class="bi bi-save me-2"></i>
           Enregistrer
-        </button>
+        </UiButton>
       </div>
     </form>
   </div>
@@ -417,23 +388,20 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Supprimer la ligne</h2>
-      <button @click="showDeleteLigneConfirm = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showDeleteLigneConfirm = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <div class="modal-body">
       <p>Voulez-vous vraiment supprimer cette ligne d'écriture ?</p>
       <div class="modal-footer">
-        <button class="btn btn-ghost" @click="showDeleteLigneConfirm = false">
+        <UiButton variant="ghost" @click="showDeleteLigneConfirm = false">
           Annuler
-        </button>
-        <button
-          class="btn btn-primary"
-          @click="
+        </UiButton>
+        <UiButton variant="primary" @click="
             deleteLigne(pendingDeleteLigne.mouvementId, pendingDeleteLigne.ligneIndex);
             showDeleteLigneConfirm = false;
-          "
-        >
+          ">
           Supprimer
-        </button>
+        </UiButton>
       </div>
     </div>
   </div>
@@ -443,23 +411,20 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Supprimer le mouvement</h2>
-      <button @click="showDeleteMouvementConfirm = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showDeleteMouvementConfirm = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <div class="modal-body">
       <p>Voulez-vous vraiment supprimer ce mouvement et toutes ses lignes ?</p>
       <div class="modal-footer">
-        <button class="btn btn-ghost" @click="showDeleteMouvementConfirm = false">
+        <UiButton variant="ghost" @click="showDeleteMouvementConfirm = false">
           Annuler
-        </button>
-        <button
-          class="btn btn-primary"
-          @click="
+        </UiButton>
+        <UiButton variant="primary" @click="
             deleteMouvement(pendingDeleteMouvement);
             showDeleteMouvementConfirm = false;
-          "
-        >
+          ">
           Supprimer
-        </button>
+        </UiButton>
       </div>
     </div>
   </div>
@@ -469,14 +434,14 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Succès</h2>
-      <button @click="showSuccessModal = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showSuccessModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <div class="modal-body">
       <p>{{ successMessage || successModalMessage }}</p>
       <div class="modal-footer">
-        <button class="btn btn-primary" @click="showSuccessModal = false">
+        <UiButton variant="primary" @click="showSuccessModal = false">
           OK
-        </button>
+        </UiButton>
       </div>
     </div>
   </div>

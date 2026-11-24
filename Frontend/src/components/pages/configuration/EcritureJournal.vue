@@ -14,7 +14,7 @@
 
           <!-- Bouton Retour -->
           <div class="mb-4">
-            <button @click="goBack" class="btn btn-outline">Retour aux Journaux</button>
+            <UiButton @click="goBack">Retour aux Journaux</UiButton>
           </div>
           <br>
 
@@ -30,15 +30,15 @@
                 <label class="form-label">Date de fin</label>
                 <input v-model="dateFilter.date_fin" type="date" class="form-input" />
               </div>
-              <button type="submit" class="btn btn-primary" style="height: 40px; margin-top: 20px;">Appliquer</button>
-              <button type="button" @click="resetDateFilter" class="btn btn-outline" style="height: 40px; margin-top: 20px;">Réinitialiser</button>
+              <UiButton variant="primary" type="submit">Appliquer</UiButton>
+              <UiButton @click="resetDateFilter">Réinitialiser</UiButton>
             </form>
           </div>
 
           <!-- Boutons d'exportation -->
           <div class="export-container mb-6 d-flex gap-4">
-            <button @click="exportToPDF" class="btn btn-primary">Exporter en PDF</button>
-            <button @click="exportToExcel" class="btn btn-primary">Exporter en Excel</button>
+            <UiButton variant="primary" @click="exportToPDF">Exporter en PDF</UiButton>
+            <UiButton variant="primary" @click="exportToExcel">Exporter en Excel</UiButton>
           </div>
 
           <!-- Tableau des écritures -->

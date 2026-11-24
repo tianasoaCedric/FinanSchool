@@ -43,17 +43,12 @@
               />
             </div>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary">
+              <UiButton variant="primary" type="submit">
                 {{ isEditing ? "Mettre à jour" : "Ajouter" }}
-              </button>
-              <button
-                v-if="isEditing"
-                type="button"
-                @click="cancelEdit"
-                class="btn btn-ghost"
-              >
+              </UiButton>
+              <UiButton variant="ghost" v-if="isEditing" @click="cancelEdit">
                 Annuler
-              </button>
+              </UiButton>
             </div>
           </form>
 
@@ -76,18 +71,12 @@
                   <td>{{ devise.Code }}</td>
                   <td>{{ devise.Sigle }}</td>
                   <td class="d-flex gap-2 justify-center">
-                    <button
-                      @click="editDevise(devise)"
-                      class="btn btn-primary text-base"
-                    >
+                    <UiButton variant="soft-primary" @click="editDevise(devise)" size="sm">
                       ✏️
-                    </button>
-                    <button
-                      @click="deleteDevise(devise.Id_Devise)"
-                      class="btn btn-error text-base" style="height: 40px; margin-top: 10px;"
-                    >
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteDevise(devise.Id_Devise)" size="sm">
                       Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>

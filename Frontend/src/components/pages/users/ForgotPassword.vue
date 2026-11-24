@@ -12,9 +12,9 @@
           Si un compte existe pour <strong>{{ email }}</strong>, un lien de réinitialisation vient d'y être envoyé.
         </p>
       </div>
-      <button type="button" class="fs-btn fs-btn--primary fs-btn--block" @click="openGmail">
+      <UiButton variant="primary" @click="openGmail" block>
         <i class="bi bi-box-arrow-up-right"></i> Ouvrir la messagerie
-      </button>
+      </UiButton>
     </div>
 
     <form v-else class="fs-form" @submit.prevent="sendLink">
@@ -25,14 +25,13 @@
         <label for="forgot-email">Adresse email</label>
         <input id="forgot-email" v-model="email" type="email" class="fs-input" autocomplete="email" placeholder="nom@exemple.com" required />
       </div>
-      <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-        <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+      <UiButton variant="primary" :loading="loading" block type="submit">
         {{ loading ? 'Envoi…' : 'Envoyer le lien' }}
-      </button>
+      </UiButton>
     </form>
 
     <p class="fs-muted-text">
-      <router-link to="/" class="fs-link"><i class="bi bi-arrow-left"></i> Retour à la connexion</router-link>
+      <UiButton variant="link" to="/"><i class="bi bi-arrow-left"></i> Retour à la connexion</UiButton>
     </p>
   </AuthLayout>
 </template>

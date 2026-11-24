@@ -7,7 +7,7 @@
     <div v-if="done" class="fs-success-box">
       <i class="bi bi-check2"></i>
       <p style="margin: 0; font-weight: 600; color: var(--fs-text);">Mot de passe réinitialisé !</p>
-      <router-link to="/" class="fs-btn fs-btn--primary fs-btn--block">Se connecter</router-link>
+      <UiButton variant="primary" to="/" block>Se connecter</UiButton>
     </div>
 
     <form v-else class="fs-form" @submit.prevent="submitForm">
@@ -26,10 +26,9 @@
         <label for="reset-password2">Confirmer le mot de passe</label>
         <input id="reset-password2" v-model="password_confirmation" type="password" class="fs-input" autocomplete="new-password" required />
       </div>
-      <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
-        <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+      <UiButton variant="primary" :loading="loading" block type="submit">
         {{ loading ? 'Enregistrement…' : 'Réinitialiser le mot de passe' }}
-      </button>
+      </UiButton>
     </form>
   </AuthLayout>
 </template>

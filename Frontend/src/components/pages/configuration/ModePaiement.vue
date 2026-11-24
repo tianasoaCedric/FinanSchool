@@ -36,17 +36,12 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary">
+              <UiButton variant="primary" type="submit">
                 {{ isEditing ? "Mettre à jour" : "Ajouter" }}
-              </button>
-              <button
-                v-if="isEditing"
-                type="button"
-                @click="resetForm"
-                class="btn btn-ghost"
-              >
+              </UiButton>
+              <UiButton variant="ghost" v-if="isEditing" @click="resetForm">
                 Annuler
-              </button>
+              </UiButton>
             </div>
           </form>
 
@@ -67,18 +62,12 @@
                   <td>{{ mode.Libelle }}</td>
                   <td>{{ mode.Abr }}</td>
                   <td class="d-flex gap-2">
-                    <button
-                      @click="editModePaiement(mode)"
-                      class="btn btn-primary text-base"
-                    >
+                    <UiButton variant="soft-primary" @click="editModePaiement(mode)" size="sm">
                       Modifier
-                    </button>
-                    <button
-                      @click="deleteModePaiement(mode.Id_Mode_paiement)"
-                      class="btn btn-error text-base" style="height: 40px; margin-top: 10px;"
-                    >
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteModePaiement(mode.Id_Mode_paiement)" size="sm">
                       Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>

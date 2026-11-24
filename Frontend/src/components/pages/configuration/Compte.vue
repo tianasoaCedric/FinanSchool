@@ -282,9 +282,9 @@ const goToPage = (page) => { currentPage.value = page }
             </div>
           </div>
           
-          <button @click="openCreateModal" class="btn btn-primary mb-4" style="margin-bottom: 15px;">
+          <UiButton variant="primary" @click="openCreateModal" class="mb-4">
             Nouveau compte
-          </button>
+          </UiButton>
           
           <div class="table-container mt-5">
             <table class="table table-bordered table-striped">
@@ -304,12 +304,12 @@ const goToPage = (page) => { currentPage.value = page }
                   <td>{{ compte.rubrique?.classe?.Code }}</td>
                   <td>{{ compte.rubrique?.Libelle }}</td>
                   <td class="d-flex gap-2">
-                    <button @click="openEditModal(compte)" class="btn btn-primary text-base">
+                    <UiButton variant="soft-primary" @click="openEditModal(compte)" size="sm">
                       Modifier
-                    </button>
-                    <button @click="deleteCompte(compte.Id_Compte)" class="btn btn-error">
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteCompte(compte.Id_Compte)" size="sm">
                       Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>
@@ -317,21 +317,15 @@ const goToPage = (page) => { currentPage.value = page }
           </div>
           
           <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <button @click="prevPage" :disabled="currentPage === 1" class="btn btn-ghost btn-sm text-base">
+            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" size="sm">
               <i class="bi bi-chevron-left"></i>
-            </button>
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn"
-              :class="{'btn-primary': currentPage === page, 'btn-ghost': currentPage !== page}"
-            >
+            </UiButton>
+            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined">
               {{ page }}
-            </button>
-            <button @click="nextPage" :disabled="currentPage === totalPages" class="btn btn-ghost btn-sm text-base">
+            </UiButton>
+            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" size="sm">
               <i class="bi bi-chevron-right"></i>
-            </button>
+            </UiButton>
           </div>
         </div>
         
@@ -344,7 +338,7 @@ const goToPage = (page) => { currentPage.value = page }
           <h2 class="modal-title">
             {{ isEditing ? 'Modifier le compte' : 'Nouveau compte' }}
           </h2>
-          <button @click="showModal = false" class="modal-close">×</button>
+          <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
         </div>
         <form @submit.prevent="saveCompte" class="modal-body">
           <div class="form-group">
@@ -369,8 +363,8 @@ const goToPage = (page) => { currentPage.value = page }
             <input type="text" v-model="form.Libelle" class="form-input w-full" required />
           </div>
           <div class="modal-footer">
-            <button type="button" @click="showModal = false" class="btn btn-ghost">Annuler</button>
-            <button type="submit" class="btn btn-primary">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</button>
+            <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+            <UiButton variant="primary" type="submit">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
           </div>
         </form>
       </div>
@@ -380,12 +374,12 @@ const goToPage = (page) => { currentPage.value = page }
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title" style="color: #047857;">Succès</h2>
-          <button @click="showSuccessModal = false" class="modal-close">×</button>
+          <UiButton variant="ghost" @click="showSuccessModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
         </div>
         <div class="modal-body" style="text-align: center;">
           <p style="font-size: 1.1rem;">{{ successModalMessage }}</p>
           <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
-            <button class="btn btn-primary" @click="showSuccessModal = false">OK</button>
+            <UiButton variant="primary" @click="showSuccessModal = false">OK</UiButton>
           </div>
         </div>
       </div>
@@ -395,12 +389,12 @@ const goToPage = (page) => { currentPage.value = page }
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title" style="color: #dc2626;">Erreur</h2>
-          <button @click="showErrorModal = false" class="modal-close">×</button>
+          <UiButton variant="ghost" @click="showErrorModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
         </div>
         <div class="modal-body" style="text-align: center;">
           <p style="font-size: 1.1rem;">{{ errorModalMessage }}</p>
           <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
-            <button class="btn btn-primary" @click="showErrorModal = false">OK</button>
+            <UiButton variant="primary" @click="showErrorModal = false">OK</UiButton>
           </div>
         </div>
       </div>

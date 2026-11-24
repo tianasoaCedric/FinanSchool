@@ -132,7 +132,7 @@ onMounted(async () => {
 <div class="card card-form">
         <div class="card-header d-flex space-between align-items-center">
           
-          <button class="btn btn-primary" @click="showImportModal = true" style="margin-left: 500px;">Importer un fichier</button>
+          <UiButton variant="primary" @click="showImportModal = true" style="margin-left: 500px;">Importer un fichier</UiButton>
         </div>
         <div class="card-body">
           <h3>Historique des imports</h3>
@@ -171,7 +171,7 @@ onMounted(async () => {
         <div class="modal">
           <div class="modal-header">
             <h2 class="modal-title">Importer un fichier d'écritures</h2>
-            <button @click="showImportModal = false; clearFile()" class="modal-close">×</button>
+            <UiButton variant="ghost" @click="showImportModal = false; clearFile()" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
           </div>
           <div class="modal-body">
             <div
@@ -186,7 +186,7 @@ onMounted(async () => {
                 @change="handleFileChange" />
               <div v-if="selectedFile">
                 <strong>Fichier sélectionné:</strong> {{ selectedFile.name }}
-                <button @click.stop="clearFile" class="btn btn-error btn-sm">Retirer</button>
+                <UiButton variant="danger" @click.stop="clearFile" size="sm">Retirer</UiButton>
               </div>
               <div v-else>
                 Glissez-déposez un fichier CSV ou Excel ici, ou cliquez pour sélectionner.
@@ -212,10 +212,10 @@ onMounted(async () => {
               <div v-for="err in importErrors" :key="err">{{ err }}</div>
             </div>
             <div class="modal-footer mt-3">
-              <button class="btn btn-ghost" @click="showImportModal = false; clearFile()">Annuler</button>
-              <button class="btn btn-primary" :disabled="!selectedFile || !formatValide || isImporting" @click="sendImport">
+              <UiButton variant="ghost" @click="showImportModal = false; clearFile()">Annuler</UiButton>
+              <UiButton variant="primary" :disabled="!selectedFile || !formatValide || isImporting" @click="sendImport">
                 Importer
-              </button>
+              </UiButton>
             </div>
             <div v-if="importSuccess" class="text-success mt-2">{{ importSuccess }}</div>
           </div>

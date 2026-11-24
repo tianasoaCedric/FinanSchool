@@ -25,17 +25,12 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary">
+              <UiButton variant="primary" type="submit">
                 {{ isEditing ? "Mettre à jour" : "Ajouter" }}
-              </button>
-              <button
-                v-if="isEditing"
-                type="button"
-                @click="resetForm"
-                class="btn btn-ghost"
-              >
+              </UiButton>
+              <UiButton variant="ghost" v-if="isEditing" @click="resetForm">
                 Annuler
-              </button>
+              </UiButton>
             </div>
           </form>
 
@@ -54,18 +49,12 @@
                   <td>{{ journal.Id_Type_Journal }}</td>
                   <td>{{ journal.Type }}</td>
                   <td class="d-flex gap-2">
-                    <button
-                      @click="editTypeJournal(journal)"
-                      class="btn btn-primary text-base"
-                    >
+                    <UiButton variant="soft-primary" @click="editTypeJournal(journal)" size="sm">
                       Modifier
-                    </button>
-                    <button
-                      @click="deleteTypeJournal(journal.Id_Type_Journal)"
-                      class="btn btn-error text-base" style="height: 40px; margin-top: 10px;"
-                    >
+                    </UiButton>
+                    <UiButton variant="soft-danger" @click="deleteTypeJournal(journal.Id_Type_Journal)" size="sm">
                       Supprimer
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
               </tbody>

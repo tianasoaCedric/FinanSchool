@@ -11,29 +11,29 @@
         <div v-if="rapport" class="stat-row mb-4">
           <div class="stat-block">
             <span class="stat-label">Écritures à valider</span>
-            <span class="stat-value badge badge-warning">{{ rapport.total_non_validees }}</span>
+            <UiBadge tone="warning" size="lg" class="stat-value">{{ rapport.total_non_validees }}</UiBadge>
           </div>
           <div class="stat-block">
             <span class="stat-label">Validées</span>
-            <span class="stat-value badge badge-success">{{ rapport.valides }}</span>
+            <UiBadge tone="success" size="lg" class="stat-value">{{ rapport.valides }}</UiBadge>
           </div>
           <div class="stat-block">
             <span class="stat-label">Non valides</span>
-            <span class="stat-value badge badge-danger">{{ rapport.invalides }}</span>
+            <UiBadge tone="danger" size="lg" class="stat-value">{{ rapport.invalides }}</UiBadge>
           </div>
           <div class="stat-block">
             <span class="stat-label">Valides (restants)</span>
-            <span class="stat-value badge badge-primary">{{ rapport.validables }}</span>
+            <UiBadge tone="primary" size="lg" class="stat-value">{{ rapport.validables }}</UiBadge>
           </div>
           <div class="stat-block">
             <span class="stat-label">Mouvements non équilibrés</span>
-            <span class="stat-value badge badge-info">{{ rapport.mouvements_non_equilibres }}</span>
+            <UiBadge tone="info" size="lg" class="stat-value">{{ rapport.mouvements_non_equilibres }}</UiBadge>
           </div>
         </div>
-        <button class="btn btn-success mt-2" :disabled="validating" @click="validerToutes">
+        <UiButton variant="success" :disabled="validating" @click="validerToutes">
           <i v-if="validating" class="spinner spinner-sm me-2"></i>
           Valider toutes les écritures non validées
-        </button>
+        </UiButton>
       </div>
       <!-- ... reste inchangé ... -->
       <div class="card mb-8">
@@ -63,7 +63,7 @@
                 <td class="text-right">{{ formatMontant(ligne.Credit) }}</td>
                 <td>{{ ligne.Reference }}</td>
                 <td>
-                  <span class="badge badge-warning">À valider</span>
+                  <UiBadge tone="warning">À valider</UiBadge>
                 </td>
               </tr>
             </tbody>
@@ -71,9 +71,9 @@
           <div v-else class="text-center text-gray-500 py-4">Aucune écriture non validée à afficher</div>
 
           <div v-if="ecritures.last_page > 1" class="mt-4 flex justify-center items-center gap-2">
-            <button @click="changePage(ecritures.current_page-1)" :disabled="ecritures.current_page === 1" class="btn btn-xs btn-ghost">Précédent</button>
+            <UiButton variant="ghost" @click="changePage(ecritures.current_page-1)" :disabled="ecritures.current_page === 1" size="sm">Précédent</UiButton>
             <span class="mx-2">Page {{ ecritures.current_page }} / {{ ecritures.last_page }}</span>
-            <button @click="changePage(ecritures.current_page+1)" :disabled="ecritures.current_page === ecritures.last_page" class="btn btn-xs btn-ghost">Suivant</button>
+            <UiButton variant="ghost" @click="changePage(ecritures.current_page+1)" :disabled="ecritures.current_page === ecritures.last_page" size="sm">Suivant</UiButton>
           </div>
         </div>
       </div>
@@ -83,12 +83,12 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Succès</h2>
-      <button @click="showSuccessModal = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showSuccessModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <div class="modal-body">
       <p>{{ successModalMessage }}</p>
       <div class="modal-footer">
-        <button class="btn btn-primary" @click="showSuccessModal = false">OK</button>
+        <UiButton variant="primary" @click="showSuccessModal = false">OK</UiButton>
       </div>
     </div>
   </div>
@@ -98,12 +98,12 @@
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Erreur</h2>
-      <button @click="showErrorModal = false" class="modal-close">×</button>
+      <UiButton variant="ghost" @click="showErrorModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
     </div>
     <div class="modal-body">
       <p>{{ errorModalMessage }}</p>
       <div class="modal-footer">
-        <button class="btn btn-primary" @click="showErrorModal = false">OK</button>
+        <UiButton variant="primary" @click="showErrorModal = false">OK</UiButton>
       </div>
     </div>
   </div>

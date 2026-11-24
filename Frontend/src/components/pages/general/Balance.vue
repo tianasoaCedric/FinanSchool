@@ -30,9 +30,9 @@
           </select>
         </div>
         <div class="fs-filters__actions">
-          <button type="button" class="fs-btn" @click="resetFilters">
+          <UiButton @click="resetFilters">
             <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
-          </button>
+          </UiButton>
         </div>
       </form>
     </template>

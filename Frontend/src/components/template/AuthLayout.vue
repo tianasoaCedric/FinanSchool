@@ -15,15 +15,9 @@
     </aside>
 
     <main class="auth-main">
-      <button
-        type="button"
-        class="fs-btn fs-btn--icon fs-btn--ghost auth-theme"
-        :aria-label="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
-        :title="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
-        @click="toggleTheme"
-      >
+      <UiButton variant="ghost" :aria-label="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'" :title="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'" @click="toggleTheme" class="auth-theme" aria-label="Action" icon-only>
         <i :class="theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars'"></i>
-      </button>
+      </UiButton>
 
       <div class="auth-panel">
         <img src="@/assets/img/01Raitra kidz 300px.png" alt="Raitra Kidz" class="auth-panel__logo" />
