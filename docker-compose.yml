@@ -1,0 +1,89 @@
+name: finanschool
+
+# Lancement : docker compose up --build
+#   Frontend : http://localhost:5173
+#   Backend  : http://localhost:8000
+#   Postgres : localhost:5433 (user postgres / mdp postgres / base finance)
+
+x-backend-env: &backend-env
+  DB_CONNECTION: pgsql
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_DATABASE: finance
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: finance
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Restauré automatiquement uniquement au premier démarrage (volume vide)
+      - ./Backend/export_base.sql:/docker-entrypoint-initdb.d/01-export_base.sql:ro
+      - ./docker/db/02-sync-migrations.sql:/docker-entrypoint-initdb.d/02-sync-migrations.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d finance"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  backend:
+    build: ./docker/php
+    image: finanschool-backend
+    working_dir: /var/www/html
+    environment: *backend-env
+    command: >
+      sh -c "composer install --no-interaction --prefer-dist &&
+             php artisan config:clear &&
+             (php artisan migrate --force || echo 'ATTENTION: migrate a echoue') &&
+             cd public &&
+             PHP_CLI_SERVER_WORKERS=4 php -S 0.0.0.0:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
+    # Pas de 'artisan serve' : il ne transmet pas DB_HOST & co au processus PHP
+    # et retomberait sur les valeurs du .env (127.0.0.1).
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scheduler:
+    build: ./docker/php
+    image: finanschool-backend
+    working_dir: /var/www/html
+    environment: *backend-env
+    command: >
+      sh -c "until [ -f vendor/autoload.php ]; do echo 'attente composer...'; sleep 3; done;
+             php artisan schedule:work"
+    volumes:
+      - ./Backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    depends_on:
+      - backend
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  backend_vendor:
+  frontend_node_modules:

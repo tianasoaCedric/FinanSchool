@@ -1,10 +1,11 @@
+import { API_BASE } from '@/config/api';
 import { ref } from 'vue'
 import axios from 'axios'
 import html2pdf from 'html2pdf.js'
 import * as XLSX from 'xlsx-js-style'
 
 export const useExportDiagnostic = () => {
-  const API_URL = "http://127.0.0.1:8000/api"
+  const API_URL = `${API_BASE}`
   const loading = ref(false)
   const message = ref('')
 

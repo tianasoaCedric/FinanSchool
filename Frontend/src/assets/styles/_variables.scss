@@ -4,39 +4,11 @@ $tablet: 1024px;
 $desktop: 1200px;
 $small-mobile: 480px;
 
+// Ce fichier est injecté dans CHAQUE composant (vite.config.js > additionalData) :
+// n'y mettre que des variables/mixins, jamais de CSS réel (@font-face, règles…),
+// sinon il est dupliqué dans le bundle. Les polices sont dans fonts.css.
+
 // couleurs
-@font-face {
-    font-family: 'Ninetea-Medium';
-    src: url('/fonts/Ninetea-Medium.woff2') format('woff2'),
-         url('/fonts/Ninetea-Medium.woff') format('woff');
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Ninetea-Bold';
-    src: url('/fonts/Ninetea-Bold.woff2') format('woff2'),
-         url('/fonts/Ninetea-Bold.woff') format('woff');
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Ninetea-Black';
-    src: url('/fonts/Ninetea-Black.woff2') format('woff2'),
-         url('/fonts/Ninetea-Black.woff') format('woff');
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Ninetea-SemiBold';
-    src: url('/fonts/Ninetea-SemiBold.woff2') format('woff2'),
-         url('/fonts/Ninetea-SemiBold.woff') format('woff');
-    font-style: normal;
-    font-display: swap;
-}
-
 $gradient: linear-gradient(135deg, #1F2F98, #0136D4);
 $primary:#053170;
 $secondary:#2657eb;

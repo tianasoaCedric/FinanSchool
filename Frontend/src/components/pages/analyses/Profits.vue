@@ -399,7 +399,6 @@ body {
   //   #ffffff, 
   //   #ffe0e0, 
   //   #ffffff);
-  background: url('@/assets/img/25.jpg') center no-repeat;
   background-color: $light;
   background-size:cover;
   // animation: gradient 15s ease infinite;

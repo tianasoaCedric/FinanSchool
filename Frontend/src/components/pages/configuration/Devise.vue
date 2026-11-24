@@ -1,17 +1,13 @@
 <template>
-  <div class="dashboard-container">
-    <!-- Header -->
-    <Header v-if="user" :user="user" />
-
-    <!-- Sidebar -->
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-
-    <!-- Main content -->
-    <div class="main-content p-4">
-      <div class="card card-form">
-        <div class="card-header">
-          <h1 class="card-title text-2xl">Gestion des Devises</h1>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-currency-exchange"
+    title="Devises"
+    subtitle="Monnaies utilisables dans les écritures"
+    section="Structure"
+  >
+<div class="card card-form">
+        
         
         <div class="card-body">
           <!-- Formulaire -->
@@ -99,19 +95,17 @@
           </div>
         </div>
         
-        <AppFooter />
+        
       </div>
-    </div>
-  </div>
+  </AppLayout>
 </template>
   
   <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
   import { ref, onMounted } from "vue";
   import axios from "axios";
   import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
 import { getUser } from "../../../services/Auth"; 
 
 const router = useRouter();
@@ -143,16 +137,16 @@ if (!token) {
   
   // Charger les devises
   const fetchDevises = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/devises");
+    const res = await axios.get(`${API_BASE}/devises`);
     devises.value = res.data;
   };
   
   // Sauvegarder (ajout ou update)
   const saveDevise = async () => {
     if (isEditing.value) {
-      await axios.put(`http://127.0.0.1:8000/api/devises/${editingId.value}`, form.value);
+      await axios.put(`${API_BASE}/devises/${editingId.value}`, form.value);
     } else {
-      await axios.post("http://127.0.0.1:8000/api/devises", form.value);
+      await axios.post(`${API_BASE}/devises`, form.value);
     }
     resetForm();
     fetchDevises();
@@ -173,7 +167,7 @@ if (!token) {
   // Supprimer
   const deleteDevise = async (id) => {
     if (confirm("Supprimer cette devise ?")) {
-      await axios.delete(`http://127.0.0.1:8000/api/devises/${id}`);
+      await axios.delete(`${API_BASE}/devises/${id}`);
       fetchDevises();
     }
   };
@@ -221,7 +215,7 @@ if (!token) {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 

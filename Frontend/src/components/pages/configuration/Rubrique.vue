@@ -1,12 +1,10 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth"; 
 const router = useRouter();
 const user = ref(null);
@@ -16,7 +14,7 @@ const handleNavigation = (item) => {
   router.push(item.route);
 };
 
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 const rubriques = ref([])
 const classes = ref([])
 const showModal = ref(false)
@@ -165,15 +163,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    
-    <div class="main-content p-6">
-      <div class="card card-form">
-        <div class="card-header">
-          <h2 class="card-title text-3xl">Gestion des Rubriques</h2>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-diagram-3"
+    title="Rubriques"
+    subtitle="Regroupements des comptes par classe du plan comptable"
+    section="Structure"
+  >
+<div class="card card-form">
+        
         
         <div class="card-body">
           <div class="d-flex justify-between mb-6 gap-4 flex-column md:flex-row">
@@ -339,21 +337,9 @@ onMounted(async () => {
           </div>
         </div>
         
-        <AppFooter />
+        
       </div>
-    </div>
-     <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
-
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>
@@ -367,12 +353,12 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
 .filter-container, .export-container {
-  background: #fff;
+  background: var(--fs-surface);
   padding: 16px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -421,7 +407,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

@@ -4,3 +4,7 @@ Backend/vendor/composer/autoload_classmap.php
 Backend/vendor/composer/autoload_static.php
 Backend/vendor/composer/InstalledVersions.php
 Backend/vendor/composer/platform_check.php
+
+# Captures d'écran de vérification (outil dev)
+docker/screenshots/out/
+docker/screenshots/node_modules/

@@ -1,9 +1,10 @@
+import { API_BASE } from '@/config/api';
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 
 export function useIndicateurGeneral(filters) {
-  const API_URL = "http://127.0.0.1:8000/api";
+  const API_URL = `${API_BASE}`;
   
   const exercice = ref(null);
   const exercicesList = ref([]);

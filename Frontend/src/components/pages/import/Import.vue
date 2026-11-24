@@ -1,10 +1,8 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { useRouter } from 'vue-router'
 import { getUser } from "../../../services/Auth"; // Ajuste le chemin
 
@@ -24,7 +22,7 @@ const importFail = ref('')
 const historique = ref([])
 
 const token = localStorage.getItem("token");
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 
 const loadHistorique = async () => {
   try {
@@ -123,13 +121,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <div v-else class="loading">Chargement...</div>
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />    <div class="main-content p-4">
-      <div class="card card-form">
+  <AppLayout
+    :user="user"
+    icon="bi-cloud-arrow-up"
+    title="Import d'écritures"
+    subtitle="Importez des écritures comptables depuis un fichier Excel"
+    section="Saisie"
+  >
+
+<div class="card card-form">
         <div class="card-header d-flex space-between align-items-center">
-          <h1 class="card-title text-2xl" style="margin-top: 15px;">Import des Écritures Comptables</h1>
+          
           <button class="btn btn-primary" @click="showImportModal = true" style="margin-left: 500px;">Importer un fichier</button>
         </div>
         <div class="card-body">
@@ -221,18 +223,8 @@ onMounted(async () => {
       </div>
       <!-- MODAL END -->
 
-      <AppFooter />
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-    <span v-if="!showChat">💬</span>
-    <span v-else>✖</span>
-  </button>
-  <transition name="chatbot-fade">
-    <div v-if="showChat">
-      <ChatBot />
-    </div>
-  </transition>
-  </div>
+      
+  </AppLayout>
 </template>
 
 <style scoped>
@@ -246,17 +238,17 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
   font-family: 'Manrope', sans-serif;
 }
 .dropzone {
-  border: 2px dashed #ddd;
-  background: #fafbfc;
+  border: 2px dashed var(--fs-border);
+  background: var(--fs-surface-2);
   min-height: 86px;
   display: flex; align-items: center;
   justify-content: center;
-  color: #888;
+  color: var(--fs-muted);
   border-radius: 4px;
   padding: 20px;
   margin-bottom: 10px;
@@ -294,7 +286,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

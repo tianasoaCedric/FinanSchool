@@ -1,6 +1,7 @@
+import { API_BASE } from '@/config/api';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = `${API_BASE}`;
 
 export const login = (email, password) => {
     return axios.post(`${API_URL}/login`, { email, password });

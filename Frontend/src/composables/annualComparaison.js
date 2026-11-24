@@ -1,7 +1,8 @@
+import { API_BASE } from '@/config/api';
 import axios from 'axios';
 import { ref, computed } from 'vue';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = `${API_BASE}`;
 
 // État global simple
 export const globalState = {

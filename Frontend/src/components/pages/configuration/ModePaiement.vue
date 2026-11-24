@@ -1,13 +1,13 @@
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    
-    <div class="main-content p-4">
-      <div class="card card-form">
-        <div class="card-header">
-          <h2 class="card-title text-2xl">Gestion des Modes de Paiement</h2>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-credit-card"
+    title="Modes de paiement"
+    subtitle="Moyens de règlement associés aux écritures"
+    section="Structure"
+  >
+<div class="card card-form">
+        
         
         <div class="card-body">
           <!-- Formulaire -->
@@ -86,28 +86,27 @@
           </div>
         </div>
         
-        <AppFooter />
+        
       </div>
-    </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router'
 import axios from "axios";
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
 import { getUser } from "../../../services/Auth";
 
 const router = useRouter();
+const user = ref(null);
 
 const handleNavigation = (item) => {
   router.push(item.route);
 };
 
-const API_URL = "http://localhost:8000/api/mode-paiements";
+const API_URL = `${API_BASE}/mode-paiements`;
 
 const modePaiements = ref([]);
 const isEditing = ref(false);
@@ -206,7 +205,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 

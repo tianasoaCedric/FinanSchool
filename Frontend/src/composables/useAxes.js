@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import { ref } from "vue";
 import axios from "axios";
 
@@ -25,7 +26,7 @@ export function useAxes() {
     // Charger les axes
     const fetchAxes = async () => {
       loading.value = true;
-      const res = await axios.get("http://127.0.0.1:8000/api/axes");
+      const res = await axios.get(`${API_BASE}/axes`);
       nombreLignesLoader.value = res.data.length || 10;
       axes.value = res.data;
       loading.value = false;
@@ -35,12 +36,12 @@ export function useAxes() {
     const saveAxe = async () => {
       if (isEditing.value) {
         loading.value = true;
-        await axios.put(`http://127.0.0.1:8000/api/axes/${editingId.value}`, form.value);
+        await axios.put(`${API_BASE}/axes/${editingId.value}`, form.value);
         loading.value = false;
         nombreLignesLoader.value = axes.value.length || 10;
       } else {
         loading.value = true;
-        await axios.post("http://127.0.0.1:8000/api/axes", form.value);
+        await axios.post(`${API_BASE}/axes`, form.value);
         loading.value = false;
         nombreLignesLoader.value = axes.value.length || 10;
       }
@@ -61,7 +62,7 @@ export function useAxes() {
     // Supprimer
     const deleteAxe = async (id) => {
         loading.value = true;
-        await axios.delete(`http://127.0.0.1:8000/api/axes/${id}`);
+        await axios.delete(`${API_BASE}/axes/${id}`);
         loading.value = false;
         nombreLignesLoader.value = axes.value.length || 10;
         fetchAxes();
@@ -92,7 +93,7 @@ export function useAxes() {
       formData.append("file", file.value);
     
       try {
-        const res = await axios.post("http://127.0.0.1:8000/api/import/axes", formData, {
+        const res = await axios.post(`${API_BASE}/import/axes`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

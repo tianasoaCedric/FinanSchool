@@ -1,14 +1,14 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-
-    <div class="main-content p-6">
-      <div class="card card-form">
+  <AppLayout
+    :user="user"
+    icon="bi-journal-text"
+    title="Journaux"
+    subtitle="Journaux comptables de l'établissement"
+    section="Saisie"
+  >
+<div class="card card-form">
         <div class="p-6">
-          <div class="card-header">
-            <h1 class="card-title text-3xl" style="font-family: 'Stara' sans-serif;">Gestion des Journaux</h1>
-          </div>
+          
 
           <!-- Formulaire stylisé -->
           <form @submit.prevent="saveJournal" class="card-form">
@@ -85,7 +85,7 @@
             </table>
           </div>
           
-          <AppFooter />
+          
 
                     <!-- Bouton flottant pour ChatBot - hors du flux principal -->
           
@@ -93,27 +93,15 @@
 
         </div>
       </div>
-    </div>
-     <button class="chatbot-float-btn" @click="showChat = !showChat">
-    <span v-if="!showChat">💬</span>
-    <span v-else>✖</span>
-  </button>
-  <transition name="chatbot-fade">
-    <div v-if="showChat">
-      <ChatBot />
-    </div>
-  </transition>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from 'vue-router';
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth";
 
 const router = useRouter();
@@ -149,7 +137,7 @@ if (!token) {
 
 const fetchJournals = async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:8000/api/journals");
+    const res = await axios.get(`${API_BASE}/journals`);
     journals.value = res.data;
     console.log("Journaux chargés:", journals.value);
   } catch (error) {
@@ -160,9 +148,9 @@ const fetchJournals = async () => {
 
 const fetchOptions = async () => {
   try {
-    const types = await axios.get("http://127.0.0.1:8000/api/type-journals");
+    const types = await axios.get(`${API_BASE}/type-journals`);
     typeJournals.value = types.data;
-    const comptes = await axios.get("http://127.0.0.1:8000/api/sous-comptes");
+    const comptes = await axios.get(`${API_BASE}/sous-comptes`);
     sousComptes.value = comptes.data;
   } catch (error) {
     console.error("Erreur lors du chargement des options:", error);
@@ -172,9 +160,9 @@ const fetchOptions = async () => {
 const saveJournal = async () => {
   try {
     if (isEditing.value) {
-      await axios.put(`http://127.0.0.1:8000/api/journals/${editingId.value}`, form.value);
+      await axios.put(`${API_BASE}/journals/${editingId.value}`, form.value);
     } else {
-      await axios.post("http://127.0.0.1:8000/api/journals", form.value);
+      await axios.post(`${API_BASE}/journals`, form.value);
     }
     resetForm();
     fetchJournals();
@@ -201,7 +189,7 @@ const cancelEdit = () => {
 const deleteJournal = async (id) => {
   if (confirm("Supprimer ce journal ?")) {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/journals/${id}`);
+      await axios.delete(`${API_BASE}/journals/${id}`);
       fetchJournals();
     } catch (error) {
       console.error("Erreur lors de la suppression du journal:", error);
@@ -275,7 +263,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
   font-family: 'Stara', sans-serif;
 }
@@ -313,7 +301,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

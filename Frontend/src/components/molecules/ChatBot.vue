@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { API_BASE } from '@/config/api';
 import axios from 'axios';
 import { ref } from 'vue';
 
@@ -161,7 +162,7 @@ export default {
       this.loading = true;
       this.suggestions = [];
       try {
-        const response = await axios.post('http://localhost:8000/api/chat/sending', {
+        const response = await axios.post(`${API_BASE}/chat/sending`, {
           message: userMessage,
           session_id: this.sessionId
         });

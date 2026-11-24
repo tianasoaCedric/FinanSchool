@@ -11,6 +11,7 @@
 </template>
 
 <script setup>
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -28,7 +29,7 @@ onMounted(() => {
 
 const submitForm = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/api/reset-password', {
+    await axios.post(`${API_BASE}/reset-password`, {
       token: token.value,
       email: email.value,
       password: password.value,

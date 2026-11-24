@@ -1,6 +1,7 @@
+import { API_BASE } from '@/config/api';
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = `${API_BASE}`;
 
 export const getAffectations = () => axios.get(`${API_URL}/affectations`);
 export const getCentres = () => axios.get(`${API_URL}/centres`);

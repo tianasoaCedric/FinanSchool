@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import html2pdf from 'html2pdf.js'
 import * as XLSX from 'xlsx-js-style'
 import axios from 'axios'
@@ -15,7 +16,7 @@ export const useExport = () => {
   const getDonneesExport = async (annee) => {
     try {
       console.log(`Récupération données pour l'année: ${annee}`)
-      const response = await axios.get(`http://localhost:8000/api/export/donnees/${annee}`)
+      const response = await axios.get(`${API_BASE}/export/donnees/${annee}`)
       
       console.log('Réponse API:', response.data)
       

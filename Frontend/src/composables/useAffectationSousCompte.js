@@ -1,7 +1,8 @@
+import { API_BASE } from '@/config/api';
 import { ref, computed } from "vue";
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = `${API_BASE}`;
 
 export function useAffectationSousCompte() {
   const form = ref({

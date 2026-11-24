@@ -1,133 +1,75 @@
+<template>
+  <AuthLayout
+    icon="bi-shield-lock"
+    title="Nouveau mot de passe"
+    :subtitle="done ? '' : 'Choisissez un nouveau mot de passe pour votre compte.'"
+  >
+    <div v-if="done" class="fs-success-box">
+      <i class="bi bi-check2"></i>
+      <p style="margin: 0; font-weight: 600; color: var(--fs-text);">Mot de passe réinitialisé !</p>
+      <router-link to="/" class="fs-btn fs-btn--primary fs-btn--block">Se connecter</router-link>
+    </div>
+
+    <form v-else class="fs-form" @submit.prevent="submitForm">
+      <div v-if="errorMessage" class="fs-alert fs-alert--error" role="alert">
+        <i class="bi bi-exclamation-circle"></i> <span>{{ errorMessage }}</span>
+      </div>
+      <div class="fs-field">
+        <label for="reset-email">Adresse email</label>
+        <input id="reset-email" v-model="email" type="email" class="fs-input" readonly />
+      </div>
+      <div class="fs-field">
+        <label for="reset-password">Nouveau mot de passe</label>
+        <input id="reset-password" v-model="password" type="password" class="fs-input" autocomplete="new-password" required />
+      </div>
+      <div class="fs-field">
+        <label for="reset-password2">Confirmer le mot de passe</label>
+        <input id="reset-password2" v-model="password_confirmation" type="password" class="fs-input" autocomplete="new-password" required />
+      </div>
+      <button type="submit" class="fs-btn fs-btn--primary fs-btn--block" :disabled="loading">
+        <span v-if="loading" class="fs-spinner" aria-hidden="true"></span>
+        {{ loading ? 'Enregistrement…' : 'Réinitialiser le mot de passe' }}
+      </button>
+    </form>
+  </AuthLayout>
+</template>
+
 <script setup>
-import Page from '@/components/template/Page.vue';
-import formCard from '@/components/molecules/Form-card.vue';
-import Texte from '@/components/atoms/Texte.vue';
-import Input from '@/components/atoms/Input.vue';
-import Bouton from '@/components/atoms/Bouton.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import Icon from '@/components/atoms/Icon.vue';
-import Popup from '@/components/molecules/Pop-up-card.vue';
-import BoutonLoading from '@/components/atoms/Bouton-loading.vue';
-
+import { API_BASE } from '@/config/api';
+import AuthLayout from '@/components/template/AuthLayout.vue';
 
 const email = ref('');
 const password = ref('');
 const password_confirmation = ref('');
 const token = ref('');
 const errorMessage = ref('');
-const successMessage = ref('');
+const done = ref(false);
 const loading = ref(false);
 
-// Récupérer token + email depuis l'URL
+// Le lien reçu par email contient ?token=…&email=…
 onMounted(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    token.value = urlParams.get('token');
-    email.value = urlParams.get('email');
+  const params = new URLSearchParams(window.location.search);
+  token.value = params.get('token') || '';
+  email.value = params.get('email') || '';
 });
 
-const submitForm = async () => {
-    try {
-        loading.value = true;
-        await axios.post('http://127.0.0.1:8000/api/reset-password', {
-            token: token.value,
-            email: email.value,
-            password: password.value,
-            password_confirmation: password_confirmation.value
-        });
-        successMessage.value = 'Mot de passe réinitialisé avec succès !';
-        errorMessage.value = '';
-    } catch (error) {
-        console.error(error);
-        errorMessage.value = 'Erreur lors de la réinitialisation.';
-        successMessage.value = '';
-    }
-    finally {
-        loading.value = false;
-    }
-};
-const login = async () => {
-    window.location.href = '/';
-};
+async function submitForm() {
+  errorMessage.value = '';
+  loading.value = true;
+  try {
+    await axios.post(`${API_BASE}/reset-password`, {
+      token: token.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: password_confirmation.value,
+    });
+    done.value = true;
+  } catch (error) {
+    errorMessage.value = error.response?.data?.message || 'Erreur lors de la réinitialisation.';
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
-
-<template>
-    <Page :type="'dark'">
-        <div class="main">
-            <Popup v-if="successMessage">
-                <Icon :color="'vert'" :icon="'bi bi-check2'" />
-                <Texte :type="'bold-dark'" texte="Mot de passe réinitialisé !" />
-                <Bouton @click="login" :type="'input'" :texte="'Se connecter'" />
-            </Popup>
-            <div class="gauche">
-                <div class="welcome">
-                    <Texte type="title-light" texte="Bonjour." />
-                    <Texte type="light"
-                        texte="Bienvenue sur votre espace financier sécurisé. Suivez, analysez et maîtrisez vos états financiers en toute confiance." />
-                </div>
-            </div>
-            <div class="droite">
-                <formCard>
-                    <Icon :color="'primary'" :icon="'bi bi-lock'" />
-                    <Texte type="bold-dark" texte="Créez un nouveau mot de passe." />
-                    <form @submit.prevent="submitForm">
-                        <Input :label="'Email'" :type="'email'" v-model="email" :read="'true'" />
-                        <Input :label="'Mot de passe'" :type="'password'" v-model="password" :required="'true'" />
-                        <Input :label="'Confirmer le mot de passe'" :type="'password'" v-model="password_confirmation"
-                            :required="'true'" />
-                        <div class="button" style="margin-top: 24px;">
-                            <Bouton v-if="!loading" :type="'input'" :texte="'Réinitialiser'" />
-                            <BoutonLoading v-if="loading" :type="'input'" :texte="'Connexion ...'" />
-                        </div>
-                    </form>
-                    <Texte v-if="errorMessage" :type="'thin-error'" :texte="errorMessage" />
-                    <Texte v-if="successMessage" :type="'thin-success'" :texte="successMessage" />
-                </formCard>
-            </div>
-        </div>
-    </Page>
-</template>
-<style lang="scss" scoped>
-.forgot-pwd {
-    display: flex;
-    width: auto;
-    gap: 8px;
-    justify-content: center;
-
-    a {
-        text-decoration: none;
-        height: 0px;
-        margin: 0%;
-        padding: 0%;
-    }
-}
-
-.main {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    background: url('@/assets/img/pattern01.png') repeat-x; // répétition horizontale
-    background-size: auto 100%; // garde la taille du pattern
-    animation: scroll-bg 60s linear infinite;
-    .gauche {
-        @include position-contenus(flex, center, center);
-        width: 100%;
-        height: 100vh;
-        border-radius: 0 var(--border-radius, 32px) var(--border-radius, 32px) 0;
-    }
-}
-
-.welcome {
-    display: flex;
-    width: 494px;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-</style>

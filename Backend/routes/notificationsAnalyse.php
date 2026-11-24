@@ -1,5 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\schedule;
+use Illuminate\Support\Facades\Schedule;
 
-schedule::command('comptes:check-non-affectes')->daily();
+Schedule::command('comptes:check-non-affectes')->daily();

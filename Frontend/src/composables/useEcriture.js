@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import { ref, onMounted, nextTick, computed } from "vue";
 import axios from "axios";
 import { useRouter } from 'vue-router';
@@ -63,7 +64,7 @@ const sousCompteForm = ref({
 // ========== CHARGEMENT DES COMPTES ==========
 const fetchComptes = async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:8000/api/comptes");
+    const res = await axios.get(`${API_BASE}/comptes`);
     comptes.value = res.data.data || res.data;
   } catch (error) {
     console.error('Erreur chargement comptes:', error);
@@ -99,8 +100,8 @@ const openSousCompteModalFromDropdown = (mouvementId, ligneIndex) => {
 // ========== SAUVEGARDER SOUS-COMPTE ==========
 const saveSousCompte = async () => {
   try {
-    const res = await axios.post("http://127.0.0.1:8000/api/sous-comptes", sousCompteForm.value);
-    await axios.post("http://127.0.0.1:8000/api/assigner-toutes-automatiquement");
+    const res = await axios.post(`${API_BASE}/sous-comptes`, sousCompteForm.value);
+    await axios.post(`${API_BASE}/assigner-toutes-automatiquement`);
 
     showSuccess('Sous-compte créé avec succès'); // ancien message
     successModalMessage.value = 'Sous-compte créé avec succès';
@@ -149,7 +150,7 @@ const saveSousCompte = async () => {
 const fetchMouvements = async () => {
   try {
     // ✅ Utilisez la route complète au lieu de index()
-    const res = await axios.get("http://127.0.0.1:8000/api/mouvements-complets?limit=100");
+    const res = await axios.get(`${API_BASE}/mouvements-complets?limit=100`);
     
     console.log('📦 Données reçues:', res.data);
     
@@ -169,7 +170,7 @@ const solderMouvement = async (mouvementId) => {
   errorMessage.value = '';
   successMessage.value = '';
   try {
-    const res = await axios.post(`http://127.0.0.1:8000/api/mouvements/${mouvementId}/solder`);
+    const res = await axios.post(`${API_BASE}/mouvements/${mouvementId}/solder`);
     showSuccess('Mouvement soldé : ligne ajoutée');
     await fetchMouvements(); // Refresh listing
   } catch (error) {
@@ -182,9 +183,9 @@ const solderMouvement = async (mouvementId) => {
   const fetchOptions = async () => {
     try {
       const [journalsRes, sousComptesRes, modesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/journals").catch(() => ({ data: [] })),
-        axios.get("http://127.0.0.1:8000/api/sous-comptes").catch(() => ({ data: [] })),
-        axios.get("http://127.0.0.1:8000/api/mode-paiements").catch(() => ({ data: [] }))
+        axios.get(`${API_BASE}/journals`).catch(() => ({ data: [] })),
+        axios.get(`${API_BASE}/sous-comptes`).catch(() => ({ data: [] })),
+        axios.get(`${API_BASE}/mode-paiements`).catch(() => ({ data: [] }))
       ]);
       
       journals.value = journalsRes.data || [];
@@ -202,7 +203,7 @@ const solderMouvement = async (mouvementId) => {
     errorMessage.value = '';
     
     try {
-      await axios.post("http://127.0.0.1:8000/api/mouvements", mouvementForm.value);
+      await axios.post(`${API_BASE}/mouvements`, mouvementForm.value);
       mouvementForm.value.Date_mouvement = "";
       mouvementForm.value.Id_Journal = "";
       showSuccess('Mouvement créé avec succès');
@@ -223,7 +224,7 @@ const solderMouvement = async (mouvementId) => {
     isDeletingMouvement.value = true;
     
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/mouvements/${mouvementId}`);
+      await axios.delete(`${API_BASE}/mouvements/${mouvementId}`);
       showSuccess('Mouvement supprimé avec succès');
       await fetchMouvements();
     } catch (error) {
@@ -440,7 +441,7 @@ const updateLigne = async (mouvementId, ligneIndex) => {
       // ✅ MISE À JOUR d'une ligne existante
       console.log('📝 Mise à jour ligne:', ligne.Id_Ligne_ecriture);
       const res = await axios.put(
-        `http://127.0.0.1:8000/api/lignes/${ligne.Id_Ligne_ecriture}`, 
+        `${API_BASE}/lignes/${ligne.Id_Ligne_ecriture}`, 
         ligneData
       );
       
@@ -451,7 +452,7 @@ const updateLigne = async (mouvementId, ligneIndex) => {
     } else {
       // ✅ CRÉATION d'une nouvelle ligne
       console.log('➕ Création nouvelle ligne');
-      const res = await axios.post("http://127.0.0.1:8000/api/lignes", ligneData);
+      const res = await axios.post(`${API_BASE}/lignes`, ligneData);
       
       // ⚠️ CORRECTION : Récupère l'ID depuis différents formats de réponse
       const newId = res.data.data?.Id_Ligne_ecriture 
@@ -494,7 +495,7 @@ const askDeleteLigne = (mouvementId, ligneIndex) => {
 
   try {
     if (ligne.Id_Ligne_ecriture) {
-      await axios.delete(`http://127.0.0.1:8000/api/lignes/${ligne.Id_Ligne_ecriture}`);
+      await axios.delete(`${API_BASE}/lignes/${ligne.Id_Ligne_ecriture}`);
       showSuccess('Ligne supprimée avec succès');
     }
 
@@ -555,7 +556,7 @@ const askDeleteLigne = (mouvementId, ligneIndex) => {
     isValidating.value = true;
 
     try {
-      await axios.post(`http://127.0.0.1:8000/api/mouvements/${mouvementId}/valider`);
+      await axios.post(`${API_BASE}/mouvements/${mouvementId}/valider`);
       showSuccess('Mouvement validé avec succès');
       await fetchMouvements();
     } catch (error) {

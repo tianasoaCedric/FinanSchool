@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
@@ -23,7 +24,7 @@ const markAsRead = async (notificationId) => {
     }
     
     // Appeler l'API
-    await axios.patch(`http://localhost:8000/api/notifications/${notificationId}/read`)
+    await axios.patch(`${API_BASE}/notifications/${notificationId}/read`)
     
     // Mettre à jour localement
     notification.statut = 'lu'
@@ -73,7 +74,7 @@ const markAsRead = async (notificationId) => {
     }
     notifications.value = notifications.value.filter(n => n.id !== notificationId)
     try {
-        await axios.delete(`http://localhost:8000/api/notifications/${notificationId}`)
+        await axios.delete(`${API_BASE}/notifications/${notificationId}`)
         notifications.value = notifications.value.filter(n => n.id !== notificationId)
         if (notification.statut === 'non_lu') {
           unreadCount.value = Math.max(0, unreadCount.value - 1)
@@ -86,7 +87,7 @@ const markAsRead = async (notificationId) => {
   // Charger les notifications initiales
   const loadNotifications = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/notifications')
+      const response = await axios.get(`${API_BASE}/notifications`)
       notifications.value = response.data
       unreadCount.value = notifications.value.filter(n => n.statut === 'non_lu').length
     } catch (error) {

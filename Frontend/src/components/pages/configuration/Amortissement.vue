@@ -1,18 +1,16 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { getUser } from "../../../services/Auth"
 import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue"
-import Header from "../../molecules/Header.vue"
-import AppFooter from "../../molecules/Footer.vue"
-import ChatBot from "../../molecules/ChatBot.vue"
 
 const router = useRouter()
 const user = ref(null)
 const handleNavigation = (item) => { router.push(item.route) }
 
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 
 const immobilisations = ref([])
 const sousComptes = ref([])
@@ -157,14 +155,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    <div class="main-content p-4">
-      <div class="card card-form">
-        <div class="card-header">
-          <h1 class="card-title text-2xl">Gestion des Immobilisations & Amortissements</h1>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-building-gear"
+    title="Immobilisations & amortissements"
+    subtitle="Suivi des immobilisations et de leurs plans d'amortissement"
+    section="Structure"
+  >
+<div class="card card-form">
+        
         <div class="card-body">
           <div class="d-flex flex-column md:flex-row gap-3 mb-4">
             <div class="form-group w-full">
@@ -275,21 +274,9 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <AppFooter />
+        
       </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
-
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>
@@ -302,7 +289,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 @media (max-width: 768px) {
@@ -359,7 +346,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;
@@ -385,7 +372,7 @@ onMounted(async () => {
   justify-content: center;
 }
 .modal {
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 8px;
   padding: 28px 32px;
   min-width: 350px;

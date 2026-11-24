@@ -1,0 +1,41 @@
+/* Polices chargées une seule fois pour toute l'application (importé dans main.js). */
+@font-face {
+  font-family: 'Ninetea-Medium';
+  src: url('/fonts/Ninetea-Medium.woff2') format('woff2'),
+       url('/fonts/Ninetea-Medium.woff') format('woff');
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ninetea-Bold';
+  src: url('/fonts/Ninetea-Bold.woff2') format('woff2'),
+       url('/fonts/Ninetea-Bold.woff') format('woff');
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ninetea-Black';
+  src: url('/fonts/Ninetea-Black.woff2') format('woff2'),
+       url('/fonts/Ninetea-Black.woff') format('woff');
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ninetea-SemiBold';
+  src: url('/fonts/Ninetea-SemiBold.woff2') format('woff2'),
+       url('/fonts/Ninetea-SemiBold.woff') format('woff');
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Stara';
+  src: url('/fonts/Stara-Medium.woff2') format('woff2'),
+       url('/fonts/Stara-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

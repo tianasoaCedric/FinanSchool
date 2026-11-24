@@ -1,237 +1,61 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Produits from "../views/Produits.vue"; // page Produits
-import Dashboard from "../views/Dashboard.vue"; // page Dashboard
-import HelloWorld from "../components/HelloWorld.vue"; // page d'accueil
-import Login from "@/components/pages/users/Login.vue";
-import ForgotPassword from "@/components/pages/users/ForgotPassword.vue";
-import ResetPassword from "@/components/pages/users/ResetPassword.vue";
-import Register from "@/components/pages/users/Register.vue";
-import Compte from "@/components/pages/configuration/Compte.vue";
-import SousCompte from "@/components/pages/configuration/SousCompte.vue";
-import Rubrique from "@/components/pages/configuration/Rubrique.vue";
-import TypeJournal from "@/components/pages/configuration/TypeJournal.vue";
-import Devise from "@/components/pages/configuration/Devise.vue";
-import Journal from "@/components/pages/configuration/Journal.vue";
-import ModePaiement from "@/components/pages/configuration/ModePaiement.vue";
-import Ecriture from "@/components/pages/saisie/Ecriture.vue";
-import TypeCentre from "@/components/pages/configAnalytique/TypeCentre.vue";
-import AxeAnalytique from "@/components/pages/configAnalytique/AxeAnalytique.vue";
-import CentreAnalytique from "@/components/pages/configAnalytique/CentreAnalytique.vue";
-import AffectationAnalytique from "@/components/pages/configAnalytique/AffectationAnalytique.vue";
-import CoutsEtProfits from "@/components/pages/analyses/Couts.vue";
-import EcritureJournal from "@/components/pages/configuration/EcritureJournal.vue";
-import ListeGrandLivre from "@/components/pages/saisie/ListeGrandLivre.vue";
-import GrandLivre from "@/components/pages/saisie/GrandLivre.vue";
-import Balance from "@/components/pages/general/Balance.vue";
-import ModuleChoice from "@/views/ModuleChoice.vue";
 import AnalyseRoutes from "./routesAnalyse.js";
-import CRNature from "@/components/pages/general/CRNature.vue";
-import CRFonction from "@/components/pages/general/CRFonction.vue";
-import BilanActif from "@/components/pages/general/BilanActif.vue";
-import BilanPassif from "@/components/pages/general/BilanPassif.vue";
-import FluxTresorerie from "@/components/pages/general/FluxTresorerie.vue";
-import VariationsCapitaux from "@/components/pages/general/VariationsCapitaux.vue";
-import Import from "@/components/pages/import/Import.vue";
-import Amortissement from "@/components/pages/configuration/Amortissement.vue";
-import ListeEcriture from "@/components/pages/saisie/ListeEcriture.vue";
-import Validation from "@/components/pages/saisie/Validation.vue";
-import SimulationList from "@/components/pages/Simulation/SimulationList.vue";
+
+// Chaque page est chargée à la demande (code-splitting) : le navigateur ne
+// télécharge que le code de la page affichée au lieu de toute l'application.
 const routes = [
-  {
-    path: "/",
-    name: "Login",
-    component: Login
-  },
+  { path: "/", name: "Login", component: () => import("@/components/pages/users/Login.vue") },
   ...AnalyseRoutes,
-  {
-    path: "/produits",
-    name: "Produits",
-    component: Produits
-  },
-    
-  {
-    path: "/home",
-    name: "Home",
-    component: ModuleChoice
-  },
+  { path: "/produits", name: "Produits", component: () => import("@/views/Produits.vue") },
+  { path: "/home", name: "Home", component: () => import("@/views/ModuleChoice.vue") },
+  { path: "/dashboard", name: "Dashboard", component: () => import("@/views/Dashboard.vue") },
+  { path: "/forgot-password", name: "ForgotPassword", component: () => import("@/components/pages/users/ForgotPassword.vue") },
+  { path: "/reset-password", name: "ResetPassword", component: () => import("@/components/pages/users/ResetPassword.vue") },
+  { path: "/signup", name: "Register", component: () => import("@/components/pages/users/Register.vue") },
 
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: Dashboard
-  },
+  // Configuration
+  { path: "/compte", name: "Compte", component: () => import("@/components/pages/configuration/Compte.vue") },
+  { path: "/souscompte", name: "SousCompte", component: () => import("@/components/pages/configuration/SousCompte.vue") },
+  { path: "/rubrique", name: "Rubrique", component: () => import("@/components/pages/configuration/Rubrique.vue") },
+  { path: "/type-journal", name: "TypeJournal", component: () => import("@/components/pages/configuration/TypeJournal.vue") },
+  { path: "/devise", name: "Devise", component: () => import("@/components/pages/configuration/Devise.vue") },
+  { path: "/journal", name: "Journal", component: () => import("@/components/pages/configuration/Journal.vue") },
+  { path: "/paiement-mode", name: "ModePaiement", component: () => import("@/components/pages/configuration/ModePaiement.vue") },
+  { path: "/amortissement", name: "Amortissement", component: () => import("@/components/pages/configuration/Amortissement.vue") },
+  { path: "/ecritures-journal/:id", name: "EcritureJournal", component: () => import("@/components/pages/configuration/EcritureJournal.vue"), props: true },
 
-  {
-    path: "/forgot-password",
-    name: "ForgotPassword",
-    component: ForgotPassword
-  },
-  {
-    path: "/reset-password",
-    name: "ResetPassword",
-    component: ResetPassword
-  },
-  {
-    path: "/signup",
-    name: "Register",
-    component: Register
-  },
-  {
-    path: "/compte",
-    name: "Compte",
-    component: Compte
-  },
-  {
-    path: "/souscompte",
-    name: "SousCompte",
-    component: SousCompte
-  },
-  {
-    path: "/rubrique",
-    name: "Rubrique",
-    component: Rubrique
-  },
-  {
-    path: "/type-journal",
-    name: TypeJournal,
-    component: TypeJournal
-  },
-  {
-    path: "/devise",
-    name: Devise,
-    component: Devise
-  },
-  {
-    path: "/journal",
-    name: Journal,
-    component: Journal
-  },
+  // Saisie
+  { path: "/ecriture", name: "Ecriture", component: () => import("@/components/pages/Saisie/Ecriture.vue") },
+  { path: "/liste-grand-livre", name: "ListeGrandLivre", component: () => import("@/components/pages/Saisie/ListeGrandLivre.vue") },
+  { path: "/grand-livres/:codeCompte", name: "GrandLivre", component: () => import("@/components/pages/Saisie/GrandLivre.vue"), props: true },
+  { path: "/liste-ecriture", name: "ListeEcriture", component: () => import("@/components/pages/Saisie/ListeEcriture.vue") },
+  { path: "/validation", name: "Validation", component: () => import("@/components/pages/Saisie/Validation.vue") },
+  { path: "/import", name: "Import", component: () => import("@/components/pages/import/Import.vue") },
 
-  {
-      path: "/paiement-mode",
-      name: ModePaiement,
-      component: ModePaiement
-  },
-  {
-    path: "/ecriture",
-    name: Ecriture,
-    component: Ecriture
-  },
-  // analytique
+  // Analytique
+  { path: "/type-centre", name: "TypeCentre", component: () => import("@/components/pages/configAnalytique/TypeCentre.vue") },
+  { path: "/axe-analytique", name: "AxeAnalytique", component: () => import("@/components/pages/configAnalytique/AxeAnalytique.vue") },
+  { path: "/centre-analytique", name: "CentreAnalytique", component: () => import("@/components/pages/configAnalytique/CentreAnalytique.vue") },
+  { path: "/affectation-analytique", name: "AffectationAnalytique", component: () => import("@/components/pages/configAnalytique/AffectationAnalytique.vue") },
+  { path: "/couts-et-profits", name: "CoutsEtProfits", component: () => import("@/components/pages/analyses/Couts.vue") },
 
-{
-    path: "/type-centre",
-    name: TypeCentre,
-    component: TypeCentre
-  },
-  {
-    path: "/axe-analytique",
-    name: AxeAnalytique,
-    component: AxeAnalytique
-  },
-  {
-    path: "/centre-analytique",
-    name: CentreAnalytique,
-    component: CentreAnalytique
-  },
-  {
-    path: "/affectation-analytique",
-    name: AffectationAnalytique,
-    component: AffectationAnalytique
-  },
-  {
-    path: "/couts-et-profits",
-    name: CoutsEtProfits,
-    component: CoutsEtProfits
-  },
-  {
-    path:"/ecritures-journal/:id",
-    name: EcritureJournal,
-    component: EcritureJournal,
-    props: true,
-  },
-  {
-    path:"/liste-grand-livre",
-    name: "ListeGrandLivre",
-    component: ListeGrandLivre
-  },
-  {
-    path:"/grand-livres/:codeCompte",
-    name: "GrandLivre",
-    component: GrandLivre,
-    props: true,
-  },
-  {
-    path:"/balance",
-    name: "Balance",
-    component: Balance
-  },
-  {
-    path: "/CR-Nature",
-    name : "CR-Nature",
-    component : CRNature
-  },
+  // États financiers
+  { path: "/balance", name: "Balance", component: () => import("@/components/pages/general/Balance.vue") },
+  { path: "/CR-Nature", name: "CR-Nature", component: () => import("@/components/pages/general/CRNature.vue") },
+  { path: "/CR-Fonction", name: "CR-Fonction", component: () => import("@/components/pages/general/CRFonction.vue") },
+  { path: "/BilanActif", name: "BilanActif", component: () => import("@/components/pages/general/BilanActif.vue") },
+  { path: "/BilanPassif", name: "BilanPassif", component: () => import("@/components/pages/general/BilanPassif.vue") },
+  { path: "/flux-tresorerie", name: "FluxTresorerie", component: () => import("@/components/pages/general/FluxTresorerie.vue") },
+  { path: "/variation-capitaux", name: "VariationCapitaux", component: () => import("@/components/pages/general/VariationsCapitaux.vue") },
 
-  {
-    path: "/CR-Fonction",
-    name : "CR-Fonction",
-    component : CRFonction
-  },
-  {
-    path: "/BilanActif",
-    name : "BilanActif",
-    component : BilanActif
-  },
-   {
-    path: "/BilanPassif",
-    name : "BilanPassif",
-    component : BilanPassif
-  },
-  {
-    path: "/flux-tresorerie",
-    name : "FluxTresorerie",
-    component : FluxTresorerie
-  },
-  {
-    path : "/variation-capitaux",
-    name : "VariationCapitaux",
-    component : VariationsCapitaux
-  },
-  {
-    path : "/import",
-    name : "Import",
-    component : Import
-  },
-  {
-    path : "/amortissement",
-    name : "Amortissement",
-    component : Amortissement
-  },
-  {
-    path : "/liste-ecriture",
-    name : "ListeEcriture",
-    component : ListeEcriture
-  },
-  {
-    path: "/validation",
-    name : "Validation",
-    component : Validation
-  },
-  {
-    path: "/simulations",
-    name: "Simulations",
-    component: SimulationList
-  }
-
-
-
-
-
+  // Simulation
+  { path: "/simulations", name: "Simulations", component: () => import("@/components/pages/Simulation/SimulationList.vue") },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior: () => ({ top: 0 }),
 });
 
 export default router;

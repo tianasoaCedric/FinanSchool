@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { API_BASE } from '@/config/api';
 import axios from "axios";
 
 export default {
@@ -31,7 +32,7 @@ export default {
     };
   },
   mounted() {
-    axios.get("http://127.0.0.1:8000/api/produits")
+    axios.get(`${API_BASE}/produits`)
       .then(res => this.produits = res.data)
       .catch(err => console.error(err));
   }

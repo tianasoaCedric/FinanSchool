@@ -1,43 +1,33 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
+  <AppLayout
+    :user="user"
+    icon="bi-magic"
+    title="Simulations budgétaires"
+    subtitle="Créez et comparez des scénarios de projection à partir de vos données historiques"
+    section="Outils"
+  >
+    <template #actions>
+      <button type="button" class="fs-btn fs-btn--primary" @click="openCreateModal">
+        <i class="bi bi-plus-lg"></i> Nouvelle simulation
+      </button>
+    </template>
 
-    <div class="main-content">
       <div class="page-animate">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div class="page-header-content">
-            <div class="page-header-icon">
-              <i class="bi bi-graph-up-arrow"></i>
-            </div>
-            <div>
-              <h1 class="page-title">Simulations Budgétaires</h1>
-              <p class="page-subtitle">Créez et gérez vos scénarios de projections financières</p>
-            </div>
-          </div>
-          <div class="page-header-stats" v-if="simulations.length > 0">
-            <div class="header-stat">
-              <span class="header-stat-value">{{ simulations.length }}</span>
-              <span class="header-stat-label">Scénarios</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="search-wrapper">
             <i class="bi bi-search search-icon"></i>
             <input
-              type="text"
+              type="search"
               v-model="searchQuery"
               class="form-input search-input"
-              placeholder="Rechercher un scénario..."
+              placeholder="Rechercher un scénario…"
+              aria-label="Rechercher un scénario"
             >
           </div>
-          <button @click="openCreateModal" class="btn btn-primary btn-create">
-            <i class="bi bi-plus-lg me-2"></i>Nouvelle Simulation
-          </button>
+          <span v-if="simulations.length > 0" class="sim-count">
+            {{ simulations.length }} scénario{{ simulations.length > 1 ? 's' : '' }}
+          </span>
         </div>
 
         <!-- Loading State -->
@@ -88,7 +78,7 @@
               <div class="sim-card-metric">
                 <span class="sim-metric-label">Impact budgétaire</span>
                 <span :class="['sim-metric-value', getSimulationResult(sim) >= 0 ? 'positive' : 'negative']">
-                  <i :class="['bi', getSimulationResult(sim) >= 0 ? 'bi-trending-up' : 'bi-trending-down']"></i>
+                  <i :class="['bi', getSimulationResult(sim) >= 0 ? 'bi-arrow-up-right' : 'bi-arrow-down-right']"></i>
                   {{ getSimulationResult(sim) >= 0 ? '+' : '-' }}{{ Math.abs(getSimulationResult(sim)).toLocaleString('fr-FR') }} Ar
                 </span>
               </div>
@@ -106,9 +96,7 @@
           </div>
         </div>
 
-        <AppFooter />
       </div>
-    </div>
 
     <!-- MODALE DE CRÉATION -->
     <transition name="modal-fade">
@@ -120,7 +108,7 @@
                 <i class="bi bi-sliders2"></i>
               </div>
               <div>
-                <h2 class="modal-title" style="font-family: 'Stara', sans-serif;">
+                <h2 class="modal-title">
                   Paramétrage du Scénario
                 </h2>
                 <p class="modal-subtitle">Configurez vos hypothèses de croissance</p>
@@ -424,25 +412,14 @@
       </div>
     </transition>
 
-    <!-- CHATBOT -->
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-      <i v-if="!showChat" class="bi bi-chat-dots-fill" style="font-size: 1.4rem;"></i>
-      <i v-else class="bi bi-x-lg" style="font-size: 1.4rem;"></i>
-    </button>
-    <transition name="chatbot-fade">
-      <div v-if="showChat"><ChatBot /></div>
-    </transition>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import axios from "axios";
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
+import AppLayout from "@/components/template/AppLayout.vue";
 import { getSimulations, getSimulation, createSimulation, deleteSimulation, getHistoricalData } from "@/services/SimulationService";
 import { getUser } from "@/services/Auth";
 
@@ -628,7 +605,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
   font-family: 'Stara', sans-serif;
 }
@@ -642,7 +619,7 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: var(--fs-surface);
   border-radius: 16px;
   padding: 28px 32px;
   margin-bottom: 24px;
@@ -740,7 +717,7 @@ onMounted(async () => {
   height: 48px !important;
   border-radius: 12px;
   border: 1px solid var(--gray-200);
-  background: white;
+  background: var(--fs-surface);
   width: 100%;
   transition: all 0.2s ease;
   font-size: 0.95rem;
@@ -776,7 +753,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: 80px 32px;
-  background: white;
+  background: var(--fs-surface);
   border-radius: 16px;
   border: 2px dashed var(--gray-200);
   text-align: center;
@@ -786,7 +763,7 @@ onMounted(async () => {
   width: 80px;
   height: 80px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  background: var(--fs-primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -816,7 +793,7 @@ onMounted(async () => {
 }
 
 .sim-card {
-  background: white;
+  background: var(--fs-surface);
   border-radius: 14px;
   border: 1px solid var(--gray-200);
   overflow: hidden;
@@ -871,7 +848,7 @@ onMounted(async () => {
 }
 
 .sim-action-btn.view:hover {
-  background: #eef2ff;
+  background: var(--fs-primary-soft);
   color: var(--primary-dark);
 }
 
@@ -880,7 +857,7 @@ onMounted(async () => {
 }
 
 .sim-action-btn.delete:hover {
-  background: #fef2f2;
+  background: var(--fs-negative-soft);
   color: var(--error-color);
 }
 
@@ -970,7 +947,7 @@ onMounted(async () => {
 }
 
 .modal {
-  background: white;
+  background: var(--fs-surface);
   border-radius: 16px;
   box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.25);
   display: flex;
@@ -1027,7 +1004,7 @@ onMounted(async () => {
 
 /* ===== CREATION MODAL ===== */
 .premium-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, #1c45bd 0%, #13297a 100%);
   padding: 24px 28px;
   border-bottom: none;
 }
@@ -1110,7 +1087,7 @@ onMounted(async () => {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--fs-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1146,9 +1123,9 @@ onMounted(async () => {
   opacity: 0.7;
 }
 
-.bg-success-light { background-color: #f0fdf4 !important; }
-.bg-danger-light { background-color: #fef2f2 !important; }
-.bg-primary-light { background-color: #eef2ff !important; }
+.bg-success-light { background-color: var(--fs-success-soft) !important; }
+.bg-danger-light { background-color: var(--fs-negative-soft) !important; }
+.bg-primary-light { background-color: var(--fs-primary-soft) !important; }
 
 /* ===== SIMULATION TABLE (Creation Modal) ===== */
 .sim-table-wrapper {
@@ -1172,8 +1149,8 @@ onMounted(async () => {
 }
 
 .sim-table th {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: white;
+  background: var(--fs-thead);
+  color: var(--fs-muted);
   font-weight: 600;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -1192,7 +1169,7 @@ onMounted(async () => {
 }
 
 .sim-table-row:hover {
-  background-color: #f8fafc;
+  background-color: var(--fs-surface-2);
 }
 
 .sim-table-row:last-child td {
@@ -1210,13 +1187,13 @@ onMounted(async () => {
 }
 
 .type-produit {
-  background: #ecfdf5;
-  color: #059669;
+  background: var(--fs-success-soft);
+  color: var(--fs-success);
 }
 
 .type-charge {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--fs-negative-soft);
+  color: var(--fs-negative);
 }
 
 .nature-select {
@@ -1224,7 +1201,7 @@ onMounted(async () => {
   border: 1px solid var(--gray-200);
   border-radius: 6px;
   font-size: 0.82rem;
-  background: white;
+  background: var(--fs-surface);
   color: var(--gray-600);
   cursor: pointer;
   outline: none;
@@ -1245,7 +1222,7 @@ onMounted(async () => {
   font-weight: 600;
   outline: none;
   transition: all 0.15s;
-  background: white;
+  background: var(--fs-surface);
 }
 
 .coeff-input:focus {
@@ -1278,13 +1255,13 @@ onMounted(async () => {
 }
 
 .notif-icon.success {
-  background: #ecfdf5;
-  color: #059669;
+  background: var(--fs-success-soft);
+  color: var(--fs-success);
 }
 
 .notif-icon.error {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--fs-negative-soft);
+  color: var(--fs-negative);
 }
 
 .notif-title {
@@ -1315,7 +1292,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 24px;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   border-bottom: 1px solid var(--gray-200);
 }
 
@@ -1352,7 +1329,7 @@ onMounted(async () => {
   padding: 8px 16px;
   border: 1px solid var(--gray-200);
   border-radius: 8px;
-  background: white;
+  background: var(--fs-surface);
   color: var(--gray-600);
   font-size: 0.82rem;
   font-weight: 600;
@@ -1371,7 +1348,7 @@ onMounted(async () => {
   height: 36px;
   border-radius: 8px;
   border: 1px solid var(--gray-200);
-  background: white;
+  background: var(--fs-surface);
   color: var(--gray-400);
   font-size: 1rem;
   cursor: pointer;
@@ -1382,8 +1359,8 @@ onMounted(async () => {
 }
 
 .doc-close-btn:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
+  background: var(--fs-negative-soft);
+  border-color: color-mix(in srgb, var(--fs-negative) 40%, transparent);
   color: var(--error-color);
 }
 
@@ -1391,7 +1368,7 @@ onMounted(async () => {
   padding: 0;
   overflow-y: auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #1e293b;
+  color: var(--fs-text);
 }
 
 /* Report Hero Banner */
@@ -1432,7 +1409,7 @@ onMounted(async () => {
 .report-hero-title {
   font-size: 1.85rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--fs-text);
   margin: 0 0 8px;
   line-height: 1.2;
   letter-spacing: -0.5px;
@@ -1483,7 +1460,7 @@ onMounted(async () => {
   gap: 16px;
   margin: 0 40px 32px;
   padding: 20px 24px;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   border-radius: 12px;
   border: 1px solid var(--gray-200);
 }
@@ -1492,7 +1469,7 @@ onMounted(async () => {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: white;
+  background: var(--fs-surface);
   border: 1px solid var(--gray-200);
   display: flex;
   align-items: center;
@@ -1553,8 +1530,8 @@ onMounted(async () => {
 
 /* Recettes card */
 .kpi-recettes {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-color: #bbf7d0;
+  background: var(--fs-success-soft);
+  border-color: color-mix(in srgb, var(--fs-success) 30%, transparent);
 }
 
 .kpi-recettes .kpi-v2-icon-circle {
@@ -1563,7 +1540,7 @@ onMounted(async () => {
 }
 
 .kpi-recettes .kpi-v2-value {
-  color: #15803d;
+  color: var(--fs-success);
 }
 
 .kpi-recettes .kpi-v2-bar-fill {
@@ -1572,8 +1549,8 @@ onMounted(async () => {
 
 /* Dépenses card */
 .kpi-depenses {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  border-color: #fecaca;
+  background: var(--fs-negative-soft);
+  border-color: color-mix(in srgb, var(--fs-negative) 30%, transparent);
 }
 
 .kpi-depenses .kpi-v2-icon-circle {
@@ -1582,7 +1559,7 @@ onMounted(async () => {
 }
 
 .kpi-depenses .kpi-v2-value {
-  color: #b91c1c;
+  color: var(--fs-negative);
 }
 
 .kpi-depenses .kpi-v2-bar-fill {
@@ -1591,8 +1568,8 @@ onMounted(async () => {
 
 /* Résultat card */
 .kpi-resultat-pos {
-  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-  border-color: #c7d2fe;
+  background: var(--fs-primary-soft);
+  border-color: color-mix(in srgb, var(--fs-primary) 30%, transparent);
 }
 
 .kpi-resultat-pos .kpi-v2-icon-circle {
@@ -1605,13 +1582,13 @@ onMounted(async () => {
 }
 
 .kpi-resultat-pos .kpi-v2-tag {
-  color: #15803d;
-  background: #dcfce7;
+  color: var(--fs-success);
+  background: var(--fs-success-soft);
 }
 
 .kpi-resultat-neg {
-  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-  border-color: #fed7aa;
+  background: var(--fs-warning-soft);
+  border-color: color-mix(in srgb, var(--fs-warning) 30%, transparent);
 }
 
 .kpi-resultat-neg .kpi-v2-icon-circle {
@@ -1620,12 +1597,12 @@ onMounted(async () => {
 }
 
 .kpi-resultat-neg .kpi-v2-value {
-  color: #c2410c;
+  color: var(--fs-warning);
 }
 
 .kpi-resultat-neg .kpi-v2-tag {
-  color: #b91c1c;
-  background: #fee2e2;
+  color: var(--fs-negative);
+  background: var(--fs-negative-soft);
 }
 
 /* KPI V2 inner elements */
@@ -1707,8 +1684,8 @@ onMounted(async () => {
 }
 
 .report-table thead th {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--fs-surface-2);
+  color: var(--fs-text-2);
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -1727,7 +1704,7 @@ onMounted(async () => {
 }
 
 .report-table-row:hover {
-  background: #f8fafc;
+  background: var(--fs-surface-2);
 }
 
 .report-table-row:last-child td {
@@ -1736,7 +1713,7 @@ onMounted(async () => {
 
 .report-poste-name {
   font-weight: 600;
-  color: #334155;
+  color: var(--fs-text);
 }
 
 .nature-badge {
@@ -1757,7 +1734,7 @@ onMounted(async () => {
 
 .report-table-total td {
   padding: 16px 20px;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   border-top: 2px solid var(--gray-200);
   font-size: 0.9rem;
 }
@@ -1842,12 +1819,12 @@ onMounted(async () => {
   .document-body { padding: 0 !important; }
 
   .report-stat-card, .table-responsive, .signature-box, .bg-light {
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid var(--fs-border) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .table th { background: #f1f5f9 !important; color: #1e293b !important; }
+  .table th { background: var(--fs-surface-2) !important; color: var(--fs-text) !important; }
   .text-success { color: #16a34a !important; }
   .text-danger { color: #dc2626 !important; }
   .bg-success-light { background-color: #f0fdf4 !important; }

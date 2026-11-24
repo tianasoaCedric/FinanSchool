@@ -1,14 +1,15 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-
-    <div class="main-content p-6">
-      <div class="card card-form">
+  <AppLayout
+    :user="user"
+    icon="bi-journal-text"
+    title="Écritures du journal"
+    subtitle="Mouvements enregistrés dans ce journal"
+    section="Saisie"
+    wide
+  >
+<div class="card card-form">
         <div class="p-6">
-          <div class="card-header">
-            <h1 class="card-title text-3xl">Écritures du Journal {{ journal }}</h1>
-          </div>
+          
           <br>
 
           <!-- Bouton Retour -->
@@ -78,34 +79,20 @@
             </table>
           </div>
 
-          <AppFooter />
+          
         </div>
       </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
-
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
 import * as XLSX from "xlsx-js-style";
-import Header from "../../molecules/Header.vue";
-import Sidebar from "../../molecules/Sidebar.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth";
 import logo from '@/assets/img/01Raitra kidz 300px.png';
 
@@ -160,7 +147,7 @@ const fetchEcritures = async () => {
       ...(dateFilter.value.date_debut && { date_debut: dateFilter.value.date_debut }),
       ...(dateFilter.value.date_fin && { date_fin: dateFilter.value.date_fin }),
     }).toString();
-    const res = await axios.get(`http://127.0.0.1:8000/api/journals/${journalId.value}/ecritures?${queryParams}`);
+    const res = await axios.get(`${API_BASE}/journals/${journalId.value}/ecritures?${queryParams}`);
     ecritures.value = res.data;
     console.log("Écritures chargées:", ecritures.value);
   } catch (error) {
@@ -171,7 +158,7 @@ const fetchEcritures = async () => {
 
 const fetchDevises = async () => {
   try {
-    const res = await axios.get(`http://127.0.0.1:8000/api/devises`);
+    const res = await axios.get(`${API_BASE}/devises`);
     devises.value = res.data;
     if (devises.value.length > 0) {
       defaultDevise.value = devises.value[0];
@@ -302,9 +289,9 @@ const exportToPDF = async () => {
   // Styles pour le tableau dans tbody
   const tbodyStyle = `
     <style>
-      tbody tr { border: 1px solid #ddd; }
-      tbody tr:nth-child(even) { background-color: #f8f9fa; }
-      tbody td { padding: 8px; border: 1px solid #ddd; font-size: 9px; }
+      tbody tr { border: 1px solid var(--fs-border); }
+      tbody tr:nth-child(even) { background-color: var(--fs-surface-2); }
+      tbody td { padding: 8px; border: 1px solid var(--fs-border); font-size: 9px; }
     </style>
   `;
 
@@ -595,12 +582,12 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
 .filter-container, .export-container {
-  background: #fff;
+  background: var(--fs-surface);
   padding: 16px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -649,7 +636,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

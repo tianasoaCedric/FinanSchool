@@ -1,4 +1,5 @@
 <script>
+import { API_BASE } from '@/config/api';
 import axios from 'axios';
 import { ref } from 'vue';
 
@@ -203,7 +204,7 @@ export default {
       const shouldAutoRead = this.lastMessageWasVoice;
       
       try {
-        const response = await axios.post('http://localhost:8000/api/chat/send', {
+        const response = await axios.post(`${API_BASE}/chat/send`, {
           message: userMessage,
           session_id: this.sessionId
         });

@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { API_BASE } from '@/config/api';
 import axios from 'axios'
 import { ref } from 'vue'
 
@@ -20,7 +21,7 @@ const showOpenMail = ref(false)
 
 const sendLink = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/api/forgot-password', { email: email.value })
+    await axios.post(`${API_BASE}/forgot-password`, { email: email.value })
     alert('Lien envoyé par email !')
     showOpenMail.value = true
   } catch (err) {

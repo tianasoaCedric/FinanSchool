@@ -1,12 +1,11 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { debounce } from 'lodash'
 import { useRouter, useRoute } from 'vue-router'
 import * as XLSX from 'xlsx-js-style';
-import Sidebar from '../../molecules/Sidebar.vue'
-import Header from '../../molecules/Header.vue'
-import AppFooter from '../../molecules/Footer.vue'
 import { getUser } from "../../../services/Auth";
 import logoImg from '../../../assets/img/01300.png'
 import html2pdf from 'html2pdf.js'
@@ -33,7 +32,7 @@ const filters = ref({
 })
 const currentPage = ref(1)
 const itemsPerPage = 20
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 const token = localStorage.getItem('token')
 if (!token) {
   window.location.href = '/'
@@ -359,16 +358,18 @@ const exportToExcel = async () => {
 
 
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    <div class="main-content p-4">
-      <div class="card card-form">
+  <AppLayout
+    :user="user"
+    icon="bi-journal-richtext"
+    :title="isSingleCompte ? `Grand livre — compte ${currentCompte}` : 'Grand livre'"
+    subtitle="Détail des mouvements du compte"
+    section="Saisie"
+    wide
+  >
+<div class="card card-form">
         <div class="card-header">
           <div class="d-flex justify-between items-center">
-            <h1 class="card-title text-2xl">
-              {{ isSingleCompte ? `Grand Livre - Compte ${currentCompte}` : 'Liste des Grand Livres' }}
-            </h1>
+            
             <div class="d-flex gap-2">
               <button v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportGrandLivre" class="btn btn-primary">
                 <i class="bi bi-file-pdf"></i> Exporter PDF
@@ -580,10 +581,9 @@ const exportToExcel = async () => {
             <p>Chargement des données...</p>
           </div>
         </div>
-        <AppFooter />
+        
       </div>
-    </div>
-  </div>
+  </AppLayout>
 </template>
 
 
@@ -598,7 +598,7 @@ const exportToExcel = async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
@@ -607,7 +607,7 @@ const exportToExcel = async () => {
 }
 
 .stat-card {
-  background: #fff;
+  background: var(--fs-surface);
   padding: 16px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -616,7 +616,7 @@ const exportToExcel = async () => {
 
 .stat-label {
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--fs-muted);
   margin-bottom: 8px;
 }
 

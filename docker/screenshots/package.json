@@ -1,0 +1,9 @@
+{
+  "name": "finanschool-screenshots",
+  "private": true,
+  "type": "module",
+  "description": "Outil dev : captures d'écran des pages via Playwright (voir shot.mjs)",
+  "dependencies": {
+    "playwright": "1.49.1"
+  }
+}

@@ -1,63 +1,75 @@
 <template>
-  <header class="app-header">
-    <!-- Recherche globale -->
-    <div class="header-left">
-      <div class="search-container">
-        <i class="bi bi-search"></i>
+  <header class="hd">
+    <div class="hd-left">
+      <div class="hd-search">
+        <i class="bi bi-search" aria-hidden="true"></i>
         <input
-          type="text"
           v-model="searchQuery"
-          placeholder="Rechercher..."
-          class="search-input"
+          type="search"
+          placeholder="Rechercher…"
+          aria-label="Rechercher"
+          class="hd-search-input"
         />
       </div>
     </div>
 
-    <!-- Section droite (Notifications + Profil) -->
-    <div class="header-right">
-      <!-- Notifications -->
-      <div class="notifications-section">
-        <div class="notification-icon" @click="showNotifications = !showNotifications">
-          <i class="bi bi-bell"></i>
-          <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
-        </div>
+    <div class="hd-right">
+      <!-- Mode clair / sombre -->
+      <button
+        type="button"
+        class="hd-icon-btn"
+        :title="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
+        :aria-label="theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
+        @click="toggleTheme"
+      >
+        <i :class="theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars'"></i>
+      </button>
 
-        <!-- Dropdown Notifications -->
-        <div v-show="showNotifications" class="notifications-dropdown">
-          <div class="dropdown-header">
+      <!-- Notifications -->
+      <div class="hd-menu">
+        <button
+          type="button"
+          class="hd-icon-btn"
+          aria-label="Notifications"
+          :aria-expanded="showNotifications"
+          @click="showNotifications = !showNotifications; showProfile = false"
+        >
+          <i class="bi bi-bell"></i>
+          <span v-if="unreadCount > 0" class="hd-badge">{{ unreadCount }}</span>
+        </button>
+
+        <div v-show="showNotifications" class="hd-dropdown hd-dropdown--notif">
+          <div class="hd-dropdown-head">
             <h3>Notifications</h3>
-            <button @click="markAllAsRead" v-if="unreadCount > 0">Tout lire</button>
+            <button v-if="unreadCount > 0" type="button" class="hd-link-btn" @click="markAllAsRead">Tout marquer comme lu</button>
           </div>
-          <div class="notifications-list">
-            <div v-if="notifications.length === 0" class="no-notifications">
-              Aucune notification
-            </div>
-            <div 
-              v-for="notification in notifications" 
+          <div class="hd-notif-list">
+            <p v-if="notifications.length === 0" class="hd-empty">
+              <i class="bi bi-bell-slash"></i> Aucune notification
+            </p>
+            <div
+              v-for="notification in notifications"
               :key="notification.id"
-              class="notification-item"
-              :class="{ unread: notification.statut !== 'lu' }"
+              class="hd-notif"
+              :class="{ 'is-unread': notification.statut !== 'lu' }"
               @click="handleNotificationClick(notification)"
             >
-              <div
-                class="notification-icon-small"
-                :style="getNotificationStyle(notification)"
-              >
-                <i :class="getNotificationIcon(notification)"></i>
+              <div class="hd-notif-icon" :style="getNotificationStyle(notification)">
+                <i :class="['bi', getNotificationIcon(notification)]"></i>
               </div>
-              <div class="notification-content">
-                <p class="notification-title">{{ notification.titre || notification.title }}</p>
-                <p class="notification-message">{{ notification.message }}</p>
-                <p class="notification-date">{{ formatDate(notification.created_at) }}</p>
+              <div class="hd-notif-body">
+                <p class="hd-notif-title">{{ notification.titre || notification.title }}</p>
+                <p class="hd-notif-msg">{{ notification.message }}</p>
+                <p class="hd-notif-date">{{ formatDate(notification.created_at) }}</p>
               </div>
-              <!-- Bouton croix pour suppression côté front -->
               <button
-                class="notification-close"
+                type="button"
+                class="hd-notif-close"
+                aria-label="Retirer de la liste"
+                title="Retirer de la liste"
                 @click.stop="removeFromList(notification.id)"
-                aria-label="Supprimer"
-                title="Supprimer"
               >
-                &times;
+                <i class="bi bi-x"></i>
               </button>
             </div>
           </div>
@@ -65,34 +77,29 @@
       </div>
 
       <!-- Profil -->
-      <div class="profile-section">
-        <div class="profile-trigger" @click="showProfile = !showProfile">
-          <div class="profile-avatar">
-            <span class="avatar-initials">{{ getInitials(user?.name || 'U') }}</span>
-          </div>
-          <div class="profile-info" v-if="user">
-            <span class="profile-name" v-if="user && user.name">{{ user.name }}</span>
-          </div>
-          <i class="bi bi-chevron-down"></i>
-        </div>
+      <div class="hd-menu">
+        <button
+          type="button"
+          class="hd-profile"
+          :aria-expanded="showProfile"
+          @click="showProfile = !showProfile; showNotifications = false"
+        >
+          <span class="hd-avatar">{{ getInitials(user?.name || 'U') }}</span>
+          <span v-if="user?.name" class="hd-profile-name">{{ user.name }}</span>
+          <i class="bi bi-chevron-down hd-profile-chevron"></i>
+        </button>
 
-        <!-- Dropdown Profil -->
-        <div v-show="showProfile" class="profile-dropdown">
-          <div class="profile-dropdown-header">
-            <div class="profile-avatar-large">
-              <span class="avatar-initials">{{ getInitials(user?.name || 'U') }}</span>
-            </div>
-            <div class="profile-details">
-              <h3>{{ user.name || 'Utilisateur' }}</h3>
-              <p>{{ user.email || 'email@example.com' }}</p>
+        <div v-show="showProfile" class="hd-dropdown hd-dropdown--profile">
+          <div class="hd-profile-card">
+            <span class="hd-avatar hd-avatar--lg">{{ getInitials(user?.name || 'U') }}</span>
+            <div>
+              <p class="hd-profile-card-name">{{ user?.name || 'Utilisateur' }}</p>
+              <p class="hd-profile-card-mail">{{ user?.email || '' }}</p>
             </div>
           </div>
-          <div class="profile-menu">
-            <button @click="handleLogout" class="profile-menu-item logout">
-              <i class="bi bi-box-arrow-right"></i>
-              <span>Déconnexion</span>
-            </button>
-          </div>
+          <button type="button" class="hd-menu-item hd-menu-item--danger" @click="handleLogout">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+          </button>
         </div>
       </div>
     </div>
@@ -100,8 +107,9 @@
 </template>
 
 <script>
+import { API_BASE } from '@/config/api';
 import axios from "axios"
-import { useRouter } from 'vue-router'
+import { useTheme } from '@/composables/useTheme';
 
 export default {
   name: 'AppHeader',
@@ -110,6 +118,10 @@ export default {
       type: Object,
       default: () => ({ name: 'Utilisateur', email: 'email@example.com' })
     }
+  },
+  setup() {
+    const { theme, toggleTheme } = useTheme();
+    return { theme, toggleTheme };
   },
   data() {
     return {
@@ -126,8 +138,19 @@ export default {
   },
   mounted() {
     this.fetchNotifications()
+    document.addEventListener('click', this.onDocumentClick)
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.onDocumentClick)
   },
   methods: {
+    // Ferme les menus déroulants quand on clique ailleurs
+    onDocumentClick(event) {
+      if (!this.$el.contains(event.target)) {
+        this.showNotifications = false
+        this.showProfile = false
+      }
+    },
     getInitials(name) {
       return name
         ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -135,7 +158,7 @@ export default {
     },
     async fetchNotifications() {
       try {
-        const { data } = await axios.get('http://localhost:8000/api/notifications')
+        const { data } = await axios.get(`${API_BASE}/notifications`)
         this.notifications = data
       } catch (err) {
         // Optionnel : toasts ou erreur console
@@ -147,7 +170,7 @@ export default {
     getNotificationStyle(notification) {
       return {
         background: notification.niveau_urgence?.couleur || '#dbeafe',
-        color: '#233'
+        color: '#1e293b'
       }
     },
     formatDate(dateString) {
@@ -157,7 +180,7 @@ export default {
       const notif = this.notifications.find(n => n.id === id)
       if (notif && notif.statut !== 'lu') {
         try {
-          await axios.patch(`http://localhost:8000/api/notifications/${id}/read`)
+          await axios.patch(`${API_BASE}/notifications/${id}/read`)
           notif.statut = 'lu'
         } catch (err) {
           // Optionnel : toast/alerte
@@ -167,8 +190,6 @@ export default {
     async markAllAsRead() {
       const unreadIds = this.notifications.filter(n => n.statut !== 'lu').map(n => n.id)
       await Promise.all(unreadIds.map(id => this.markAsRead(id)))
-      // Optionnel : re-fetch pour sync avec backend
-      // await this.fetchNotifications()
     },
     async handleNotificationClick(notification) {
       await this.markAsRead(notification.id)
@@ -187,7 +208,6 @@ export default {
       localStorage.removeItem("token");
       this.$router.push("/")
     },
-    // Ajoutée : suppression côté front
     removeFromList(id) {
       this.notifications = this.notifications.filter(n => n.id !== id)
     }
@@ -196,294 +216,230 @@ export default {
 </script>
 
 <style scoped>
-.app-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 20px 32px;
-  margin-left: 278px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Les couleurs suivent le thème (.fs-page) ; valeurs de repli pour les pages
+   qui n'utilisent pas encore AppLayout. */
+.hd {
+  --hd-bg: var(--fs-surface, #ffffff);
+  --hd-bg-2: var(--fs-surface-2, #f8fafc);
+  --hd-border: var(--fs-border, #e5e8ef);
+  --hd-text: var(--fs-text, #0f172a);
+  --hd-text-2: var(--fs-text-2, #334155);
+  --hd-muted: var(--fs-muted, #64748b);
+  --hd-primary: var(--fs-primary, #1c45bd);
+  --hd-primary-soft: var(--fs-primary-soft, rgba(28, 69, 189, 0.08));
+
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-left: 278px;
+  height: 72px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: color-mix(in srgb, var(--hd-bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--hd-border);
+  font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--hd-text);
 }
-.header-left {
-  flex: 1;
-}
-.search-container {
-  position: relative;
-  max-width: 400px;
-}
-.search-input {
-  width: 100%;
-  padding: 8px 12px 8px 36px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  outline: none;
-  font-family: 'Manrope', sans-serif;
-}
-.search-input:focus {
-  border-color: #1e40af;
-  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
-}
-.bi-search {
+
+.hd-left { flex: 1; min-width: 0; }
+.hd-search { position: relative; max-width: 380px; }
+.hd-search .bi-search {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: var(--hd-muted);
+  font-size: 14px;
+  pointer-events: none;
 }
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.hd-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 36px;
+  border: 1px solid var(--hd-border);
+  border-radius: 10px;
+  background: var(--hd-bg-2);
+  color: var(--hd-text);
+  font: 400 14px inherit;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
-.notifications-section {
-  position: relative;
-}
-.notification-icon {
+.hd-search-input::placeholder { color: var(--hd-muted); }
+.hd-search-input:focus { border-color: var(--hd-primary); background: var(--hd-bg); box-shadow: 0 0 0 3px var(--hd-primary-soft); }
+
+.hd-right { display: flex; align-items: center; gap: 8px; }
+.hd-menu { position: relative; }
+
+.hd-icon-btn {
   position: relative;
   width: 40px;
   height: 40px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.notification-icon:hover {
-  background: #1e40af;
-  color: white;
-}
-.notification-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #dc2626;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
   border-radius: 10px;
-  min-width: 18px;
-}
-.notifications-dropdown {
-  position: absolute;
-  font-family: 'Manrope', sans-serif;
-  top: 50px;
-  right: 0;
-  width: 350px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-}
-.dropdown-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.dropdown-header h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-}
-.dropdown-header button {
-  background: none;
-  border: none;
-  color: #1e40af;
-  font-size: 0.75rem;
+  background: transparent;
+  color: var(--hd-text-2);
+  font-size: 18px;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
-.notifications-list {
-  max-height: 350px;
-  overflow-y: auto;
-}
-.no-notifications {
-  padding: 40px 20px;
+.hd-icon-btn:hover { background: var(--hd-bg-2); color: var(--hd-text); border-color: var(--hd-border); }
+.hd-icon-btn:focus-visible, .hd-profile:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: 2px; }
+.hd-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
   text-align: center;
-  color: #94a3b8;
-  font-size: 0.875rem;
+  box-shadow: 0 0 0 2px var(--hd-bg);
 }
-.notification-item {
-  padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
-  cursor: pointer;
-  display: flex;
-  gap: 12px;
-  position: relative;
-}
-.notification-item:hover {
-  background: #f8fafc;
-}
-.notification-item.unread {
-  background: #eff6ff;
-  border-left: 3px solid #1e40af;
-}
-.notification-icon-small {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+
+.hd-profile {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.notification-content {
-  flex: 1;
-}
-.notification-close {
-  background: none;
-  border: none;
-  color: #888;
-  font-size: 1.4em;
+  gap: 10px;
+  height: 44px;
+  padding: 0 10px 0 4px;
+  margin-left: 6px;
+  border: 1px solid var(--hd-border);
+  border-radius: 999px;
+  background: var(--hd-bg);
+  color: var(--hd-text);
+  font: 500 14px inherit;
+  font-family: inherit;
   cursor: pointer;
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  z-index: 2;
+  transition: background-color 0.15s ease;
 }
-.notification-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-}
-.notification-message {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-}
-.profile-section {
-  position: relative;
-}
-.profile-trigger {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  cursor: pointer;
-  height: 40px;
-  font-family: 'Manrope', sans-serif;
-}
-.profile-trigger:hover {
-  background: #f8fafc;
-}
-.profile-avatar {
-  width: 25px;
-  height: 25px;
+.hd-profile:hover { background: var(--hd-bg-2); }
+.hd-profile-chevron { font-size: 11px; color: var(--hd-muted); }
+.hd-avatar {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: #1e40af;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-family: 'Manrope', sans-serif;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1c45bd, #5b7fff);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
-.profile-info {
-  display: flex;
-  flex-direction: column;
-}
-.profile-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-.bi-chevron-down {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-.profile-dropdown {
+.hd-avatar--lg { width: 44px; height: 44px; font-size: 15px; }
+
+.hd-dropdown {
   position: absolute;
-  top: 40px;
+  top: calc(100% + 10px);
   right: 0;
-  width: 280px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  font-family: 'Manrope', sans-serif;
+  background: var(--hd-bg);
+  border: 1px solid var(--hd-border);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px -16px rgba(15, 23, 42, 0.3);
+  overflow: hidden;
 }
-.profile-dropdown-header {
-  padding: 20px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  gap: 12px;
-}
-.profile-avatar-large {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #1e40af;
-  color: white;
+.hd-dropdown--notif { width: 380px; }
+.hd-dropdown--profile { width: 280px; padding: 8px; }
+
+.hd-dropdown-head {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1rem;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--hd-border);
 }
-.profile-details h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-}
-.profile-details p {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-}
-.profile-menu {
-  padding: 8px 0;
-}
-.profile-menu-item {
-  width: 100%;
+.hd-dropdown-head h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--hd-text); }
+.hd-link-btn { border: 0; background: none; padding: 0; color: var(--hd-primary); font: 500 13px inherit; font-family: inherit; cursor: pointer; }
+.hd-link-btn:hover { text-decoration: underline; }
+
+.hd-notif-list { max-height: 420px; overflow-y: auto; }
+.hd-empty { margin: 0; padding: 32px 16px; text-align: center; color: var(--hd-muted); font-size: 14px; }
+.hd-empty .bi { display: block; font-size: 22px; margin-bottom: 6px; }
+.hd-notif {
+  position: relative;
   display: flex;
-  align-items: center;
   gap: 12px;
-  padding: 12px 20px;
-  border: none;
-  background: none;
+  padding: 12px 36px 12px 16px;
+  border-bottom: 1px solid var(--hd-border);
   cursor: pointer;
-  font-size: 0.875rem;
-  color: #374151;
+  transition: background-color 0.15s ease;
+}
+.hd-notif:last-child { border-bottom: 0; }
+.hd-notif:hover { background: var(--hd-bg-2); }
+.hd-notif.is-unread { background: var(--hd-primary-soft); }
+.hd-notif.is-unread::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--hd-primary);
+}
+.hd-notif-icon { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; }
+.hd-notif-body { min-width: 0; }
+.hd-notif-title { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; color: var(--hd-text); }
+.hd-notif-msg { margin: 0 0 4px; font-size: 13px; color: var(--hd-text-2); line-height: 1.4; }
+.hd-notif-date { margin: 0; font-size: 12px; color: var(--hd-muted); }
+.hd-notif-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--hd-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+.hd-notif:hover .hd-notif-close, .hd-notif-close:focus-visible { opacity: 1; }
+.hd-notif-close:hover { background: var(--hd-border); color: var(--hd-text); }
+
+.hd-profile-card { display: flex; align-items: center; gap: 12px; padding: 10px 10px 14px; border-bottom: 1px solid var(--hd-border); margin-bottom: 6px; }
+.hd-profile-card-name { margin: 0; font-size: 14px; font-weight: 600; color: var(--hd-text); }
+.hd-profile-card-mail { margin: 2px 0 0; font-size: 12.5px; color: var(--hd-muted); word-break: break-all; }
+.hd-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--hd-text-2);
+  font: 500 14px inherit;
+  font-family: inherit;
   text-align: left;
+  cursor: pointer;
 }
-.profile-menu-item:hover {
-  background: #f9fafb;
-}
-.profile-menu-item i {
-  width: 20px;
-}
-.profile-menu-item.logout {
-  color: #dc2626;
-}
-.profile-menu-item.logout:hover {
-  background: #fef2f2;
-}
-.menu-divider {
-  height: 1px;
-  background: #e5e7eb;
-  margin: 8px 0;
-}
+.hd-menu-item:hover { background: var(--hd-bg-2); }
+.hd-menu-item--danger { color: #dc2626; }
+.hd-menu-item--danger:hover { background: rgba(220, 38, 38, 0.08); }
+
 @media (max-width: 768px) {
-  .app-header {
-    margin-left: 0;
-    padding: 16px 20px;
-  }
-  .profile-info {
-    display: none;
-  }
+  .hd { margin-left: 0; padding: 0 16px; }
+  .hd-profile-name { display: none; }
+  .hd-dropdown--notif { width: calc(100vw - 32px); right: -60px; }
 }
 </style>

@@ -1,11 +1,10 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
 import { getUser } from "../../../services/Auth";
 
 const router = useRouter();
@@ -23,7 +22,7 @@ const isEditing = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = 20
 
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 
 const filters = ref({
   classe_id: '',
@@ -229,14 +228,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    <div class="main-content p-4">
-      <div class="card card-form">
-        <div class="card-header">
-          <h1 class="card-title text-2xl">Liste des Grand Livres</h1>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-journals"
+    title="Grand livre"
+    subtitle="Tous les comptes mouvementés et leurs soldes"
+    section="Saisie"
+  >
+<div class="card card-form">
+        
         <div class="card-body">
           <div class="d-flex flex-column md:flex-row gap-3 mb-4">
             <div class="form-group w-full">
@@ -397,10 +397,9 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <AppFooter />
+        
       </div>
-    </div>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>
@@ -414,7 +413,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 

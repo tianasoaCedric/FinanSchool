@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 
@@ -31,7 +32,7 @@ export function useCodesAnalytiques() {
     // Charger les codes analytiques
     const fetchCodes = async () => {
       loading.value = true;
-      const res = await axios.get("http://127.0.0.1:8000/api/codes");
+      const res = await axios.get(`${API_BASE}/codes`);
       nombreLignesLoader.value = res.data.length || 10;
       codes.value = res.data;
       loading.value = false;
@@ -59,12 +60,12 @@ export function useCodesAnalytiques() {
     const saveCode = async () => {
       if (isEditing.value) {
         loading.value = true;
-        await axios.put(`http://127.0.0.1:8000/api/codes/${editingId.value}`, form.value);
+        await axios.put(`${API_BASE}/codes/${editingId.value}`, form.value);
         loading.value = false;
         nombreLignesLoader.value = codes.value.length || 10;
       } else {
         loading.value = true;
-        await axios.post("http://127.0.0.1:8000/api/codes", form.value);
+        await axios.post(`${API_BASE}/codes`, form.value);
         loading.value = false;
         nombreLignesLoader.value = codes.value.length || 10;
       }
@@ -85,7 +86,7 @@ export function useCodesAnalytiques() {
     // Supprimer
     const deleteCode = async (id) => {
         loading.value = true;
-        await axios.delete(`http://127.0.0.1:8000/api/codes/${id}`);
+        await axios.delete(`${API_BASE}/codes/${id}`);
         loading.value = false;
         nombreLignesLoader.value = codes.value.length || 10;
         fetchCodes();
@@ -120,7 +121,7 @@ export function useCodesAnalytiques() {
       formData.append("file", file.value);
     
       try {
-        const res = await axios.post("http://127.0.0.1:8000/api/import/codes", formData, {
+        const res = await axios.post(`${API_BASE}/import/codes`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

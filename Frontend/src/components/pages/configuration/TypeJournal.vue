@@ -1,13 +1,13 @@
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    
-    <div class="main-content p-4">
-      <div class="card card-form">
-        <div class="card-header">
-          <h2 class="card-title text-2xl">Gestion des Types de Journal</h2>
-        </div>
+  <AppLayout
+    :user="user"
+    icon="bi-tags"
+    title="Types de journaux"
+    subtitle="Catégories utilisées pour classer les journaux"
+    section="Saisie"
+  >
+<div class="card card-form">
+        
         
         <div class="card-body">
           <!-- Formulaire -->
@@ -73,31 +73,17 @@
           </div>
         </div>
                     
-        <AppFooter />
+        
       </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
-
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-  </div>  
+  </AppLayout>
 </template>
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth";
 
 const router = useRouter();
@@ -107,7 +93,7 @@ const handleNavigation = (item) => {
   router.push(item.route);
 };
 
-const API_URL = "http://localhost:8000/api/type-journals";
+const API_URL = `${API_BASE}/type-journals`;
 
 const typeJournals = ref([]);
 const isEditing = ref(false);
@@ -209,7 +195,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
@@ -246,7 +232,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

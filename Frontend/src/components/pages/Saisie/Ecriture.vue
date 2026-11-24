@@ -1,17 +1,15 @@
 <template>
-  <div class="dashboard-container w-full">
-    <!-- Header -->
-    <Header v-if="user" :user="user" />
-
-    <!-- Sidebar -->
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-
-    <div class="main-content p-6">
-      <div class="p-4">
+  <AppLayout
+    :user="user"
+    icon="bi-pencil-square"
+    title="Saisie d'écriture"
+    subtitle="Créez un mouvement puis ajoutez ses lignes au débit et au crédit"
+    section="Saisie"
+    wide
+  >
+<div class="p-4">
         <div class="card card-form">
-          <div class="card-header">
-            <h1 class="card-title text-3xl mb-4">Écriture Comptable</h1>
-          </div>
+          
           
           <!-- FORMULAIRE MOUVEMENT -->
           <form @submit.prevent="createMouvement" class="card-form">
@@ -346,23 +344,10 @@
             <p>Créez votre premier mouvement d'écriture en utilisant le formulaire ci-dessus.</p>
           </div>
           
-          <AppFooter />
+          
         </div>
       </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
 
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-
-<!-- MODAL CRÉATION SOUS-COMPTE -->
 <div v-if="showSousCompteModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -428,7 +413,7 @@
   </div>
 </div>
 
-   <div v-if="showDeleteLigneConfirm" class="modal-overlay">
+<div v-if="showDeleteLigneConfirm" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Supprimer la ligne</h2>
@@ -453,6 +438,7 @@
     </div>
   </div>
 </div>
+
 <div v-if="showDeleteMouvementConfirm" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -478,6 +464,7 @@
     </div>
   </div>
 </div>
+
 <div v-if="showSuccessModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -494,18 +481,15 @@
     </div>
   </div>
 </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { getUser } from "../../../services/Auth"; // Adapte le chemin
-import Header from "../../molecules/Header.vue";
-import Sidebar from "../../molecules/Sidebar.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { useEcriture } from '@/composables/useEcriture';
 
 const router = useRouter();
@@ -624,7 +608,7 @@ select:focus {
 }
 
 .hover\:bg-gray-50:hover {
-  background-color: #f9fafb;
+  background-color: var(--fs-surface-2);
 }
 
 .hover\:bg-blue-50:hover {
@@ -669,7 +653,7 @@ input, select {
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--fs-surface-2);
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb {
@@ -690,7 +674,7 @@ input, select {
   box-sizing: border-box;
 }
 .ligne-table td {
-  background: #fff;
+  background: var(--fs-surface);
   vertical-align: middle;
 }
 .ligne-table input:focus,
@@ -701,7 +685,7 @@ input, select {
 
 .input-compact {
   border-radius: 5px !important;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--fs-border);
   height: 28px !important;
   font-size: 15px !important;
   padding: 2px 4px !important;
@@ -726,7 +710,7 @@ input, select {
 }
 
 .modal {
-  background: white;
+  background: var(--fs-surface);
   border-radius: 12px;
   max-width: 500px;
   width: 100%;
@@ -741,14 +725,14 @@ input, select {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--fs-border);
   font-family: 'Manrope', sans-serif;
 }
 
 .modal-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--fs-text);
 }
 
 .modal-close {
@@ -756,12 +740,12 @@ input, select {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--fs-muted);
   transition: color 0.2s;
 }
 
 .modal-close:hover {
-  color: #111827;
+  color: var(--fs-text);
 }
 
 .modal-body {
@@ -843,7 +827,7 @@ input, select {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
@@ -880,7 +864,7 @@ input, select {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

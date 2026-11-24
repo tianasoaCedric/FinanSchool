@@ -1,3 +1,4 @@
+import { API_BASE } from '@/config/api';
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from 'vue-router';
 import axios from "axios";
@@ -5,7 +6,7 @@ import axios from "axios";
 // État global partagé entre tous les composants
 const user = ref(null);
 const isAuthenticated = ref(false);
-const API_URL = 'http://localhost:8000/api';
+const API_URL = `${API_BASE}`;
 export function useAuth() {
   const router = useRouter();
   

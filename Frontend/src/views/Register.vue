@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { API_BASE } from '@/config/api';
 import { ref } from 'vue'
 import axios from 'axios'
 
@@ -47,7 +48,7 @@ const codeDigits = ref(['', '', '', '', '', ''])
 const message = ref('')
 const error = ref(false)
 
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 
 // Étape 1 : envoyer le code
 const sendCode = async () => {

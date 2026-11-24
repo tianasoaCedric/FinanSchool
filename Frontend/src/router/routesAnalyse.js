@@ -1,87 +1,17 @@
-import Analyse from "@/components/pages/analyses/Dashboard.vue";
-import Couts from "@/components/pages/analyses/Couts.vue";
-import Profits from "@/components/pages/analyses/Profits.vue";
-import Comparaison from "@/components/pages/analyses/Comparaison.vue";
-import General from "@/components/pages/indicateurs/General.vue";
-import Liquidite from "@/components/pages/indicateurs/Liquidite.vue";
-import Solvabilite from "@/components/pages/indicateurs/Solvabilite.vue";
-import Rentabilite from "@/components/pages/indicateurs/Rentabilite.vue";
-import NonAffected from "@/components/pages/configAnalytique/NonAffected.vue";
-import CodeAnalytique from "@/components/pages/configAnalytique/CodeAnalytique.vue";
-import Pedagogique from "@/components/pages/indicateurs/Pedagogique.vue";
-import Parametres from "@/components/pages/configAnalytique/Parametres.vue";
-import EffectifEleve from "@/components/pages/configAnalytique/EffectifEleve.vue";
-import Connexion from "@/components/pages/loginAnalyse/Connexion.vue";
-
+// Routes du module Analyse — pages chargées à la demande.
 export default [
-  {
-    path: "/GetStarted",
-    name: "Connexion",
-    component: Connexion
-  },
-  {
-    path: "/analyse",
-    name: "Analyse",
-    component: Analyse
-  },
-  {
-      path: "/couts",
-      name: Couts,
-      component: Couts
-    },
-    {
-      path: "/profits",
-      name: Profits,
-      component: Profits
-    },
-    {
-      path: "/comparatif",
-      name: Comparaison,
-      component: Comparaison
-    },
-    {
-      path: "/indicateur-general",
-      name: General,
-      component: General
-    },
-    {
-      path: "/indicateur-liquidite",
-      name: Liquidite,
-      component: Liquidite
-    },
-    {
-      path: "/indicateur-solvabilite",
-      name: Solvabilite,
-      component: Solvabilite
-    },
-    {
-      path: "/indicateur-rentabilite",
-      name: Rentabilite,
-      component: Rentabilite
-    },
-    {
-      path: "/non-affected",
-      name: NonAffected,
-      component: NonAffected
-    },
-    {
-      path: "/code-analytique",
-      name: CodeAnalytique,
-      component: CodeAnalytique
-    },
-    {
-      path: "/indicateur-pedagogique",
-      name: Pedagogique,
-      component: Pedagogique
-    },
-    {
-      path: "/parametres",
-      name: Parametres,
-      component: Parametres
-    },
-    {
-      path: "/effectif-eleve",
-      name: EffectifEleve,
-      component: EffectifEleve
-    }
+  { path: "/GetStarted", name: "Connexion", component: () => import("@/components/pages/loginAnalyse/Connexion.vue") },
+  { path: "/analyse", name: "Analyse", component: () => import("@/components/pages/analyses/Dashboard.vue") },
+  { path: "/couts", name: "Couts", component: () => import("@/components/pages/analyses/Couts.vue") },
+  { path: "/profits", name: "Profits", component: () => import("@/components/pages/analyses/Profits.vue") },
+  { path: "/comparatif", name: "Comparaison", component: () => import("@/components/pages/analyses/Comparaison.vue") },
+  { path: "/indicateur-general", name: "General", component: () => import("@/components/pages/indicateurs/General.vue") },
+  { path: "/indicateur-liquidite", name: "Liquidite", component: () => import("@/components/pages/indicateurs/Liquidite.vue") },
+  { path: "/indicateur-solvabilite", name: "Solvabilite", component: () => import("@/components/pages/indicateurs/Solvabilite.vue") },
+  { path: "/indicateur-rentabilite", name: "Rentabilite", component: () => import("@/components/pages/indicateurs/Rentabilite.vue") },
+  { path: "/indicateur-pedagogique", name: "Pedagogique", component: () => import("@/components/pages/indicateurs/Pedagogique.vue") },
+  { path: "/non-affected", name: "NonAffected", component: () => import("@/components/pages/configAnalytique/NonAffected.vue") },
+  { path: "/code-analytique", name: "CodeAnalytique", component: () => import("@/components/pages/configAnalytique/CodeAnalytique.vue") },
+  { path: "/parametres", name: "Parametres", component: () => import("@/components/pages/configAnalytique/Parametres.vue") },
+  { path: "/effectif-eleve", name: "EffectifEleve", component: () => import("@/components/pages/configAnalytique/EffectifEleve.vue") },
 ];

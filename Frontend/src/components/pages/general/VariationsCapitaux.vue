@@ -1,145 +1,57 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    <div class="main-content p-6">
-      <div class="card card-form">
-        <div class="p-6">
-          <div class="card-header">
-            <h1 class="text-3xl mb-4">
-              <i class="bi bi-graph-up-arrow me-2"></i> Tableau des Variations des Capitaux Propres
-            </h1>
-          </div>
-          <br>
-          <div class="mb-4">
-            <button @click="goBack" class="btn btn-outline">Retour</button>
-          </div>
-          <br>
-          <!-- FILTRE EXERCICE -->
-          <div class="filter-section mb-6" v-if="exercices.length">
-            <label>
-              <strong>Sélectionner un exercice :</strong>
-              <select v-model="selectedExercice" @change="onExerciceChange" class="form-select">
-                <option v-for="ex in exercices" :key="ex.Id_Exercice_comptable" :value="ex.Id_Exercice_comptable">
-                  {{ ex.Annee_fiscale }} - Du {{ formatDate(ex.Date_debut) }} au {{ formatDate(ex.Date_fin) }}
-                </option>
-              </select>
-            </label>
-          </div>
-          <br>
-          <div class="info-container mb-6" v-if="exerciceInfo.date_debut">
-            <h2 class="text-xl mb-3 font-bold">Informations du tableau</h2>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Exercice :</span>
-                <span class="info-value">{{ exerciceInfo.annee_fiscale }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Période :</span>
-                <span class="info-value">Du {{ formatDate(exerciceInfo.date_debut) }} au {{ formatDate(exerciceInfo.date_fin) }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Unité monétaire :</span>
-                <span class="info-value">Ariary (Ar)</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Statut :</span>
-                <span class="info-value badge" :class="exerciceInfo.statut === 'OUVERT' ? 'badge-success' : 'badge-secondary'">
-                  {{ exerciceInfo.statut }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <br>
-          <div class="export-container mb-6 d-flex gap-4">
-            <button @click="exportToPDF" class="btn btn-primary">Exporter en PDF</button>
-            <button @click="exportToExcel" class="btn btn-primary">Exporter en Excel</button>
-          </div>
-          <br>
-          <div class="table-container mt-6">
-            <table v-if="loading" class="table table-bordered table-striped w-full">
-              <tbody>
-                <tr>
-                  <td colspan="6" class="p-4 text-center text-base">
-                    <span class="spinner spinner-lg"></span> Chargement...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table v-else class="table table-bordered w-full variations-table">
-              <thead>
-                <tr>
-                  <th class="w-30">CAPITAUX PROPRES</th>
-                  <th class="text-right">Capital</th>
-                  <th class="text-right">Primes & Réserves</th>
-                  <th class="text-right">Résultat</th>
-                  <th class="text-right">Report à nouveau</th>
-                  <th class="text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr 
-                  v-for="(ligne, idx) in listeComplete" 
-                  :key="idx" 
-                  :class="{
-                    'total-row': ligne.isTotal,
-                    'detail-row': ligne.isDetail
-                  }"
-                >
-                  <td :class="{ 'font-bold': ligne.isTotal }">{{ ligne.label }}</td>
-                  
-                  <!-- CAPITAL -->
-                  <td class="text-right" :class="{ 'font-bold': ligne.isTotal, 'text-red': ligne.capital < 0 }">
-                    {{ formatMontant(ligne.capital) }}
-                  </td>
-                  
-                  <!-- RESERVES -->
-                  <td class="text-right" :class="{ 'font-bold': ligne.isTotal, 'text-red': ligne.reserves < 0 }">
-                    {{ formatMontant(ligne.reserves) }}
-                  </td>
-                  
-                  <!-- RESULTAT -->
-                  <td class="text-right" :class="{ 'font-bold': ligne.isTotal, 'text-red': ligne.result < 0 }">
-                    {{ formatMontant(ligne.result) }}
-                  </td>
-                  
-                  <!-- REPORT -->
-                  <td class="text-right" :class="{ 'font-bold': ligne.isTotal, 'text-red': ligne.report < 0 }">
-                    {{ formatMontant(ligne.report) }}
-                  </td>
-                  
-                  <!-- TOTAL -->
-                  <td class="text-right" :class="{ 'font-bold': ligne.isTotal, 'text-red': ligne.total < 0 }">
-                    {{ formatMontant(ligne.total) }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <AppFooter />
-        </div>
-      </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-    <span v-if="!showChat">💬</span>
-    <span v-else>✖</span>
-  </button>
-  <transition name="chatbot-fade">
-    <div v-if="showChat">
-      <ChatBot />
-    </div>
-  </transition>
-  </div>
+  <FinancialStatementLayout
+    :user="user"
+    icon="bi-graph-up-arrow"
+    title="Variation des capitaux propres"
+    subtitle="Évolution du capital, des réserves, du résultat et du report à nouveau"
+    table-title="Capitaux propres"
+    :exercice-options="exercices.map(ex => ({ value: ex.Id_Exercice_comptable, label: `Exercice ${ex.Annee_fiscale}` }))"
+    v-model:exercice="selectedExercice"
+    :exercice-info="exerciceInfo"
+    :loading="loading"
+    @exercice-change="onExerciceChange"
+    @export-pdf="exportToPDF"
+    @export-excel="exportToExcel"
+    @back="goBack"
+  >
+    <table class="fs-table">
+      <thead>
+        <tr>
+          <th>Capitaux propres</th>
+          <th class="text-right">Capital</th>
+          <th class="text-right">Primes &amp; réserves</th>
+          <th class="text-right">Résultat</th>
+          <th class="text-right">Report à nouveau</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(ligne, idx) in listeComplete"
+          :key="idx"
+          :class="{ 'total-row': ligne.isTotal, 'detail-row': ligne.isDetail }"
+        >
+          <td>{{ ligne.label }}</td>
+          <td class="text-right" :class="{ 'text-red': ligne.capital < 0 }">{{ formatMontant(ligne.capital) }}</td>
+          <td class="text-right" :class="{ 'text-red': ligne.reserves < 0 }">{{ formatMontant(ligne.reserves) }}</td>
+          <td class="text-right" :class="{ 'text-red': ligne.result < 0 }">{{ formatMontant(ligne.result) }}</td>
+          <td class="text-right" :class="{ 'text-red': ligne.report < 0 }">{{ formatMontant(ligne.report) }}</td>
+          <td class="text-right font-bold" :class="{ 'text-red': ligne.total < 0 }">{{ formatMontant(ligne.total) }}</td>
+        </tr>
+        <tr v-if="!listeComplete.length">
+          <td colspan="6" class="fs-empty">Aucune donnée pour cet exercice</td>
+        </tr>
+      </tbody>
+    </table>
+  </FinancialStatementLayout>
 </template>
 
 <script setup>
+import { API_BASE } from '@/config/api';
+import FinancialStatementLayout from "@/components/template/FinancialStatementLayout.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import Header from "../../molecules/Header.vue";
-import Sidebar from "../../molecules/Sidebar.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import html2pdf from 'html2pdf.js';
 import * as XLSX from 'xlsx-js-style';
 import { getUser } from "../../../services/Auth";
@@ -185,7 +97,7 @@ if (!token) {
 
 const fetchExerciceCourant = async () => {
   try {
-    const { data } = await axios.get("http://localhost:8000/api/exercices/courant");
+    const { data } = await axios.get(`${API_BASE}/exercices/courant`);
     exerciceCourantId.value = data.Id_Exercice_comptable ?? (data.exercice?.Id_Exercice_comptable) ?? "";
   } catch (e) {
     exerciceCourantId.value = "";
@@ -194,7 +106,7 @@ const fetchExerciceCourant = async () => {
 
 const loadExercices = async () => {
   try {
-    const { data } = await axios.get("http://localhost:8000/api/exercices");
+    const { data } = await axios.get(`${API_BASE}/exercices`);
     exercices.value = Array.isArray(data) ? data : (data.exercices || []);
   } catch (error) {
     exercices.value = [];
@@ -241,7 +153,7 @@ const fetchVariationsCapitaux = async () => {
   loading.value = true;
   try {
     if (exerciceInfo.value.date_debut && exerciceInfo.value.date_fin) {
-      const { data } = await axios.get("http://localhost:8000/api/variations-capitaux", {
+      const { data } = await axios.get(`${API_BASE}/variations-capitaux`, {
         params: { date_debut: exerciceInfo.value.date_debut, date_fin: exerciceInfo.value.date_fin }
       });
       listeComplete.value = Array.isArray(data) ? data : (data.structure || []);
@@ -500,95 +412,3 @@ const exportToExcel = () => {
 };
 
 </script>
-
-<style scoped>
-.dashboard-container { display: flex; min-height: 100vh; flex-direction: column; }
-.main-content { margin-left: 278px; padding: 32px; flex: 1; background: #f8fafb; min-height: calc(100vh - 80px);}
-.info-container, .export-container { background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);}
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;}
-.info-item { display: flex; flex-direction: column; gap: 0.25rem;}
-.info-label { font-size: 0.875rem; color: #6b7280; font-weight: 500;}
-.info-value { font-size: 1rem; color: #1f2937; font-weight: 600;}
-.badge { display: inline-block; width: fit-content; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;}
-.badge-success { background-color: #d1fae5; color: #065f46;}
-.badge-secondary { background-color: #e5e7eb; color: #374151;}
-
-.variations-table thead th { background-color: #1e40af; color: white; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 0.75rem; border: 1px solid #ddd;}
-.w-30 { width: 25% !important;}
-
-.total-row { background-color: #e0e7ff !important; font-weight: bold; border-top: 2px solid #3b82f6; border-bottom: 2px solid #3b82f6;}
-.total-row td { padding: 0.75rem 1rem; color: #1e40af; font-weight: 700;}
-
-.detail-row { background-color: #f0f9ff;}
-.detail-row td { padding: 0.6rem 1rem; color: #374151;}
-
-.text-red { color: #dc2626 !important; font-weight: 600; } /* Style pour nombres négatifs */
-
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 100;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Animation d'apparition */
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-.font-bold { font-weight: 700;}
-.table-container { overflow-x: auto; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); border-radius: 0.5rem; background: white;}
-.table tbody tr { border-bottom: 1px solid #e5e7eb;}
-.spinner { display: inline-block; width: 2rem; height: 2rem; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;}
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); }}
-@media (max-width: 768px) { .main-content { margin-left: 0; padding: 1rem;} .info-grid { grid-template-columns: 1fr;} .export-container { flex-direction: column !important;}.dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }}
-</style>

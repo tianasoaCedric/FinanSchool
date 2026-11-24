@@ -1,134 +1,86 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-
-    <div class="main-content p-6">
-      <div class="card card-form">
-        <div class="p-6">
-          <div class="card-header">
-            <h1 class="text-3xl">
-              <i class="bi bi-table me-2"></i> Balance Générale
-            </h1>
-          </div>
-          <br>
-
-          <div class="mb-4">
-            <button @click="goBack" class="btn btn-outline">Retour aux Journaux</button>
-          </div>
-          <br>
-
-          <div class="filter-container mb-6">
-            <h2 class="text-xl mb-4">Filtrer la balance</h2>
-            <form @submit.prevent="applyFilters" class="d-flex gap-4 flex-column flex-md-row">
-              <div class="form-group" style="display: flex;">
-                <label class="form-label">Exercice comptable</label>
-                <select v-model="selectedExercice" class="form-select" @change="onExerciceChange">
-                  <option v-for="ex in exercices" :key="ex.id" :value="ex.id">{{ ex.nom }}</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Classe de compte</label>
-                <select v-model="filters.classe_compte" class="form-select">
-                  <option value="">Toutes</option>
-                  <option value="1">Classe 1 - Capitaux</option>
-                  <option value="2">Classe 2 - Immobilisations</option>
-                  <option value="3">Classe 3 - Stocks</option>
-                  <option value="4">Classe 4 - Tiers</option>
-                  <option value="5">Classe 5 - Finances</option>
-                  <option value="6">Classe 6 - Charges</option>
-                  <option value="7">Classe 7 - Produits</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Date début</label>
-                <input type="date" v-model="filters.date_debut" class="form-input" readonly />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Date fin</label>
-                <input type="date" v-model="filters.date_fin" class="form-input" readonly />
-              </div>
-              <div class="d-flex gap-2 align-center">
-                <button type="submit" class="btn btn-primary" style="height: 40px;">Appliquer</button>
-                <button type="button" @click="resetFilters" class="btn btn-outline" style="height: 40px; margin-top: 10px;">Réinitialiser</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="export-container mb-6 d-flex gap-4">
-            <button @click="exportToPDF" class="btn btn-primary">Exporter en PDF</button>
-            <button @click="exportToExcel" class="btn btn-primary">Exporter en Excel</button>
-          </div>
-
-          <div class="table-container mt-6">
-            <table v-if="loading" class="table table-bordered table-striped w-full">
-              <tbody>
-                <tr>
-                  <td colspan="3" class="p-4 text-center text-base">
-                    <span class="spinner spinner-lg"></span> Chargement...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table v-else class="table table-bordered w-full">
-              <thead>
-                <tr>
-                  <th class="text-base p-4">Compte</th>
-                  <th class="text-base p-4">Débit</th>
-                  <th class="text-base p-4">Crédit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template v-for="(mainAccount, mainCode) in groupedComptes" :key="mainCode">
-                  <tr class="main-account-row">
-                    <td class="p-4 text-base font-bold cursor-pointer" @click="toggleAccount(mainCode)">
-                      <i :class="mainAccount.expanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'" class="me-2"></i>
-                      {{ mainCode }} - {{ mainAccount.libelle }}
-                    </td>
-                    <td class="p-4 text-base font-bold">{{ formatNumber(Math.abs(mainAccount.total_debit)) }}</td>
-                    <td class="p-4 text-base font-bold">{{ formatNumber(Math.abs(mainAccount.total_credit)) }}</td>
-                  </tr>
-                  <template v-if="mainAccount.expanded">
-                    <tr v-for="(subAccount, index) in mainAccount.subAccounts" :key="`${mainCode}-${index}`" class="sub-account-row">
-                      <td class="p-4 text-base pl-8">{{ subAccount.code_sous_compte }} - {{ subAccount.libelle_sous_compte }}</td>
-                      <td class="p-4 text-base">
-                        {{ subAccount.solde_final >= 0 ? formatNumber(subAccount.solde_final) : '' }}
-                      </td>
-                      <td class="p-4 text-base">
-                        {{ subAccount.solde_final < 0 ? formatNumber(Math.abs(subAccount.solde_final)) : '' }}
-                      </td>
-                    </tr>
-                  </template>
-                </template>
-                <tr v-if="!Object.keys(groupedComptes).length">
-                  <td colspan="3" class="p-4 text-center text-base">Aucune donnée disponible</td>
-                </tr>
-                <tr v-if="Object.keys(groupedComptes).length" class="total-row">
-                  <td class="p-4 text-base font-bold">Totaux</td>
-                  <td class="p-4 text-base font-bold">{{ formatNumber(totalDebit) }}</td>
-                  <td class="p-4 text-base font-bold">{{ formatNumber(totalCredit) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <AppFooter />
+  <FinancialStatementLayout
+    :user="user"
+    icon="bi-table"
+    title="Balance générale"
+    subtitle="Soldes débiteurs et créditeurs de tous les comptes, par classe"
+    table-title="Comptes"
+    :exercice-options="exercices.map(ex => ({ value: ex.id, label: `Exercice ${ex.Annee_fiscale}` }))"
+    v-model:exercice="selectedExercice"
+    :exercice-info="exerciceInfo"
+    :loading="loading"
+    @exercice-change="onExerciceChange"
+    @export-pdf="exportToPDF"
+    @export-excel="exportToExcel"
+    @back="goBack"
+  >
+    <template #filters>
+      <form class="fs-filters" @submit.prevent="applyFilters">
+        <div class="fs-field">
+          <label class="fs-label" for="balance-classe">Classe de compte</label>
+          <select id="balance-classe" v-model="filters.classe_compte" class="fs-select" @change="applyFilters">
+            <option value="">Toutes les classes</option>
+            <option value="1">Classe 1 — Capitaux</option>
+            <option value="2">Classe 2 — Immobilisations</option>
+            <option value="3">Classe 3 — Stocks</option>
+            <option value="4">Classe 4 — Tiers</option>
+            <option value="5">Classe 5 — Finances</option>
+            <option value="6">Classe 6 — Charges</option>
+            <option value="7">Classe 7 — Produits</option>
+          </select>
         </div>
-      </div>
-    </div>
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-    <span v-if="!showChat">💬</span>
-    <span v-else>✖</span>
-  </button>
-  <transition name="chatbot-fade">
-    <div v-if="showChat">
-      <ChatBot />
-    </div>
-  </transition>
-  </div>
+        <div class="fs-filters__actions">
+          <button type="button" class="fs-btn" @click="resetFilters">
+            <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+          </button>
+        </div>
+      </form>
+    </template>
+
+    <template #table-hint>Cliquez sur une classe pour voir le détail</template>
+
+    <table class="fs-table">
+      <thead>
+        <tr>
+          <th>Compte</th>
+          <th class="text-right">Débit</th>
+          <th class="text-right">Crédit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="(mainAccount, mainCode) in groupedComptes" :key="mainCode">
+          <tr class="main-account-row">
+            <td @click="toggleAccount(mainCode)">
+              <i :class="mainAccount.expanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+              Classe {{ mainCode }} — {{ mainAccount.libelle }}
+            </td>
+            <td class="text-right">{{ formatNumber(Math.abs(mainAccount.total_debit)) }}</td>
+            <td class="text-right">{{ formatNumber(Math.abs(mainAccount.total_credit)) }}</td>
+          </tr>
+          <template v-if="mainAccount.expanded">
+            <tr v-for="(subAccount, index) in mainAccount.subAccounts" :key="`${mainCode}-${index}`" class="sub-account-row">
+              <td>{{ subAccount.code_sous_compte }} — {{ subAccount.libelle_sous_compte }}</td>
+              <td class="text-right">{{ subAccount.solde_final >= 0 ? formatNumber(subAccount.solde_final) : '' }}</td>
+              <td class="text-right">{{ subAccount.solde_final < 0 ? formatNumber(Math.abs(subAccount.solde_final)) : '' }}</td>
+            </tr>
+          </template>
+        </template>
+        <tr v-if="!Object.keys(groupedComptes).length">
+          <td colspan="3" class="fs-empty">Aucune donnée disponible</td>
+        </tr>
+        <tr v-else class="total-row">
+          <td>Totaux</td>
+          <td class="text-right">{{ formatNumber(totalDebit) }}</td>
+          <td class="text-right">{{ formatNumber(totalCredit) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </FinancialStatementLayout>
 </template>
 
-
 <script setup>
+import { API_BASE } from '@/config/api';
+import FinancialStatementLayout from "@/components/template/FinancialStatementLayout.vue";
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -136,10 +88,6 @@ import html2pdf from 'html2pdf.js'
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx-js-style';
-import Header from "../../molecules/Header.vue";
-import Sidebar from "../../molecules/Sidebar.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth";
 
 const router = useRouter();
@@ -207,6 +155,12 @@ const groupedComptes = computed(() => {
   return grouped;
 });
 
+// Infos de l'exercice sélectionné (période, statut) affichées dans l'en-tête
+const exerciceInfo = computed(() => {
+  const ex = exercices.value.find(e => e.id == selectedExercice.value);
+  return ex ? { annee_fiscale: ex.Annee_fiscale, date_debut: ex.Date_debut, date_fin: ex.Date_fin, statut: ex.Statut } : null;
+});
+
 const totalDebit = computed(() =>
   Object.values(groupedComptes.value).reduce((sum, acc) => sum + (acc.total_debit || 0), 0)
 );
@@ -248,7 +202,7 @@ const fetchBalanceGenerale = async () => {
       ...(filters.value.classe_compte && { classe_compte: filters.value.classe_compte }),
       ...(filters.value.exercice_comptable && { exercice_comptable: filters.value.exercice_comptable }),
     }).toString();
-    const res = await axios.get(`http://127.0.0.1:8000/api/balance-generale?${queryParams}`);
+    const res = await axios.get(`${API_BASE}/balance-generale?${queryParams}`);
     comptes.value = res.data;
   } catch (error) {
     comptes.value = [];
@@ -259,7 +213,7 @@ const fetchBalanceGenerale = async () => {
 
 const fetchExercices = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/exercices');
+    const res = await axios.get(`${API_BASE}/exercices`);
     exercices.value = res.data.map(e => ({
       id: e.Id_Exercice_comptable,
       nom: `${e.Annee_fiscale} | Du ${e.Date_debut.slice(0, 10)} au ${e.Date_fin.slice(0, 10)} | ${e.Statut}`,
@@ -291,6 +245,7 @@ const onExerciceChange = () => {
 
 const applyFilters = () => { fetchBalanceGenerale(); };
 const resetFilters = () => {
+  filters.value.classe_compte = "";
   if (exercices.value.length) {
     const courant = exercices.value.find(ex => ex.Statut === 'OUVERT') || exercices.value[0];
     selectedExercice.value = courant.id;
@@ -564,85 +519,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-
-
-
-<!-- Style identique à l'original, tu peux garder tel quel -->
-<style scoped>
-.dashboard-container { display: flex; min-height: 100vh; flex-direction: column; }
-.main-content { margin-left: 278px; padding: 32px; flex: 1; background: #f9fafb; min-height: calc(100vh - 80px); }
-.filter-container, .export-container { background: white; padding: 1rem; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-.bi-table { font-size: 1.125rem; color: #142c6c; vertical-align: middle; }
-.main-account-row { background-color: #f0f4f8; cursor: pointer; }
-.main-account-row:hover { background-color: #e1e8f0; }
-.sub-account-row { background-color: #fafafa; }
-.total-row { background-color: #e6e6e6; font-weight: bold; }
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 100;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Animation d'apparition */
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-@media (max-width: 768px) { .main-content { margin-left: 0; padding: 1rem; }
-  .dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  } }
-.table-container { overflow-x: auto; }
-.spinner { display: inline-block; width: 2rem; height: 2rem; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
-
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>

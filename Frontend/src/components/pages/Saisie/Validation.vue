@@ -1,10 +1,13 @@
 <template>
-  <div class="dashboard-container w-full">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    <div class="main-content p-6">
-      <div class="card card-form mb-8">
-        <h1 class="text-2xl mb-4"><i class="bi bi-shield-check me-2"></i> Validation des écritures comptables</h1>
+  <AppLayout
+    :user="user"
+    icon="bi-shield-check"
+    title="Validation des écritures"
+    subtitle="Contrôlez l'équilibre et validez les écritures de l'exercice"
+    section="Saisie"
+  >
+<div class="card card-form mb-8">
+        
         <div v-if="rapport" class="stat-row mb-4">
           <div class="stat-block">
             <span class="stat-label">Écritures à valider</span>
@@ -74,21 +77,8 @@
           </div>
         </div>
       </div>
-      <AppFooter />
-    </div>
-     <button class="chatbot-float-btn" @click="showChat = !showChat">
-  <span v-if="!showChat">💬</span>
-  <span v-else>✖</span>
-</button>
+      
 
-<!-- POPIN CHATBOT (fixe à droite, petite taille) -->
-<transition name="chatbot-fade">
-  <div v-if="showChat">
-    <ChatBot />
-  </div>
-</transition>
-
-<!-- Popup de succès -->
 <div v-if="showSuccessModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -104,7 +94,6 @@
   </div>
 </div>
 
-<!-- Popup d'erreur -->
 <div v-if="showErrorModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -119,20 +108,17 @@
     </div>
   </div>
 </div>
-
-  </div>
+  </AppLayout>
 </template>
 
 
 
 
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import Header from "../../molecules/Header.vue";
-import Sidebar from "../../molecules/Sidebar.vue";
-import AppFooter from "../../molecules/Footer.vue";
-import ChatBot from "../../molecules/ChatBot.vue";
 import { getUser } from "../../../services/Auth"; // ou ton chemin exact
 const token = localStorage.getItem("token");
 if (!token) window.location.href = "/";
@@ -160,12 +146,12 @@ function formatMontant(m) {
 }
 
 async function fetchExerciceCourant() {
-  const { data } = await axios.get("http://localhost:8000/api/exercices/courant");
+  const { data } = await axios.get(`${API_BASE}/exercices/courant`);
   exerciceCourant.value = data.exercice || data;
 }
 
 async function fetchRapport() {
-  const { data } = await axios.get("http://localhost:8000/api/lignes/rapport-validation");
+  const { data } = await axios.get(`${API_BASE}/lignes/rapport-validation`);
   rapport.value = data;
 }
 
@@ -178,7 +164,7 @@ async function fetchEcrituresNonValidees(page = 1) {
       date_debut: exerciceCourant.value.Date_debut,
       date_fin: exerciceCourant.value.Date_fin
     };
-    const res = await axios.get("http://localhost:8000/api/ecritures", { params });
+    const res = await axios.get(`${API_BASE}/ecritures`, { params });
     // Filtrer côté front au cas où le backend ne gère pas le 'statut!=valide'
     ecritures.value = {
       ...res.data,
@@ -202,7 +188,7 @@ function changePage(page) {
 async function validerToutes() {
   validating.value = true;
   try {
-    await axios.post("http://localhost:8000/api/lignes/valider-toutes");
+    await axios.post(`${API_BASE}/lignes/valider-toutes`);
     showSuccessModal.value = true;
     successModalMessage.value = "Toutes les écritures ont été validées avec succès !";
     await fetchRapport();
@@ -256,7 +242,7 @@ onMounted(async () => {
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
   font-family: 'Manrope', sans-serif;
 }
@@ -273,7 +259,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 0.75rem;
   padding: 1rem 1.7rem;
   min-width: 180px;
@@ -283,7 +269,7 @@ onMounted(async () => {
 .stat-label {
   font-size: 0.95rem;
   font-weight: 500;
-  color: #334155;
+  color: var(--fs-text);
   margin-bottom: 0.4rem;
   text-align: center;
 }
@@ -321,7 +307,7 @@ onMounted(async () => {
   height: 520px;
   max-height: 80vh;
   z-index: 100;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;
@@ -346,7 +332,7 @@ onMounted(async () => {
 .badge-danger { background: #fca5a5; color: #991b1b; }
 .badge-primary { background: #c7d2fe; color: #1e40af; }
 .badge-info { background: #bae6fd; color: #0369a1; }
-.spinner { display: inline-block; width: 1.5em; height: 1.5em; border: 2.5px solid #e0e7ef; border-top: 2.5px solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite; vertical-align: middle;}
+.spinner { display: inline-block; width: 1.5em; height: 1.5em; border: 2.5px solid var(--fs-border); border-top: 2.5px solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite; vertical-align: middle;}
 @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);}}
 @media (max-width: 1024px) {
   .stat-row { gap: 1rem; }

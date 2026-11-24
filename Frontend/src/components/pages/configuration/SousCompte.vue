@@ -1,16 +1,15 @@
 <script setup>
+import AppLayout from "@/components/template/AppLayout.vue";
+import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
-import Sidebar from "../../molecules/Sidebar.vue";
-import Header from "../../molecules/Header.vue";
-import AppFooter from "../../molecules/Footer.vue";
 import { getUser } from "../../../services/Auth";
 
 // --- Configuration ---
 const router = useRouter();
-const API_URL = 'http://localhost:8000/api'
+const API_URL = `${API_BASE}`
 const itemsPerPage = 10
 
 // --- State ---
@@ -211,16 +210,16 @@ const goToPage = (page) => { currentPage.value = page }
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <Header v-if="user" :user="user" />
-    <Sidebar :current-route="$route.path" @navigation-change="handleNavigation" />
-    
-    <div class="main-content p-4">
-      <div class="card card-form">
+  <AppLayout
+    :user="user"
+    icon="bi-diagram-3"
+    title="Sous-comptes"
+    subtitle="Sous-comptes utilisés pour la saisie des écritures"
+    section="Structure"
+  >
+<div class="card card-form">
         <!-- En-tête Carte -->
-        <div class="card-header">
-          <h1 class="card-title text-2xl">Gestion des Sous-comptes</h1>
-        </div>
+        
 
         <div class="card-body">
           <!-- Filtres -->
@@ -271,7 +270,7 @@ const goToPage = (page) => { currentPage.value = page }
                     <button @click="openEditModal(sc)" class="btn btn-primary text-base">
                       Modifier
                     </button>
-                    <button @click="deleteSousCompte(sc.Id_Sous_compte)" class="btn btn-error text-base h-10 mt-2" style="height: 45px; margin-top: 10px;">
+                    <button @click="deleteSousCompte(sc.Id_Sous_compte)" class="btn btn-error">
                       Supprimer
                     </button>
                   </td>
@@ -300,12 +299,10 @@ const goToPage = (page) => { currentPage.value = page }
           </div>
         </div>
         
-        <AppFooter />
+        
       </div>
-    </div>
 
-    <!-- MODAL PRINCIPAL (Création/Edition) -->
-    <div v-if="showModal" class="modal-overlay">
+<div v-if="showModal" class="modal-overlay">
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title">
@@ -342,8 +339,7 @@ const goToPage = (page) => { currentPage.value = page }
       </div>
     </div>
 
-    <!-- POPUP DE SUCCÈS -->
-    <div v-if="showSuccessModal" class="modal-overlay">
+<div v-if="showSuccessModal" class="modal-overlay">
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title text-green-600">Succès</h2>
@@ -358,8 +354,7 @@ const goToPage = (page) => { currentPage.value = page }
       </div>
     </div>
 
-    <!-- POPUP D'ERREUR -->
-    <div v-if="showErrorModal" class="modal-overlay">
+<div v-if="showErrorModal" class="modal-overlay">
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title text-red-600">Erreur</h2>
@@ -373,19 +368,7 @@ const goToPage = (page) => { currentPage.value = page }
         </div>
       </div>
     </div>
-
-    <!-- CHATBOT -->
-    <button class="chatbot-float-btn" @click="showChat = !showChat">
-      <span v-if="!showChat">💬</span>
-      <span v-else>✖</span>
-    </button>
-    
-    <transition name="chatbot-fade">
-      <div v-if="showChat">
-        <ChatBot />
-      </div>
-    </transition>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>
@@ -400,7 +383,7 @@ const goToPage = (page) => { currentPage.value = page }
   margin-left: 278px;
   padding: 32px;
   flex: 1;
-  background: #f8fafc;
+  background: var(--fs-surface-2);
   min-height: calc(100vh - 80px);
 }
 
@@ -411,7 +394,7 @@ const goToPage = (page) => { currentPage.value = page }
 
 /* --- Composants : Filtres --- */
 .filter-container {
-  background: #fff;
+  background: var(--fs-surface);
   padding: 16px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -433,7 +416,7 @@ const goToPage = (page) => { currentPage.value = page }
 }
 
 .modal {
-  background: white;
+  background: var(--fs-surface);
   width: 90%;
   max-width: 500px;
   border-radius: 8px;
@@ -447,7 +430,7 @@ const goToPage = (page) => { currentPage.value = page }
 
 .modal-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--fs-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -461,8 +444,8 @@ const goToPage = (page) => { currentPage.value = page }
 
 .modal-footer {
   padding: 1rem 1.5rem;
-  background-color: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--fs-surface-2);
+  border-top: 1px solid var(--fs-border);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -475,7 +458,7 @@ const goToPage = (page) => { currentPage.value = page }
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #64748b;
+  color: var(--fs-muted);
 }
 
 /* --- CHATBOT --- */
@@ -513,7 +496,7 @@ const goToPage = (page) => { currentPage.value = page }
   height: 520px;
   max-height: 80vh;
   z-index: 199;
-  background: #fff;
+  background: var(--fs-surface);
   border-radius: 15px;
   box-shadow: 0 8px 36px rgba(90,60,130,0.14);
   overflow: hidden;

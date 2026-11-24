@@ -48,6 +48,7 @@
   </template>
   
   <script setup>
+import { API_BASE } from '@/config/api';
   import { ref, onMounted } from "vue";
   import axios from "axios"; // ou axios direct
   
@@ -68,16 +69,16 @@ if (!token) {
   
   // Charger les types
   const fetchTypes = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/types");
+    const res = await axios.get(`${API_BASE}/types`);
     types.value = res.data;
   };
   
   // Ajouter / Mettre à jour
   const saveType = async () => {
     if (isEditing.value) {
-      await axios.put(`http://127.0.0.1:8000/api/types/${editingId.value}`, form.value);
+      await axios.put(`${API_BASE}/types/${editingId.value}`, form.value);
     } else {
-      await axios.post("http://127.0.0.1:8000/api/types", form.value);
+      await axios.post(`${API_BASE}/types`, form.value);
     }
     resetForm();
     fetchTypes();
@@ -96,7 +97,7 @@ if (!token) {
   // Supprimer
   const deleteType = async (id) => {
     if (confirm("Supprimer ce type ?")) {
-      await axios.delete(`http://127.0.0.1:8000/api/types/${id}`);
+      await axios.delete(`${API_BASE}/types/${id}`);
       fetchTypes();
     }
   };
