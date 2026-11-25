@@ -55,6 +55,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            // Volontairement absent de $fillable : ne s'attribue que par la
+            // commande utilisateur:admin, jamais par un formulaire.
+            'is_admin' => 'boolean',
         ];
     }
 

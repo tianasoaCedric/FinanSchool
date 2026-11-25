@@ -72,7 +72,7 @@
                   <td>{{ devise.Sigle }}</td>
                   <td class="d-flex gap-2 justify-center">
                     <UiButton variant="soft-primary" @click="editDevise(devise)" size="sm">
-                      ✏️
+                      <i class="bi bi-pencil"></i>
                     </UiButton>
                     <UiButton variant="soft-danger" @click="deleteDevise(devise.Id_Devise)" size="sm">
                       Supprimer

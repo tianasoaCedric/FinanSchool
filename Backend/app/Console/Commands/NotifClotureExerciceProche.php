@@ -69,9 +69,9 @@ class NotifClotureExerciceProche extends Command
                         ]);
 
                         event(new NotificationCreee($notification));
-                        $this->info("✅ Notification envoyée : Exercice {$exercice->Annee_fiscale} ({$j['message']}) - {$nbEcrituresAValider} écriture(s) à valider");
+                        $this->info("Notification envoyée : Exercice {$exercice->Annee_fiscale} ({$j['message']}) - {$nbEcrituresAValider} écriture(s) à valider");
                     } else {
-                        $this->info("ℹ️ Aucune écriture à valider pour l'exercice {$exercice->Annee_fiscale} ({$j['message']})");
+                        $this->info("Aucune écriture à valider pour l'exercice {$exercice->Annee_fiscale} ({$j['message']})");
                     }
                 }
             }

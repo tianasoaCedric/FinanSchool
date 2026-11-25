@@ -6,7 +6,7 @@
 
     <!-- Bouton pour ouvrir Gmail après envoi -->
     <div v-if="showOpenMail">
-      <button @click="openGmail">📧 Ouvrir Gmail</button>
+      <button @click="openGmail">Ouvrir Gmail</button>
     </div>
   </div>
 </template>

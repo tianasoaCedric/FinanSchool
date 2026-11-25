@@ -35546,3 +35546,770 @@ LINE 1: select * from \"mouvement_ecritures\" where \"id_piece_origine\"...
         "id": 12
     }
 }  
+[2026-11-25 06:48:26] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:27] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:48:27] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:27] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:48:34] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:34] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:48:35] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:35] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:48:35] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:35] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:48:35] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:48:35] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:49:42] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:49:42] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:49:42] local.INFO: Début du rafraîchissement des vues matérialisées  
+[2026-11-25 06:49:42] local.INFO: Vues matérialisées rafraîchies avec succès  
+[2026-11-25 06:55:12] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 13,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:55:12.000000Z",
+        "created_at": "2026-11-25T06:55:12.000000Z",
+        "id": 13
+    }
+}  
+[2026-11-25 06:55:12] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 14,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:55:12.000000Z",
+        "created_at": "2026-11-25T06:55:12.000000Z",
+        "id": 14
+    }
+}  
+[2026-11-25 06:55:39] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 15,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:55:39.000000Z",
+        "created_at": "2026-11-25T06:55:39.000000Z",
+        "id": 15
+    }
+}  
+[2026-11-25 06:55:40] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 16,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:55:40.000000Z",
+        "created_at": "2026-11-25T06:55:40.000000Z",
+        "id": 16
+    }
+}  
+[2026-11-25 06:56:20] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 17,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:56:20.000000Z",
+        "created_at": "2026-11-25T06:56:20.000000Z",
+        "id": 17
+    }
+}  
+[2026-11-25 06:56:21] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 18,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:56:21.000000Z",
+        "created_at": "2026-11-25T06:56:21.000000Z",
+        "id": 18
+    }
+}  
+[2026-11-25 06:58:20] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 19,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:58:20.000000Z",
+        "created_at": "2026-11-25T06:58:20.000000Z",
+        "id": 19
+    }
+}  
+[2026-11-25 06:58:20] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 20,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T06:58:20.000000Z",
+        "created_at": "2026-11-25T06:58:20.000000Z",
+        "id": 20
+    }
+}  
+[2026-11-25 07:06:47] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 21,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:06:47.000000Z",
+        "created_at": "2026-11-25T07:06:47.000000Z",
+        "id": 21
+    }
+}  
+[2026-11-25 07:06:47] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 22,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:06:47.000000Z",
+        "created_at": "2026-11-25T07:06:47.000000Z",
+        "id": 22
+    }
+}  
+[2026-11-25 07:06:50] testing.ERROR: array_map(): Argument #2 ($array) must be of type array, Illuminate\Support\Collection given {"userId":444,"exception":"[object] (TypeError(code: 0): array_map(): Argument #2 ($array) must be of type array, Illuminate\\Support\\Collection given at /var/www/html/app/Services/Comptabilite/AffectationService.php:151)
+[stacktrace]
+#0 /var/www/html/app/Services/Comptabilite/AffectationService.php(151): array_map(Object(Closure), Object(Illuminate\\Support\\Collection))
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\\Services\\Comptabilite\\AffectationService->App\\Services\\Comptabilite\\{closure}(Object(Illuminate\\Database\\PostgresConnection))
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(497): Illuminate\\Database\\Connection->transaction(Object(Closure))
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Database\\DatabaseManager->__call('transaction', Array)
+#4 /var/www/html/app/Services/Comptabilite/AffectationService.php(108): Illuminate\\Support\\Facades\\Facade::__callStatic('transaction', Array)
+#5 /var/www/html/app/Http/Controllers/exercice/ClotureController.php(124): App\\Services\\Comptabilite\\AffectationService->generer(Object(App\\Models\\exercice\\ExerciceComptable), '2091-06-30', 'PV AG du 30/06/...', Array, true, 444)
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\exercice\\ClotureController->affecter(Object(Illuminate\\Http\\Request), 324)
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\exercice\\ClotureController), 'affecter')
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/exercices/...', Array, Array, Array, Array, '{\"date\":\"2091-0...')
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/exercices/...', Array, Array, 0)
+#46 /var/www/html/tests/Feature/Comptabilite/OrganisationComptableTest.php(240): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/exercices/...', Array)
+#47 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1656): Tests\\Feature\\Comptabilite\\OrganisationComptableTest->test_affectation_du_resultat_dans_n_plus_1()
+#48 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(514): PHPUnit\\Framework\\TestCase->runTest()
+#49 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\\Framework\\TestCase->runBare()
+#50 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Comptabilite\\OrganisationComptableTest))
+#51 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestCase->run()
+#52 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestSuite->run()
+#53 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#54 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#55 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#56 {main}
+"} 
+[2026-11-25 07:07:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 23,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:07:54.000000Z",
+        "created_at": "2026-11-25T07:07:54.000000Z",
+        "id": 23
+    }
+}  
+[2026-11-25 07:07:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 24,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:07:54.000000Z",
+        "created_at": "2026-11-25T07:07:54.000000Z",
+        "id": 24
+    }
+}  
+[2026-11-25 07:08:30] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 25,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:08:30.000000Z",
+        "created_at": "2026-11-25T07:08:30.000000Z",
+        "id": 25
+    }
+}  
+[2026-11-25 07:08:31] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 26,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:08:31.000000Z",
+        "created_at": "2026-11-25T07:08:31.000000Z",
+        "id": 26
+    }
+}  
+[2026-11-25 07:44:33] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 27,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:44:33.000000Z",
+        "created_at": "2026-11-25T07:44:33.000000Z",
+        "id": 27
+    }
+}  
+[2026-11-25 07:44:33] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 28,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:44:33.000000Z",
+        "created_at": "2026-11-25T07:44:33.000000Z",
+        "id": 28
+    }
+}  
+[2026-11-25 07:58:45] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 29,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:58:45.000000Z",
+        "created_at": "2026-11-25T07:58:45.000000Z",
+        "id": 29
+    }
+}  
+[2026-11-25 07:58:45] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 30,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T07:58:45.000000Z",
+        "created_at": "2026-11-25T07:58:45.000000Z",
+        "id": 30
+    }
+}  
+[2026-11-25 08:11:17] testing.ERROR: SQLSTATE[42703]: Undefined column: 7 ERROR:  column t.Libelle does not exist
+LINE 1: select "j"."Code", "j"."Libelle", "t"."Libelle" as "type" fr...
+                                          ^
+HINT:  Perhaps you meant to reference the column "j.Libelle". (Connection: pgsql, SQL: select "j"."Code", "j"."Libelle", "t"."Libelle" as "type" from "journals" as "j" left join "type_journals" as "t" on "t"."Id_Type_Journal" = "j"."Id_Type_Journal" order by "j"."Code" asc) {"userId":731,"exception":"[object] (Illuminate\\Database\\QueryException(code: 42703): SQLSTATE[42703]: Undefined column: 7 ERROR:  column t.Libelle does not exist
+LINE 1: select \"j\".\"Code\", \"j\".\"Libelle\", \"t\".\"Libelle\" as \"type\" fr...
+                                          ^
+HINT:  Perhaps you meant to reference the column \"j.Libelle\". (Connection: pgsql, SQL: select \"j\".\"Code\", \"j\".\"Libelle\", \"t\".\"Libelle\" as \"type\" from \"journals\" as \"j\" left join \"type_journals\" as \"t\" on \"t\".\"Id_Type_Journal\" = \"j\".\"Id_Type_Journal\" order by \"j\".\"Code\" asc) at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('select \"j\".\"Cod...', Array, Object(Closure))
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('select \"j\".\"Cod...', Array, Object(Closure))
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3188): Illuminate\\Database\\Connection->select('select \"j\".\"Cod...', Array, true)
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3173): Illuminate\\Database\\Query\\Builder->runSelect()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3763): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3172): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#6 /var/www/html/app/Services/Assistant/Comptabilite/Journaux.php(33): Illuminate\\Database\\Query\\Builder->get(Array)
+#7 /var/www/html/app/Services/Assistant/Comptabilite/Journaux.php(25): App\\Services\\Assistant\\Comptabilite\\Journaux->liste()
+#8 /var/www/html/app/Services/Assistant/Assistant.php(70): App\\Services\\Assistant\\Comptabilite\\Journaux->repondre(Object(App\\Services\\Assistant\\Question))
+#9 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(37): App\\Services\\Assistant\\Assistant->repondre('liste des journ...')
+#10 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(21): App\\Http\\Controllers\\ChatBot\\AssistantController->envoyer(Object(Illuminate\\Http\\Request), 'comptabilite')
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\ChatBot\\AssistantController->comptabilite(Object(Illuminate\\Http\\Request))
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ChatBot\\AssistantController), 'comptabilite')
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/chat/sendi...', Array, Array, Array, Array, '{\"message\":\"lis...')
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/chat/sendi...', Array, Array, 0)
+#51 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(66): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/chat/sendi...', Array)
+#52 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(197): Tests\\Feature\\Comptabilite\\AssistantTest->demander('liste des journ...')
+#53 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1656): Tests\\Feature\\Comptabilite\\AssistantTest->test_preparation_de_cloture_et_journaux()
+#54 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(514): PHPUnit\\Framework\\TestCase->runTest()
+#55 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\\Framework\\TestCase->runBare()
+#56 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Comptabilite\\AssistantTest))
+#57 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestCase->run()
+#58 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#59 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#60 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#61 {main}
+
+[previous exception] [object] (PDOException(code: 42703): SQLSTATE[42703]: Undefined column: 7 ERROR:  column t.Libelle does not exist
+LINE 1: select \"j\".\"Code\", \"j\".\"Libelle\", \"t\".\"Libelle\" as \"type\" fr...
+                                          ^
+HINT:  Perhaps you meant to reference the column \"j.Libelle\". at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(411): PDOStatement->execute()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(811): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('select \"j\".\"Cod...', Array)
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('select \"j\".\"Cod...', Array, Object(Closure))
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('select \"j\".\"Cod...', Array, Object(Closure))
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3188): Illuminate\\Database\\Connection->select('select \"j\".\"Cod...', Array, true)
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3173): Illuminate\\Database\\Query\\Builder->runSelect()
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3763): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3172): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#8 /var/www/html/app/Services/Assistant/Comptabilite/Journaux.php(33): Illuminate\\Database\\Query\\Builder->get(Array)
+#9 /var/www/html/app/Services/Assistant/Comptabilite/Journaux.php(25): App\\Services\\Assistant\\Comptabilite\\Journaux->liste()
+#10 /var/www/html/app/Services/Assistant/Assistant.php(70): App\\Services\\Assistant\\Comptabilite\\Journaux->repondre(Object(App\\Services\\Assistant\\Question))
+#11 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(37): App\\Services\\Assistant\\Assistant->repondre('liste des journ...')
+#12 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(21): App\\Http\\Controllers\\ChatBot\\AssistantController->envoyer(Object(Illuminate\\Http\\Request), 'comptabilite')
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\ChatBot\\AssistantController->comptabilite(Object(Illuminate\\Http\\Request))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ChatBot\\AssistantController), 'comptabilite')
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/chat/sendi...', Array, Array, Array, Array, '{\"message\":\"lis...')
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/chat/sendi...', Array, Array, 0)
+#53 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(66): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/chat/sendi...', Array)
+#54 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(197): Tests\\Feature\\Comptabilite\\AssistantTest->demander('liste des journ...')
+#55 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1656): Tests\\Feature\\Comptabilite\\AssistantTest->test_preparation_de_cloture_et_journaux()
+#56 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(514): PHPUnit\\Framework\\TestCase->runTest()
+#57 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\\Framework\\TestCase->runBare()
+#58 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Comptabilite\\AssistantTest))
+#59 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestCase->run()
+#60 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#61 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#62 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#63 {main}
+"} 
+[2026-11-25 08:11:17] testing.ERROR: SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:  current transaction is aborted, commands ignored until end of transaction block (Connection: pgsql, SQL: insert into "chat_messages" ("message", "session_id", "user_id", "response", "updated_at", "created_at") values (liste des journaux, test-assistant, 731, Désolé, je n'ai pas pu calculer la réponse. Réessayez ou consultez directement l'écran concerné., 2026-11-25 08:11:17, 2026-11-25 08:11:17) returning "id") {"userId":731,"exception":"[object] (Illuminate\\Database\\QueryException(code: 25P02): SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:  current transaction is aborted, commands ignored until end of transaction block (Connection: pgsql, SQL: insert into \"chat_messages\" (\"message\", \"session_id\", \"user_id\", \"response\", \"updated_at\", \"created_at\") values (liste des journaux, test-assistant, 731, Désolé, je n'ai pas pu calculer la réponse. Réessayez ou consultez directement l'écran concerné., 2026-11-25 08:11:17, 2026-11-25 08:11:17) returning \"id\") at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('insert into \"ch...', Array, Object(Closure))
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('insert into \"ch...', Array, Object(Closure))
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(384): Illuminate\\Database\\Connection->select('insert into \"ch...', Array, false)
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php(24): Illuminate\\Database\\Connection->selectFromWriteConnection('insert into \"ch...', Array)
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3853): Illuminate\\Database\\Query\\Processors\\PostgresProcessor->processInsertGetId(Object(Illuminate\\Database\\Query\\Builder), 'insert into \"ch...', Array, 'id')
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2220): Illuminate\\Database\\Query\\Builder->insertGetId(Array, 'id')
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1434): Illuminate\\Database\\Eloquent\\Builder->__call('insertGetId', Array)
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1399): Illuminate\\Database\\Eloquent\\Model->insertAndSetId(Object(Illuminate\\Database\\Eloquent\\Builder), Array)
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1238): Illuminate\\Database\\Eloquent\\Model->performInsert(Object(Illuminate\\Database\\Eloquent\\Builder))
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1204): Illuminate\\Database\\Eloquent\\Model->save()
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/helpers.php(390): Illuminate\\Database\\Eloquent\\Builder->Illuminate\\Database\\Eloquent\\{closure}(Object(App\\Models\\ChatBot\\ChatMessage))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1203): tap(Object(App\\Models\\ChatBot\\ChatMessage), Object(Closure))
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create(Array)
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2537): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'create', Array)
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2553): Illuminate\\Database\\Eloquent\\Model->__call('create', Array)
+#15 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(39): Illuminate\\Database\\Eloquent\\Model::__callStatic('create', Array)
+#16 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(21): App\\Http\\Controllers\\ChatBot\\AssistantController->envoyer(Object(Illuminate\\Http\\Request), 'comptabilite')
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\ChatBot\\AssistantController->comptabilite(Object(Illuminate\\Http\\Request))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ChatBot\\AssistantController), 'comptabilite')
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/chat/sendi...', Array, Array, Array, Array, '{\"message\":\"lis...')
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/chat/sendi...', Array, Array, 0)
+#57 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(66): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/chat/sendi...', Array)
+#58 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(197): Tests\\Feature\\Comptabilite\\AssistantTest->demander('liste des journ...')
+#59 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1656): Tests\\Feature\\Comptabilite\\AssistantTest->test_preparation_de_cloture_et_journaux()
+#60 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(514): PHPUnit\\Framework\\TestCase->runTest()
+#61 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\\Framework\\TestCase->runBare()
+#62 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Comptabilite\\AssistantTest))
+#63 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestCase->run()
+#64 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#65 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#66 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#67 {main}
+
+[previous exception] [object] (PDOException(code: 25P02): SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:  current transaction is aborted, commands ignored until end of transaction block at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(411): PDOStatement->execute()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(811): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('insert into \"ch...', Array)
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('insert into \"ch...', Array, Object(Closure))
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('insert into \"ch...', Array, Object(Closure))
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(384): Illuminate\\Database\\Connection->select('insert into \"ch...', Array, false)
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php(24): Illuminate\\Database\\Connection->selectFromWriteConnection('insert into \"ch...', Array)
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3853): Illuminate\\Database\\Query\\Processors\\PostgresProcessor->processInsertGetId(Object(Illuminate\\Database\\Query\\Builder), 'insert into \"ch...', Array, 'id')
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2220): Illuminate\\Database\\Query\\Builder->insertGetId(Array, 'id')
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1434): Illuminate\\Database\\Eloquent\\Builder->__call('insertGetId', Array)
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1399): Illuminate\\Database\\Eloquent\\Model->insertAndSetId(Object(Illuminate\\Database\\Eloquent\\Builder), Array)
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1238): Illuminate\\Database\\Eloquent\\Model->performInsert(Object(Illuminate\\Database\\Eloquent\\Builder))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1204): Illuminate\\Database\\Eloquent\\Model->save()
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/helpers.php(390): Illuminate\\Database\\Eloquent\\Builder->Illuminate\\Database\\Eloquent\\{closure}(Object(App\\Models\\ChatBot\\ChatMessage))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1203): tap(Object(App\\Models\\ChatBot\\ChatMessage), Object(Closure))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create(Array)
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2537): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'create', Array)
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2553): Illuminate\\Database\\Eloquent\\Model->__call('create', Array)
+#17 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(39): Illuminate\\Database\\Eloquent\\Model::__callStatic('create', Array)
+#18 /var/www/html/app/Http/Controllers/ChatBot/AssistantController.php(21): App\\Http\\Controllers\\ChatBot\\AssistantController->envoyer(Object(Illuminate\\Http\\Request), 'comptabilite')
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\ChatBot\\AssistantController->comptabilite(Object(Illuminate\\Http\\Request))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ChatBot\\AssistantController), 'comptabilite')
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#57 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\\Foundation\\Testing\\TestCase->call('POST', '/api/chat/sendi...', Array, Array, Array, Array, '{\"message\":\"lis...')
+#58 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json('POST', '/api/chat/sendi...', Array, Array, 0)
+#59 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(66): Illuminate\\Foundation\\Testing\\TestCase->postJson('/api/chat/sendi...', Array)
+#60 /var/www/html/tests/Feature/Comptabilite/AssistantTest.php(197): Tests\\Feature\\Comptabilite\\AssistantTest->demander('liste des journ...')
+#61 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1656): Tests\\Feature\\Comptabilite\\AssistantTest->test_preparation_de_cloture_et_journaux()
+#62 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(514): PHPUnit\\Framework\\TestCase->runTest()
+#63 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\\Framework\\TestCase->runBare()
+#64 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run(Object(Tests\\Feature\\Comptabilite\\AssistantTest))
+#65 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\\Framework\\TestCase->run()
+#66 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#67 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\\TextUI\\TestRunner->run(Object(PHPUnit\\TextUI\\Configuration\\Configuration), Object(PHPUnit\\Runner\\ResultCache\\DefaultResultCache), Object(PHPUnit\\Framework\\TestSuite))
+#68 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\\TextUI\\Application->run(Array)
+#69 {main}
+"} 
+[2026-11-25 08:12:57] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 31,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:12:57.000000Z",
+        "created_at": "2026-11-25T08:12:57.000000Z",
+        "id": 31
+    }
+}  
+[2026-11-25 08:12:58] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 32,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:12:58.000000Z",
+        "created_at": "2026-11-25T08:12:58.000000Z",
+        "id": 32
+    }
+}  
+[2026-11-25 08:13:58] local.ERROR: The "->" option does not exist. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): The \"->\" option does not exist. at /var/www/html/vendor/symfony/console/Input/ArgvInput.php:211)
+[stacktrace]
+#0 /var/www/html/vendor/symfony/console/Input/ArgvInput.php(113): Symfony\\Component\\Console\\Input\\ArgvInput->addShortOption('>', NULL)
+#1 /var/www/html/vendor/symfony/console/Input/ArgvInput.php(90): Symfony\\Component\\Console\\Input\\ArgvInput->parseShortOption('->')
+#2 /var/www/html/vendor/symfony/console/Input/ArgvInput.php(77): Symfony\\Component\\Console\\Input\\ArgvInput->parseToken('->', true)
+#3 /var/www/html/vendor/symfony/console/Input/Input.php(53): Symfony\\Component\\Console\\Input\\ArgvInput->parse()
+#4 /var/www/html/vendor/symfony/console/Command/Command.php(276): Symfony\\Component\\Console\\Input\\Input->bind(Object(Symfony\\Component\\Console\\Input\\InputDefinition))
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#6 /var/www/html/vendor/symfony/console/Application.php(1110): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#7 /var/www/html/vendor/symfony/console/Application.php(359): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/html/vendor/symfony/console/Application.php(194): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1234): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#11 /var/www/html/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#12 {main}
+"} 
+[2026-11-25 08:15:00] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 33,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:15:00.000000Z",
+        "created_at": "2026-11-25T08:15:00.000000Z",
+        "id": 33
+    }
+}  
+[2026-11-25 08:15:00] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 34,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:15:00.000000Z",
+        "created_at": "2026-11-25T08:15:00.000000Z",
+        "id": 34
+    }
+}  
+[2026-11-25 08:15:55] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 35,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:15:55.000000Z",
+        "created_at": "2026-11-25T08:15:55.000000Z",
+        "id": 35
+    }
+}  
+[2026-11-25 08:15:55] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 36,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:15:55.000000Z",
+        "created_at": "2026-11-25T08:15:55.000000Z",
+        "id": 36
+    }
+}  
+[2026-11-25 08:16:46] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 37,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:16:46.000000Z",
+        "created_at": "2026-11-25T08:16:46.000000Z",
+        "id": 37
+    }
+}  
+[2026-11-25 08:16:47] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 38,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:16:47.000000Z",
+        "created_at": "2026-11-25T08:16:47.000000Z",
+        "id": 38
+    }
+}  
+[2026-11-25 08:23:26] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 39,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:23:26.000000Z",
+        "created_at": "2026-11-25T08:23:26.000000Z",
+        "id": 39
+    }
+}  
+[2026-11-25 08:23:27] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 40,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:23:27.000000Z",
+        "created_at": "2026-11-25T08:23:27.000000Z",
+        "id": 40
+    }
+}  
+[2026-11-25 08:28:45] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 41,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:28:45.000000Z",
+        "created_at": "2026-11-25T08:28:45.000000Z",
+        "id": 41
+    }
+}  
+[2026-11-25 08:28:46] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 42,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:28:46.000000Z",
+        "created_at": "2026-11-25T08:28:46.000000Z",
+        "id": 42
+    }
+}  

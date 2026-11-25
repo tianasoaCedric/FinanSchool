@@ -6,6 +6,8 @@ use App\Models\exercice\ExerciceComptable;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\Comptabilite\Audit;
+use Illuminate\Support\Facades\DB;
 
 class ExerciceComptableController extends Controller
 {
@@ -73,7 +75,11 @@ class ExerciceComptableController extends Controller
             return response()->json(['message' => $motif], 422);
         }
 
-        $exercice->ouvrir();
+        DB::transaction(function () use ($exercice) {
+            $exercice->ouvrir();
+            Audit::enregistrer(Audit::EXERCICE_OUVERTURE, 'exercice', $exercice->Id_Exercice_comptable,
+                "Exercice {$exercice->Annee_fiscale}");
+        });
 
         return response()->json([
             'message' => 'Exercice ouvert avec succès',

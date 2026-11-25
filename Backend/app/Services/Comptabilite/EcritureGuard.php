@@ -120,7 +120,7 @@ class EcritureGuard
     {
         $mouvement->loadMissing('lignes');
         if ($mouvement->lignes->contains(fn ($l) => $l->statut === self::STATUT_VALIDE)) {
-            self::refuser("La pièce {$mouvement->Numero_piece} est validée : elle ne peut plus être modifiée ni supprimée.");
+            self::refuser("La pièce {$mouvement->numeroAffiche()} est validée : elle ne peut plus être modifiée ni supprimée.");
         }
         self::exerciceOuvertPour($mouvement->Date_mouvement);
     }
@@ -172,23 +172,38 @@ class EcritureGuard
     }
 
     /**
-     * Valide toutes les lignes d'une pièce après contrôle. Lève une erreur si la
+     * Valide toutes les lignes d'une pièce après contrôle et lui attribue son
+     * numéro définitif (PCG : numérotation continue des écritures validées ;
+     * un brouillon supprimé ne laisse donc pas de trou). Lève une erreur si la
      * pièce n'est pas validable. À appeler dans une transaction.
      */
     public static function validerPiece(MouvementEcriture $mouvement, ?int $userId): int
     {
         $motif = self::controlerPieceValidable($mouvement);
         if ($motif !== null) {
-            self::refuser("Validation impossible ({$mouvement->Numero_piece}) : {$motif}.");
+            self::refuser("Validation impossible ({$mouvement->numeroAffiche()}) : {$motif}.");
         }
 
-        return LigneEcriture::where('Id_Mouvement_ecriture', $mouvement->Id_Mouvement_ecriture)
+        if (trim((string) $mouvement->Numero_piece) === '') {
+            $mouvement->loadMissing('journal');
+            $mouvement->Numero_piece = self::prochainNumeroPiece(
+                $mouvement->journal,
+                (int) Carbon::parse($mouvement->Date_mouvement)->format('Y')
+            );
+            $mouvement->save();
+        }
+
+        $nb = LigneEcriture::where('Id_Mouvement_ecriture', $mouvement->Id_Mouvement_ecriture)
             ->where(fn ($q) => $q->where('statut', '!=', self::STATUT_VALIDE)->orWhereNull('statut'))
             ->update([
                 'statut' => self::STATUT_VALIDE,
                 'date_validation' => now(),
                 'valide_par' => $userId,
             ]);
+
+        Audit::piece(Audit::PIECE_VALIDATION, $mouvement);
+
+        return $nb;
     }
 
     /**
@@ -204,10 +219,10 @@ class EcritureGuard
         $libelle = $libelle ?: ($type === MouvementEcriture::TYPE_EXTOURNE_AUTO ? 'Extourne' : 'Contre-passation')
             . " de {$origine->Numero_piece}" . ($origine->Libelle ? " — {$origine->Libelle}" : '');
 
+        // Numéro attribué à la validation (voir validerPiece)
         $piece = MouvementEcriture::create([
             'Date_mouvement' => $date,
             'Id_Journal' => $origine->Id_Journal,
-            'Numero_piece' => self::prochainNumeroPiece($origine->journal, (int) substr($date, 0, 4)),
             'Libelle' => mb_substr($libelle, 0, 255),
             'Reference' => mb_substr($reference, 0, 100),
             'type_piece' => $type,
@@ -227,12 +242,20 @@ class EcritureGuard
                 'statut' => self::STATUT_BROUILLON,
             ]);
         }
+
+        Audit::piece(Audit::PIECE_CONTRE_PASSATION, $piece, null, [
+            'piece_origine' => $origine->Numero_piece,
+            'type' => $type === MouvementEcriture::TYPE_EXTOURNE_AUTO ? 'extourne automatique' : 'contre-passation',
+        ]);
+
         return $piece;
     }
 
     /**
      * Prochain numéro de pièce pour un journal et une année : {CODE}{AAAA}-{NNNN}.
      * Séquence propre au journal et à l'année, calculée sous verrou.
+     * Réservé aux pièces validées : appelé par validerPiece() et par les
+     * pièces système validées d'office (clôture, à-nouveaux).
      * À appeler dans une transaction.
      */
     public static function prochainNumeroPiece(Journal $journal, int $annee): string

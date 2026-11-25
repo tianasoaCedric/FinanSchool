@@ -186,7 +186,7 @@ const fetchTypes = async () => {
 // Computed: Données d'analyse pour la carte d'interprétation
 const analyseData = computed(() => {
   if (chartData.value.length === 0) {
-    console.log('❌ analyseData: chartData est vide');
+    console.log('analyseData: chartData est vide');
     return {
       pointBascule: null,
       moisRentables: 0,
@@ -199,7 +199,7 @@ const analyseData = computed(() => {
     };
   }
   
-  console.log('✅ analyseData: chartData contient', chartData.value.length, 'éléments');
+  console.log('analyseData: chartData contient', chartData.value.length, 'éléments');
   
   // 1. Créer un tableau des 12 mois
   const moisLabels = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
@@ -232,8 +232,8 @@ const analyseData = computed(() => {
     };
   }
   
-  console.log('📊 Solde par mois:', soldeParMois);
-  console.log('📋 Détails par mois:', moisInfos);
+  console.log('Solde par mois:', soldeParMois);
+  console.log('Détails par mois:', moisInfos);
   
   // 3. Trouver le point de bascule (premier mois rentable)
   let pointBascule = null;
@@ -250,7 +250,7 @@ const analyseData = computed(() => {
           moisAvantBascule: moisAvantBascule
         };
         trouve = true;
-        console.log('🎯 Point de bascule trouvé:', pointBascule);
+        console.log('Point de bascule trouvé:', pointBascule);
       } else if (soldeParMois[i] < 0) {
         moisAvantBascule++;
         console.log(`Mois ${i} déficitaire, compteur: ${moisAvantBascule}`);
@@ -265,7 +265,7 @@ const analyseData = computed(() => {
   const moisDeficitaires = Object.values(soldeParMois).filter(solde => solde < 0).length;
   const moisEquilibre = Object.values(soldeParMois).filter(solde => solde === 0).length;
   
-  console.log('📈 Statistiques:', {
+  console.log('Statistiques:', {
     rentables: moisRentables,
     deficitaires: moisDeficitaires,
     equilibre: moisEquilibre,
@@ -302,8 +302,8 @@ const analyseData = computed(() => {
     }
   }
   
-  console.log('🏆 Meilleur mois:', meilleurMois);
-  console.log('📉 Pire mois:', pireMois);
+  console.log('Meilleur mois:', meilleurMois);
+  console.log('Pire mois:', pireMois);
   
   // 6. Calculer les totaux
   let totalProfits = 0;
@@ -316,7 +316,7 @@ const analyseData = computed(() => {
   
   const soldeAnnuel = totalProfits - totalCosts;
   
-  console.log('💰 Totaux:', {
+  console.log('Totaux:', {
     profits: totalProfits,
     costs: totalCosts,
     solde: soldeAnnuel

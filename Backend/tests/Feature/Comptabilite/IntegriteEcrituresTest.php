@@ -91,6 +91,10 @@ class IntegriteEcrituresTest extends TestCase
         $this->getJson('/api/mouvements-complets')->assertUnauthorized();
         $this->postJson('/api/lignes/valider-toutes')->assertUnauthorized();
         $this->postJson('/api/exercices/1/cloturer')->assertUnauthorized();
+        // L'assistant lit des données comptables : connexion obligatoire
+        $this->postJson('/api/chat/send', ['message' => 'liste des journaux', 'session_id' => 's1'])->assertUnauthorized();
+        $this->postJson('/api/chat/sending', ['message' => 'liste des journaux', 'session_id' => 's1'])->assertUnauthorized();
+        $this->getJson('/api/chat/history/s1')->assertUnauthorized();
 
         $this->connecter();
         $this->getJson('/api/mouvements-complets')->assertOk();
@@ -189,21 +193,60 @@ class IntegriteEcrituresTest extends TestCase
 
         $reponse = $this->postJson('/api/lignes/valider-toutes')->assertOk();
 
-        $this->assertContains($mauvaise['Numero_piece'], array_column($reponse->json('pieces_ignorees'), 'numero'));
+        $this->assertContains('BR-' . $mauvaise['Id_Mouvement_ecriture'], array_column($reponse->json('pieces_ignorees'), 'numero'));
         $this->assertSame(0, LigneEcriture::where('Id_Mouvement_ecriture', $mauvaise['Id_Mouvement_ecriture'])->where('statut', 'valide')->count());
         $this->assertSame(2, LigneEcriture::where('Id_Mouvement_ecriture', $bonne['Id_Mouvement_ecriture'])->where('statut', 'valide')->count());
     }
 
     // 7. Numérotation ------------------------------------------------------
 
-    public function test_numerotation_sequentielle_par_journal_et_par_annee(): void
+    private function valider(array $piece): string
+    {
+        $this->postJson("/api/mouvements/{$piece['Id_Mouvement_ecriture']}/valider")->assertOk();
+        return MouvementEcriture::find($piece['Id_Mouvement_ecriture'])->Numero_piece;
+    }
+
+    public function test_un_brouillon_n_a_pas_de_numero_definitif(): void
     {
         $this->connecter();
-        $this->assertSame('TST2025-0001', $this->creerPiece()['Numero_piece']);
-        $this->assertSame('TST2025-0002', $this->creerPiece()['Numero_piece']);
+        $piece = $this->creerPiece();
+
+        $this->assertNull($piece['Numero_piece'] ?? null);
+        $this->assertNull(MouvementEcriture::find($piece['Id_Mouvement_ecriture'])->Numero_piece);
+        $this->assertSame('BR-' . $piece['Id_Mouvement_ecriture'], MouvementEcriture::find($piece['Id_Mouvement_ecriture'])->numeroAffiche());
+    }
+
+    public function test_numerotation_sequentielle_a_la_validation_par_journal_et_par_annee(): void
+    {
+        $this->connecter();
+        $this->assertSame('TST2025-0001', $this->valider($this->pieceEquilibree()));
+        $this->assertSame('TST2025-0002', $this->valider($this->pieceEquilibree()));
 
         MouvementEcriture::create(['Date_mouvement' => '2025-03-01', 'Id_Journal' => $this->journal->Id_Journal, 'Numero_piece' => 'TST2025-0041']);
-        $this->assertSame('TST2025-0042', $this->creerPiece()['Numero_piece']);
+        $this->assertSame('TST2025-0042', $this->valider($this->pieceEquilibree()));
+    }
+
+    public function test_supprimer_un_brouillon_ne_laisse_pas_de_trou_dans_la_numerotation(): void
+    {
+        $this->connecter();
+        $premiere = $this->pieceEquilibree();
+        $supprimee = $this->pieceEquilibree();
+        $troisieme = $this->pieceEquilibree();
+
+        $this->assertSame('TST2025-0001', $this->valider($premiere));
+        $this->deleteJson("/api/mouvements/{$supprimee['Id_Mouvement_ecriture']}")->assertOk();
+        $this->assertSame('TST2025-0002', $this->valider($troisieme));
+    }
+
+    public function test_une_piece_validee_garde_son_numero(): void
+    {
+        $this->connecter();
+        $piece = $this->pieceEquilibree();
+        $numero = $this->valider($piece);
+
+        // Une seconde demande de validation est refusée et ne renumérote pas.
+        $this->postJson("/api/mouvements/{$piece['Id_Mouvement_ecriture']}/valider")->assertStatus(422);
+        $this->assertSame($numero, MouvementEcriture::find($piece['Id_Mouvement_ecriture'])->Numero_piece);
     }
 
     // 8. Import ------------------------------------------------------------

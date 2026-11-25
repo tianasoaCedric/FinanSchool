@@ -77,7 +77,7 @@
       <!-- Bouton Modif Groupée -->
       <div class="flex justify-end mb-4 items-center h-10">
         <UiButton variant="success" v-if="selectedRows.length > 0" @click="editGroup">
-          <span>✏️</span> Modifier sélection ({{ selectedRows.length }})
+          <i class="bi bi-pencil"></i> Modifier sélection ({{ selectedRows.length }})
         </UiButton>
       </div>
 
@@ -120,7 +120,7 @@
                     <input v-if="ligne.statut !== 'valide'" type="checkbox" :value="ligne.Id_Ligne_ecriture" v-model="selectedRows" />
                   </td>
                   <td>{{ formatDate(ligne.mouvement?.Date_mouvement) }}</td>
-                  <td class="font-mono text-sm">{{ ligne.mouvement?.Numero_piece }}</td>
+                  <td class="font-mono text-sm">{{ ligne.mouvement?.Numero_piece || 'Brouillon' }}</td>
                   <td class="font-mono text-sm">{{ ligne.sous_compte?.Code_sous_compte }}</td>
                   <td class="max-w-[200px] truncate" :title="ligne.Libelle">{{ ligne.Libelle }}</td>
                   <td class="text-right">{{ formatMontant(ligne.Debit) }}</td>

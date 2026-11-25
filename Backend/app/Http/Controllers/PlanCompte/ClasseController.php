@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PlanCompte;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PlanCompte\Classe;
+use App\Services\Comptabilite\PlanComptableGuard;
 
 class ClasseController extends Controller
 {
@@ -38,6 +39,7 @@ class ClasseController extends Controller
     public function destroy($id)
     {
         $classe = Classe::findOrFail($id);
+        PlanComptableGuard::assertClasseSupprimable($classe);
         $classe->delete();
 
         return response()->json(['message' => 'Classe supprimée']);

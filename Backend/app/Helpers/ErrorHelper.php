@@ -9,7 +9,7 @@ class ErrorHelper
     public static function get($id)
     {
         $error = Error::find($id);
-        // ⚡ Debug temporaire
+        // Debug temporaire
         // dd($error);
 
         return $error ? $error->message : 'Erreur inconnue';

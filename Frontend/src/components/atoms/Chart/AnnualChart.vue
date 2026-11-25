@@ -266,11 +266,11 @@ const chartOptions = computed(() => {
 
 // Transformer les données pour ApexCharts
 const transformData = (data) => {
-  console.log('🔹 Transformation des données:', data);
+  console.log('Transformation des données:', data);
 
   // CORRECTION : Validation plus robuste des données
   if (!data || !Array.isArray(data) || data.length === 0) {
-    console.log('🔹 Aucune donnée à transformer');
+    console.log('Aucune donnée à transformer');
     series.value = [];
     chartCategories.value = [];
     legendData.value = { annee1: [], annee2: [] };
@@ -283,8 +283,8 @@ const transformData = (data) => {
     const annees = [...new Set(data.map(item => item.annee))].sort();
     const centres = [...new Set(data.map(item => item.centre))].filter(centre => centre); // Filtrer les centres vides
 
-    console.log('🔹 Années trouvées:', annees);
-    console.log('🔹 Centres trouvés:', centres);
+    console.log('Années trouvées:', annees);
+    console.log('Centres trouvés:', centres);
 
     // CORRECTION : Validation des centres
     if (centres.length === 0) {
@@ -337,10 +337,10 @@ const transformData = (data) => {
     });
 
     series.value = seriesData;
-    console.log('🔹 Transformation terminée avec succès');
+    console.log('Transformation terminée avec succès');
 
   } catch (error) {
-    console.error('❌ Erreur lors de la transformation des données:', error);
+    console.error('Erreur lors de la transformation des données:', error);
     series.value = [];
     chartCategories.value = [];
     legendData.value = { annee1: [], annee2: [] };
@@ -384,13 +384,13 @@ const getEvolutionClass = (evolution) => {
 
 // CORRECTION : Surveiller les changements de données avec gestion d'erreur
 watch(() => props.chartData, (newData) => {
-  console.log('🔹 Données changées, transformation en cours...');
+  console.log('Données changées, transformation en cours...');
   transformData(newData);
 }, { immediate: true, deep: true });
 
 // Surveiller les changements d'années
 watch(() => [props.annee1, props.annee2], () => {
-  console.log('🔹 Années changées, mise à jour du graphique');
+  console.log('Années changées, mise à jour du graphique');
   if (props.chartData && props.chartData.length > 0) {
     transformData(props.chartData);
   }

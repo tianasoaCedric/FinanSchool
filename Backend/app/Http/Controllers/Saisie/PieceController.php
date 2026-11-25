@@ -7,6 +7,7 @@ use App\Models\Saisie\Journal;
 use App\Models\Saisie\LigneEcriture;
 use App\Models\Saisie\MouvementEcriture;
 use App\Models\User;
+use App\Services\Comptabilite\Audit;
 use App\Services\Comptabilite\EcritureGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -84,7 +85,7 @@ class PieceController extends Controller
 
         $pieces->getCollection()->transform(fn ($m) => [
             'id' => $m->Id_Mouvement_ecriture,
-            'numero' => $m->Numero_piece,
+            'numero' => $m->numeroAffiche(),
             'date' => $m->Date_mouvement,
             'journal' => $m->journal ? ['id' => $m->journal->Id_Journal, 'code' => $m->journal->Code, 'libelle' => $m->journal->Libelle] : null,
             'libelle' => $m->Libelle ?: $m->libelle_ligne,
@@ -133,11 +134,12 @@ class PieceController extends Controller
                 'Reference' => $donnees['Reference'] ?? null,
                 'a_extourner' => (bool) ($donnees['a_extourner'] ?? false),
                 'created_by' => Auth::id(),
-                'Numero_piece' => EcritureGuard::prochainNumeroPiece($journal, (int) date('Y', strtotime($donnees['Date_mouvement']))),
+                // Numéro définitif attribué à la validation (EcritureGuard::validerPiece)
             ]);
 
             $this->enregistrerLignes($piece, $donnees['lignes']);
             $this->enregistrerJustificatif($piece, $request);
+            Audit::piece(Audit::PIECE_CREATION, $piece);
             $this->validerSiDemande($piece, $donnees['action']);
 
             return $piece;
@@ -145,8 +147,8 @@ class PieceController extends Controller
 
         return response()->json([
             'message' => $donnees['action'] === 'valider'
-                ? "Pièce {$piece->Numero_piece} enregistrée et validée"
-                : "Pièce {$piece->Numero_piece} enregistrée en brouillon",
+                ? "Pièce {$piece->numeroAffiche()} enregistrée et validée"
+                : "Pièce {$piece->numeroAffiche()} enregistrée en brouillon",
             'piece' => $this->serialiser($piece->fresh(['journal', 'createur:id,name', 'lignes.sousCompte'])),
         ], 201);
     }
@@ -163,22 +165,18 @@ class PieceController extends Controller
             $piece = MouvementEcriture::with('lignes')->lockForUpdate()->findOrFail($id);
             EcritureGuard::assertPieceModifiable($piece);
             EcritureGuard::exerciceOuvertPour($donnees['Date_mouvement']);
+            $avant = Audit::etatPiece($piece);
 
             $journal = Journal::findOrFail($donnees['Id_Journal']);
-            $annee = (int) date('Y', strtotime($donnees['Date_mouvement']));
-            $changeSequence = (int) $piece->Id_Journal !== (int) $journal->Id_Journal
-                || (int) date('Y', strtotime($piece->Date_mouvement)) !== $annee;
 
+            // Un brouillon n'a pas encore de numéro : changer sa date ou son
+            // journal n'a donc aucun effet sur la numérotation.
             $piece->update([
                 'Date_mouvement' => $donnees['Date_mouvement'],
                 'Id_Journal' => $journal->Id_Journal,
                 'Libelle' => $donnees['Libelle'] ?? null,
                 'Reference' => $donnees['Reference'] ?? null,
                 'a_extourner' => (bool) ($donnees['a_extourner'] ?? false),
-                // Nouveau numéro seulement si la séquence (journal / année) change
-                'Numero_piece' => $changeSequence
-                    ? EcritureGuard::prochainNumeroPiece($journal, $annee)
-                    : $piece->Numero_piece,
             ]);
 
             $piece->lignes()->delete();
@@ -187,6 +185,7 @@ class PieceController extends Controller
                 $this->supprimerJustificatif($piece);
             }
             $this->enregistrerJustificatif($piece, $request);
+            Audit::piece(Audit::PIECE_MODIFICATION, $piece, $avant);
             $this->validerSiDemande($piece, $donnees['action']);
 
             return $piece;
@@ -194,8 +193,8 @@ class PieceController extends Controller
 
         return response()->json([
             'message' => $donnees['action'] === 'valider'
-                ? "Pièce {$piece->Numero_piece} enregistrée et validée"
-                : "Pièce {$piece->Numero_piece} enregistrée",
+                ? "Pièce {$piece->numeroAffiche()} enregistrée et validée"
+                : "Pièce {$piece->numeroAffiche()} enregistrée",
             'piece' => $this->serialiser($piece->fresh(['journal', 'createur:id,name', 'lignes.sousCompte'])),
         ]);
     }
@@ -210,12 +209,13 @@ class PieceController extends Controller
         EcritureGuard::assertPieceModifiable($piece);
 
         DB::transaction(function () use ($piece) {
+            Audit::piece(Audit::PIECE_SUPPRESSION, $piece, Audit::etatPiece($piece));
             $this->supprimerJustificatif($piece);
             $piece->lignes()->delete();
             $piece->delete();
         });
 
-        return response()->json(['message' => "Pièce {$piece->Numero_piece} supprimée"]);
+        return response()->json(['message' => "Pièce {$piece->numeroAffiche()} supprimée"]);
     }
 
     /**
@@ -248,13 +248,13 @@ class PieceController extends Controller
                 $donnees['Libelle'] ?? null
             );
             if (($donnees['action'] ?? 'valider') === 'valider') {
-                EcritureGuard::validerPiece($extourne->fresh('lignes'), Auth::id());
+                EcritureGuard::validerPiece($extourne->load('lignes'), Auth::id());
             }
             return $extourne;
         });
 
         return response()->json([
-            'message' => "Pièce {$extourne->Numero_piece} : contre-passation enregistrée. Saisissez maintenant l'écriture correcte.",
+            'message' => "Pièce {$extourne->numeroAffiche()} : contre-passation enregistrée. Saisissez maintenant l'écriture correcte.",
             'piece' => $this->serialiser($extourne->fresh(['journal', 'createur:id,name', 'lignes.sousCompte'])),
         ], 201);
     }
@@ -273,7 +273,7 @@ class PieceController extends Controller
         }
         $existante = MouvementEcriture::where('id_piece_origine', $piece->Id_Mouvement_ecriture)->first();
         if ($existante) {
-            return "Pièce déjà contre-passée par {$existante->Numero_piece}.";
+            return "Pièce déjà contre-passée par {$existante->numeroAffiche()}.";
         }
         return null;
     }
@@ -359,7 +359,7 @@ class PieceController extends Controller
     private function validerSiDemande(MouvementEcriture $piece, string $action): void
     {
         if ($action === 'valider') {
-            EcritureGuard::validerPiece($piece->fresh('lignes'), Auth::id());
+            EcritureGuard::validerPiece($piece->load('lignes'), Auth::id());
         }
     }
 
@@ -398,11 +398,11 @@ class PieceController extends Controller
 
         return [
             'id' => $piece->Id_Mouvement_ecriture,
-            'numero' => $piece->Numero_piece,
+            'numero' => $piece->numeroAffiche(),
             'type_piece' => $piece->type_piece ?? MouvementEcriture::TYPE_NORMALE,
             'a_extourner' => (bool) $piece->a_extourner,
-            'origine' => $origine ? ['id' => $origine->Id_Mouvement_ecriture, 'numero' => $origine->Numero_piece] : null,
-            'contre_passee_par' => $contrePassee ? ['id' => $contrePassee->Id_Mouvement_ecriture, 'numero' => $contrePassee->Numero_piece] : null,
+            'origine' => $origine ? ['id' => $origine->Id_Mouvement_ecriture, 'numero' => $origine->numeroAffiche()] : null,
+            'contre_passee_par' => $contrePassee ? ['id' => $contrePassee->Id_Mouvement_ecriture, 'numero' => $contrePassee->numeroAffiche()] : null,
             'motif_non_contrepassable' => $estValide ? self::motifNonContrepassable($piece) : null,
             'Date_mouvement' => $piece->Date_mouvement,
             'Id_Journal' => $piece->Id_Journal,

@@ -9,6 +9,7 @@
   >
     <template #actions>
       <UiButton to="/pieces" icon="bi-list-ul">Toutes les pièces</UiButton>
+      <UiButton v-if="piece" :to="`/audit?objet_type=piece&objet_id=${piece.id}`" icon="bi-clock-history">Historique</UiButton>
       <div v-if="!lectureSeule" class="pf-menu" @keydown.esc="menuModeles = false">
         <UiButton icon="bi-collection" icon-right="bi-chevron-down" :aria-expanded="menuModeles" @click="menuModeles = !menuModeles">
           Modèles

@@ -25,7 +25,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Crée automatiquement les affectations pour tous les sous-comptes d'un compte
+     * Crée automatiquement les affectations pour tous les sous-comptes d'un compte
      */
     public function store(Request $request)
     {
@@ -100,7 +100,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Met à jour plusieurs ventilations en même temps pour un SOUS-COMPTE spécifique
+     * Met à jour plusieurs ventilations en même temps pour un SOUS-COMPTE spécifique
      */
     public function updateMultiple(Request $request)
     {
@@ -202,7 +202,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Mise à jour d'une affectation
+     * Mise à jour d'une affectation
      */
     public function update(Request $request, $id)
     {
@@ -232,7 +232,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Supprime toutes les affectations d'un sous-compte
+     * Supprime toutes les affectations d'un sous-compte
      */
     public function destroyBySousCompte($id_sous_compte)
     {
@@ -263,7 +263,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Suppression avec rééquilibrage intelligent
+     * Suppression avec rééquilibrage intelligent
      */
     public function destroy($id)
     {
@@ -318,7 +318,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Import CSV avec ventilation via compte
+     * Import CSV avec ventilation via compte
      */
     public function importViaCompte(Request $request)
     {
@@ -395,7 +395,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Import CSV avec ventilation directe par sous-comptes
+     * Import CSV avec ventilation directe par sous-comptes
      */
     public function importDirecte(Request $request)
     {
@@ -473,7 +473,7 @@ class AffectationAnalytiqueController extends Controller
     }
 
     /**
-     * 🔹 Affiche les sous-comptes non affectés avec pagination (Code_compte 600-799)
+     * Affiche les sous-comptes non affectés avec pagination (Code_compte 600-799)
      */
     public function sousComptesNonAffectesPagines(Request $request)
     {
@@ -495,7 +495,7 @@ class AffectationAnalytiqueController extends Controller
         ]);
     }
     /**
-     * 🔹 Crée une affectation pour un sous-compte spécifique
+     * Crée une affectation pour un sous-compte spécifique
      */
     public function storeForSousCompte(Request $request)
     {

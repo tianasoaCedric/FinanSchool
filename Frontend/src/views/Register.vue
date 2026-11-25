@@ -83,7 +83,7 @@ const verifyCode = async () => {
     const res = await axios.post(`${API_URL}/request-verification`, { email: email.value, code })
     if (res.data.status === 'success') {
       step.value = 3
-      message.value = 'Code validé ✅'
+      message.value = 'Code validé'
     }
   } catch (err) {
     error.value = true
@@ -103,7 +103,7 @@ const registerUser = async () => {
       password_confirmation: password_confirmation.value
     })
     if (res.data.status === 'success') {
-      message.value = 'Inscription réussie 🎉'
+      message.value = 'Inscription réussie'
       
       // Réinitialiser les champs
       step.value = 1
@@ -113,7 +113,7 @@ const registerUser = async () => {
       password_confirmation.value = ''
       codeDigits.value = ['', '', '', '', '', '']
 
-      // ✅ Redirection vers login après 1 seconde
+      // Redirection vers login après 1 seconde
       setTimeout(() => {
         window.location.href = '/'  // ou this.$router.push('/') si tu es dans un component classique
       }, 1000)

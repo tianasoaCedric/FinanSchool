@@ -38,8 +38,8 @@
             <td class="border px-3 py-2">{{ type.code }}</td>
             <td class="border px-3 py-2">{{ type.libelle }}</td>
             <td class="border px-3 py-2 text-center">
-              <button @click="editType(type)" class="bg-yellow-500 text-white px-2 py-1 rounded">✏️</button>
-              <button @click="deleteType(type.id_type)" class="ml-2 bg-red-600 text-white px-2 py-1 rounded">🗑️</button>
+              <button @click="editType(type)" class="bg-yellow-500 text-white px-2 py-1 rounded" title="Modifier"><i class="bi bi-pencil"></i></button>
+              <button @click="deleteType(type.id_type)" class="ml-2 bg-red-600 text-white px-2 py-1 rounded" title="Supprimer"><i class="bi bi-trash"></i></button>
             </td>
           </tr>
         </tbody>

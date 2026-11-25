@@ -11,7 +11,13 @@ class ChatMessage extends Model
         'message', 
         'response', 
         'session_id',
-        'user_id'
+        'user_id',
+        'liens',
+        'profil',
+    ];
+
+    protected $casts = [
+        'liens' => 'array',
     ];
 
     /**

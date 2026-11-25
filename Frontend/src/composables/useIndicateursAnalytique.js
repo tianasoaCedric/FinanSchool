@@ -10,7 +10,7 @@ export function useIndicateursAnalytique() {
   const loading = ref(false);
   const error = ref(null);
 
-  // 📌 Récupérer tous les indicateurs
+  // Récupérer tous les indicateurs
   const fetchIndicateurs = async () => {
     try {
       loading.value = true;
@@ -27,7 +27,7 @@ export function useIndicateursAnalytique() {
     }
   };
 
-  // 📌 Récupérer un indicateur par ID
+  // Récupérer un indicateur par ID
   const fetchIndicateurById = async (id) => {
     try {
       loading.value = true;
@@ -44,7 +44,7 @@ export function useIndicateursAnalytique() {
     }
   };
 
-  // 📌 Créer un nouvel indicateur
+  // Créer un nouvel indicateur
   const createIndicateur = async (data) => {
     try {
       loading.value = true;
@@ -61,7 +61,7 @@ export function useIndicateursAnalytique() {
     }
   };
 
-  // 📌 Mettre à jour un indicateur
+  // Mettre à jour un indicateur
   const updateIndicateur = async (id, data) => {
     try {
       loading.value = true;
@@ -89,7 +89,7 @@ export function useIndicateursAnalytique() {
     }
   };
 
-  // 📌 Supprimer un indicateur
+  // Supprimer un indicateur
   const deleteIndicateur = async (id) => {
     try {
       loading.value = true;
@@ -114,7 +114,7 @@ export function useIndicateursAnalytique() {
     }
   };
 
-  // 📌 Rechercher par catégorie
+  // Rechercher par catégorie
   const searchByCategorie = async (categorie) => {
     try {
       loading.value = true;

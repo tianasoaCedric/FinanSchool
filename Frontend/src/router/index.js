@@ -28,6 +28,7 @@ const routes = [
   { path: "/ecriture", name: "Ecriture", component: () => import("@/components/pages/Saisie/PieceForm.vue") },
   { path: "/ecriture/:id(\\d+)", name: "Piece", component: () => import("@/components/pages/Saisie/PieceForm.vue") },
   { path: "/pieces", name: "Pieces", component: () => import("@/components/pages/Saisie/PiecesList.vue") },
+  { path: "/audit", name: "PisteAudit", component: () => import("@/components/pages/Saisie/PisteAudit.vue") },
   { path: "/liste-grand-livre", name: "ListeGrandLivre", component: () => import("@/components/pages/Saisie/ListeGrandLivre.vue") },
   { path: "/grand-livres/:codeCompte", name: "GrandLivre", component: () => import("@/components/pages/Saisie/GrandLivre.vue"), props: true },
   { path: "/liste-ecriture", name: "ListeEcriture", component: () => import("@/components/pages/Saisie/ListeEcriture.vue") },

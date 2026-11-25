@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Saisie;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Saisie\Journal;
+use App\Services\Comptabilite\PlanComptableGuard;
 
 class JournalController extends Controller
 {
@@ -49,6 +50,7 @@ class JournalController extends Controller
     public function destroy($id)
     {
         $journal = Journal::findOrFail($id);
+        PlanComptableGuard::assertJournalSupprimable($journal);
         $journal->delete();
 
         return response()->json(['message' => 'Journal supprimé']);

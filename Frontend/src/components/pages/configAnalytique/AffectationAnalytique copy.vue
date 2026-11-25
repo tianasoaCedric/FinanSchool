@@ -110,8 +110,8 @@ onMounted(fetchData);
           <td class="border px-3 py-2">{{ aff.centre?.nom }}</td>
           <td class="border px-3 py-2">{{ aff.description }}</td>
           <td class="border px-3 py-2 text-center">
-            <button @click="edit(aff)" class="bg-yellow-500 text-white px-2 py-1 rounded">✏️</button>
-            <button @click="remove(aff.id_affectation)" class="ml-2 bg-red-600 text-white px-2 py-1 rounded">🗑️</button>
+            <button @click="edit(aff)" class="bg-yellow-500 text-white px-2 py-1 rounded" title="Modifier"><i class="bi bi-pencil"></i></button>
+            <button @click="remove(aff.id_affectation)" class="ml-2 bg-red-600 text-white px-2 py-1 rounded" title="Supprimer"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
       </tbody>

@@ -112,10 +112,10 @@ const fetchData = async () => {
   try {
     const data = await useComparaison.getDonneesEvolution12Mois(filters.value);
     chartData.value = data;
-    console.log('✅ Données évolution 12 mois reçues:', data);
+    console.log('Données évolution 12 mois reçues:', data);
   } catch (err) {
     error.value = 'Erreur lors du chargement des données';
-    console.error('❌ Erreur détaillée:', err);
+    console.error('Erreur détaillée:', err);
   } finally {
     loading.value = false;
   }

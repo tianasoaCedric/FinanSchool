@@ -238,7 +238,8 @@ class ClotureExerciceTest extends TestCase
         // Les écritures déjà saisies dans N+1 sont conservées
         $p = $this->piece('411999', '706999', 1_000, '2091-02-01')->assertCreated()->json();
 
-        $this->postJson("/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture")->assertOk();
+        $this->connecterAdmin();
+        $this->postJson("/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture", ['motif' => self::MOTIF])->assertOk();
         $this->assertNull(MouvementEcriture::find($r['piece_cloture']['id']));
         $this->assertNull(MouvementEcriture::find($r['piece_an']['id']));
         $this->assertNotNull(MouvementEcriture::find($p['piece']['id']));
@@ -250,7 +251,55 @@ class ClotureExerciceTest extends TestCase
         // On peut clôturer de nouveau ; une fois un mois de N+1 clôturé, l'annulation est refusée
         $this->cloturer()->assertOk();
         $this->postJson("/api/exercices/{$this->n1->Id_Exercice_comptable}/periodes/cloturer", ['mois' => '2091-01'])->assertOk();
-        $this->postJson("/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture")->assertStatus(422);
+        $this->postJson("/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture", ['motif' => self::MOTIF])->assertStatus(422);
+    }
+
+    private const MOTIF = 'Écriture de régularisation oubliée avant la clôture';
+
+    private function connecterAdmin(): User
+    {
+        $admin = User::factory()->create();
+        $admin->forceFill(['is_admin' => true])->save();
+        Sanctum::actingAs($admin);
+        return $admin;
+    }
+
+    public function test_seul_un_administrateur_peut_annuler_une_cloture(): void
+    {
+        $this->scenarioBenefice();
+        $this->cloturer()->assertOk();
+        $url = "/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture";
+
+        // Utilisateur ordinaire : refusé, la clôture reste en place
+        $this->postJson($url, ['motif' => self::MOTIF])
+            ->assertForbidden()
+            ->assertJsonFragment(['message' => "Seul un administrateur peut annuler la clôture d'un exercice."]);
+        $this->assertTrue($this->n->fresh()->isClotureDefinitive());
+
+        // Administrateur sans motif valable : refusé
+        $this->connecterAdmin();
+        $this->postJson($url)->assertStatus(422)->assertJsonValidationErrors('motif');
+        $this->postJson($url, ['motif' => 'erreur'])->assertStatus(422)->assertJsonValidationErrors('motif');
+        $this->assertTrue($this->n->fresh()->isClotureDefinitive());
+    }
+
+    public function test_l_annulation_est_tracee_avec_son_motif_et_son_auteur(): void
+    {
+        $this->scenarioBenefice();
+        $r = $this->cloturer()->assertOk()->json();
+        $admin = $this->connecterAdmin();
+
+        $this->postJson("/api/exercices/{$this->n->Id_Exercice_comptable}/annuler-cloture", ['motif' => self::MOTIF])->assertOk();
+
+        $trace = \Illuminate\Support\Facades\DB::table('audit_comptable')
+            ->where('action', 'exercice.annulation_cloture')
+            ->where('objet_id', $this->n->Id_Exercice_comptable)
+            ->latest('id')->first();
+        $this->assertNotNull($trace);
+        $this->assertEquals($admin->id, $trace->user_id);
+        $details = json_decode($trace->details, true);
+        $this->assertSame(self::MOTIF, $details['motif']);
+        $this->assertContains($r['piece_cloture']['numero'], $details['pieces_supprimees']);
     }
 
     public function test_dotations_aux_amortissements(): void

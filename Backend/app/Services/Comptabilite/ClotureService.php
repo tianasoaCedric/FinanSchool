@@ -197,9 +197,18 @@ class ClotureService
             $extournes = 0;
             foreach ($this->regularisationsAExtourner($debut, $fin) as $origine) {
                 $piece = EcritureGuard::contrePasser($origine, $debutSuivant->toDateString(), MouvementEcriture::TYPE_EXTOURNE_AUTO, $userId);
-                EcritureGuard::validerPiece($piece->fresh('lignes'), $userId);
+                EcritureGuard::validerPiece($piece->load('lignes'), $userId);
                 $extournes++;
             }
+
+            Audit::enregistrer(Audit::EXERCICE_CLOTURE, 'exercice', $exercice->Id_Exercice_comptable,
+                "Exercice {$exercice->Annee_fiscale}", null, null, [
+                    'resultat' => $prep['resultat'],
+                    'piece_cloture' => $pieceCloture?->Numero_piece,
+                    'piece_a_nouveaux' => $pieceAn?->Numero_piece,
+                    'regularisations_extournees' => $extournes,
+                    'exercice_ouvert' => $suivant->Annee_fiscale,
+                ]);
 
             $sens = $prep['resultat'] >= 0 ? 'bénéfice' : 'perte';
             return [
@@ -222,7 +231,7 @@ class ClotureService
      * N+1 sont conservées. Refusée dès que N+1 a un mois clôturé ou que le
      * résultat a été affecté : la chronologie de N+1 est alors figée.
      */
-    public function annuler(ExerciceComptable $exercice): array
+    public function annuler(ExerciceComptable $exercice, string $motif): array
     {
         $refus = fn (string $m) => throw ValidationException::withMessages(['cloture' => [$m]]);
         if (!$exercice->isClotureDefinitive()) {
@@ -242,12 +251,22 @@ class ClotureService
             $refus("Impossible d'annuler : le résultat {$exercice->Annee_fiscale} a été affecté. Contre-passez ou supprimez d'abord l'affectation.");
         }
 
-        return DB::transaction(function () use ($exercice, $suivant) {
+        return DB::transaction(function () use ($exercice, $suivant, $motif) {
             [$debut, $fin] = $this->bornes($exercice);
             $extournes = MouvementEcriture::where('type_piece', MouvementEcriture::TYPE_EXTOURNE_AUTO)
                 ->whereIn('id_piece_origine', MouvementEcriture::whereBetween('Date_mouvement', [$debut, $fin])->select('Id_Mouvement_ecriture'))
                 ->pluck('Id_Mouvement_ecriture')->all();
-            foreach (array_filter([$exercice->id_piece_an, $exercice->id_piece_cloture, ...$extournes]) as $id) {
+            $aSupprimer = array_values(array_filter([$exercice->id_piece_an, $exercice->id_piece_cloture, ...$extournes]));
+
+            Audit::enregistrer(Audit::EXERCICE_ANNULATION_CLOTURE, 'exercice', $exercice->Id_Exercice_comptable,
+                "Exercice {$exercice->Annee_fiscale}", null, null, [
+                    'motif' => $motif,
+                    'resultat_cloture' => $exercice->resultat_cloture,
+                    'pieces_supprimees' => MouvementEcriture::whereIn('Id_Mouvement_ecriture', $aSupprimer)
+                        ->orderBy('Id_Mouvement_ecriture')->get()->map->numeroAffiche()->all(),
+                ]);
+
+            foreach ($aSupprimer as $id) {
                 LigneEcriture::where('Id_Mouvement_ecriture', $id)->delete();
                 MouvementEcriture::whereKey($id)->delete();
             }

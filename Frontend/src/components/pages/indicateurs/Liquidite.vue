@@ -33,7 +33,7 @@ const {
     previousYearData,
     // Computed
     exercicesOptions,
-    comparisons, // 📌 NOUVEAU : Comparaisons N vs N-1
+    comparisons, // NOUVEAU : Comparaisons N vs N-1
     // Fonctions
     refreshAllData,
     initializeData,

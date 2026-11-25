@@ -10,7 +10,7 @@ class CodeAnalytique extends Model
 
     protected $primaryKey = 'id_code';
 
-    public $timestamps = false; // 🔥 Désactive les timestamps
+    public $timestamps = false; // Désactive les timestamps
 
     protected $fillable = [
         'code',

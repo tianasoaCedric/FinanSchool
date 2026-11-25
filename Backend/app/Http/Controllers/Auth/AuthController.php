@@ -113,7 +113,7 @@ public function verifyCode(Request $request)
         ], 400);
     }
 
-    // ✅ Vérification réussie → supprimer le code
+    // Vérification réussie → supprimer le code
     Cache::forget('email_verification_' . $request->email);
 
     return response()->json([

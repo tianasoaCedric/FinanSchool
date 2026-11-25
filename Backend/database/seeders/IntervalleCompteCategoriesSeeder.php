@@ -21,14 +21,14 @@ class IntervalleCompteCategoriesSeeder extends Seeder
     ['compte_debut' => '160', 'compte_fin' => '169', 'code_cat' => 'EMPRUNT'],
     ['compte_debut' => '170', 'compte_fin' => '179', 'code_cat' => 'DETTECT'],
     ['compte_debut' => '180', 'compte_fin' => '189', 'code_cat' => 'CPTLIAISON'],
-    ['compte_debut' => '190', 'compte_fin' => '199', 'code_cat' => 'PROVRISQUE'], // ⭐ AJOUTÉ
+    ['compte_debut' => '190', 'compte_fin' => '199', 'code_cat' => 'PROVRISQUE'], // AJOUTÉ
 
     // --- CLASSE 2 : IMMOBILISATIONS ---
     ['compte_debut' => '200', 'compte_fin' => '209', 'code_cat' => 'IMMOINC'],
     ['compte_debut' => '210', 'compte_fin' => '219', 'code_cat' => 'IMMOCO'],
     ['compte_debut' => '220', 'compte_fin' => '229', 'code_cat' => 'IMMOCONCESS'],
     ['compte_debut' => '230', 'compte_fin' => '239', 'code_cat' => 'IMMOCOURS'],
-    ['compte_debut' => '240', 'compte_fin' => '259', 'code_cat' => 'TERR_CONST'], // ⭐ AJOUTÉ (CRITIQUE)
+    ['compte_debut' => '240', 'compte_fin' => '259', 'code_cat' => 'TERR_CONST'], // AJOUTÉ (CRITIQUE)
     ['compte_debut' => '260', 'compte_fin' => '279', 'code_cat' => 'IMMOFIN'],
     ['compte_debut' => '280', 'compte_fin' => '280', 'code_cat' => 'AMORT_IMMOINC'],
     ['compte_debut' => '281', 'compte_fin' => '289', 'code_cat' => 'AMORT_IMMOCO'],
@@ -56,7 +56,7 @@ class IntervalleCompteCategoriesSeeder extends Seeder
     ['compte_debut' => '520', 'compte_fin' => '529', 'code_cat' => 'PLACEMENTS'],
     ['compte_debut' => '530', 'compte_fin' => '539', 'code_cat' => 'TRESOFONDS'],
     ['compte_debut' => '540', 'compte_fin' => '549', 'code_cat' => 'REGIES'],
-    ['compte_debut' => '550', 'compte_fin' => '579', 'code_cat' => 'CPTCOURANT'], // ⭐ AJOUTÉ
+    ['compte_debut' => '550', 'compte_fin' => '579', 'code_cat' => 'CPTCOURANT'], // AJOUTÉ
     ['compte_debut' => '580', 'compte_fin' => '589', 'code_cat' => 'VIRINT'],
     ['compte_debut' => '590', 'compte_fin' => '599', 'code_cat' => 'PERTEVAL_FIN'],
 
@@ -87,15 +87,15 @@ class IntervalleCompteCategoriesSeeder extends Seeder
         // $datas = [
         //     // --- PRODUITS (Classe 7) ---
         //     ['compte_debut' => '700', 'compte_fin' => '709', 'code_cat' => 'CA'],
-        //     ['compte_debut' => '710', 'compte_fin' => '719', 'code_cat' => 'PRODVENDU'],    // ✅ CORRIGÉ
+        //     ['compte_debut' => '710', 'compte_fin' => '719', 'code_cat' => 'PRODVENDU'],    // CORRIGÉ
         //     ['compte_debut' => '720', 'compte_fin' => '729', 'code_cat' => 'PRODIMMO'],
-        //     ['compte_debut' => '730', 'compte_fin' => '739', 'code_cat' => 'PRODLTTERM'],   // ✅ AJOUTÉ
+        //     ['compte_debut' => '730', 'compte_fin' => '739', 'code_cat' => 'PRODLTTERM'],   // AJOUTÉ
         //     ['compte_debut' => '740', 'compte_fin' => '749', 'code_cat' => 'SUBVENT'],
         //     ['compte_debut' => '750', 'compte_fin' => '759', 'code_cat' => 'AUTPRODOP'],
         //     ['compte_debut' => '760', 'compte_fin' => '769', 'code_cat' => 'PRODFIN'],
         //     ['compte_debut' => '770', 'compte_fin' => '779', 'code_cat' => 'PRODEXCEPT'],
         //     ['compte_debut' => '780', 'compte_fin' => '789', 'code_cat' => 'REPRISEPROV'],
-        //     ['compte_debut' => '790', 'compte_fin' => '799', 'code_cat' => 'TRANSFCHARG'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '790', 'compte_fin' => '799', 'code_cat' => 'TRANSFCHARG'], // AJOUTÉ
 
         //     // --- CHARGES (Classe 6) ---
         //     ['compte_debut' => '600', 'compte_fin' => '609', 'code_cat' => 'ACHATCONSOM'],
@@ -110,17 +110,17 @@ class IntervalleCompteCategoriesSeeder extends Seeder
 
         //     // --- BILAN ACTIF - IMMOBILISATIONS ---
         //     ['compte_debut' => '200', 'compte_fin' => '209', 'code_cat' => 'IMMOINC'],
-        //     ['compte_debut' => '210', 'compte_fin' => '219', 'code_cat' => 'IMMOCO'],      // ✅ CORRIGÉ
-        //     ['compte_debut' => '220', 'compte_fin' => '229', 'code_cat' => 'IMMOCONCESS'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '210', 'compte_fin' => '219', 'code_cat' => 'IMMOCO'],      // CORRIGÉ
+        //     ['compte_debut' => '220', 'compte_fin' => '229', 'code_cat' => 'IMMOCONCESS'], // AJOUTÉ
         //     ['compte_debut' => '230', 'compte_fin' => '239', 'code_cat' => 'IMMOCOURS'],
         //     ['compte_debut' => '260', 'compte_fin' => '279', 'code_cat' => 'IMMOFIN'],
         //     ['compte_debut' => '280', 'compte_fin' => '280', 'code_cat' => 'AMORT_IMMOINC'],
         //     ['compte_debut' => '281', 'compte_fin' => '289', 'code_cat' => 'AMORT_IMMOCO'],
-        //     ['compte_debut' => '290', 'compte_fin' => '299', 'code_cat' => 'PERTEVAL_IMMO'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '290', 'compte_fin' => '299', 'code_cat' => 'PERTEVAL_IMMO'], // AJOUTÉ
 
         //     // --- STOCKS ---
-        //     ['compte_debut' => '310', 'compte_fin' => '379', 'code_cat' => 'STOCKS'],      // ✅ CORRIGÉ
-        //     ['compte_debut' => '390', 'compte_fin' => '399', 'code_cat' => 'PERTEVAL_STOCK'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '310', 'compte_fin' => '379', 'code_cat' => 'STOCKS'],      // CORRIGÉ
+        //     ['compte_debut' => '390', 'compte_fin' => '399', 'code_cat' => 'PERTEVAL_STOCK'], // AJOUTÉ
 
         //     // --- TIERS (Classe 4) ---
         //     ['compte_debut' => '400', 'compte_fin' => '409', 'code_cat' => 'FOURN'],
@@ -128,33 +128,33 @@ class IntervalleCompteCategoriesSeeder extends Seeder
         //     ['compte_debut' => '420', 'compte_fin' => '429', 'code_cat' => 'PERS_CRED'],
         //     ['compte_debut' => '440', 'compte_fin' => '449', 'code_cat' => 'ETAT'],
             
-        //     ['compte_debut' => '450', 'compte_fin' => '459', 'code_cat' => 'DETTE_ASSOC'],  // ✅ AJOUTÉ
-        //     ['compte_debut' => '460', 'compte_fin' => '469', 'code_cat' => 'SOCGEN'],     // ✅ AJOUTÉ
-        //     ['compte_debut' => '470', 'compte_fin' => '479', 'code_cat' => 'AUTCREC'],    // ✅ CORRIGÉ
+        //     ['compte_debut' => '450', 'compte_fin' => '459', 'code_cat' => 'DETTE_ASSOC'],  // AJOUTÉ
+        //     ['compte_debut' => '460', 'compte_fin' => '469', 'code_cat' => 'SOCGEN'],     // AJOUTÉ
+        //     ['compte_debut' => '470', 'compte_fin' => '479', 'code_cat' => 'AUTCREC'],    // CORRIGÉ
         //     ['compte_debut' => '430', 'compte_fin' => '439', 'code_cat' => 'AUTCREANCES'],
         //     ['compte_debut' => '480', 'compte_fin' => '489', 'code_cat' => 'PROVC'],
-        //     ['compte_debut' => '490', 'compte_fin' => '499', 'code_cat' => 'PERTEVAL_TIERS'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '490', 'compte_fin' => '499', 'code_cat' => 'PERTEVAL_TIERS'], // AJOUTÉ
 
         //     // --- TRÉSORERIE (Classe 5) ---
         //     ['compte_debut' => '500', 'compte_fin' => '509', 'code_cat' => 'FINPLACEMENT'],
         //     ['compte_debut' => '510', 'compte_fin' => '519', 'code_cat' => 'TRESO'],
         //     ['compte_debut' => '520', 'compte_fin' => '529', 'code_cat' => 'PLACEMENTS'],
         //     ['compte_debut' => '530', 'compte_fin' => '539', 'code_cat' => 'TRESOFONDS'],
-        //     ['compte_debut' => '540', 'compte_fin' => '549', 'code_cat' => 'REGIES'],      // ✅ AJOUTÉ
-        //     ['compte_debut' => '580', 'compte_fin' => '589', 'code_cat' => 'VIRINT'],      // ✅ AJOUTÉ
-        //     ['compte_debut' => '590', 'compte_fin' => '599', 'code_cat' => 'PERTEVAL_FIN'], // ✅ AJOUTÉ
+        //     ['compte_debut' => '540', 'compte_fin' => '549', 'code_cat' => 'REGIES'],      // AJOUTÉ
+        //     ['compte_debut' => '580', 'compte_fin' => '589', 'code_cat' => 'VIRINT'],      // AJOUTÉ
+        //     ['compte_debut' => '590', 'compte_fin' => '599', 'code_cat' => 'PERTEVAL_FIN'], // AJOUTÉ
 
         //     // --- CAPITAUX PROPRES (Classe 1) ---
         //     ['compte_debut' => '100', 'compte_fin' => '103', 'code_cat' => 'CAPITAL'],
-        //     ['compte_debut' => '104', 'compte_fin' => '109', 'code_cat' => 'RESERVES'],    // ✅ AJOUTÉ
-        //     ['compte_debut' => '110', 'compte_fin' => '119', 'code_cat' => 'REPORTNOUV'],  // ✅ AJOUTÉ
+        //     ['compte_debut' => '104', 'compte_fin' => '109', 'code_cat' => 'RESERVES'],    // AJOUTÉ
+        //     ['compte_debut' => '110', 'compte_fin' => '119', 'code_cat' => 'REPORTNOUV'],  // AJOUTÉ
         //     ['compte_debut' => '120', 'compte_fin' => '129', 'code_cat' => 'RESULT'],
-        //     ['compte_debut' => '130', 'compte_fin' => '139', 'code_cat' => 'SUBVINVEST'],  // ✅ CORRIGÉ
-        //     ['compte_debut' => '140', 'compte_fin' => '149', 'code_cat' => 'PROVREG'],     // ✅ CORRIGÉ
+        //     ['compte_debut' => '130', 'compte_fin' => '139', 'code_cat' => 'SUBVINVEST'],  // CORRIGÉ
+        //     ['compte_debut' => '140', 'compte_fin' => '149', 'code_cat' => 'PROVREG'],     // CORRIGÉ
         //     ['compte_debut' => '150', 'compte_fin' => '159', 'code_cat' => 'PROVNCOUR'],
         //     ['compte_debut' => '160', 'compte_fin' => '169', 'code_cat' => 'EMPRUNT'],
-        //     ['compte_debut' => '170', 'compte_fin' => '179', 'code_cat' => 'DETTECT'],     // ✅ CORRIGÉ
-        //     ['compte_debut' => '180', 'compte_fin' => '189', 'code_cat' => 'CPTLIAISON'],  // ✅ AJOUTÉ
+        //     ['compte_debut' => '170', 'compte_fin' => '179', 'code_cat' => 'DETTECT'],     // CORRIGÉ
+        //     ['compte_debut' => '180', 'compte_fin' => '189', 'code_cat' => 'CPTLIAISON'],  // AJOUTÉ
         // ];
 
         foreach ($datas as $data) {

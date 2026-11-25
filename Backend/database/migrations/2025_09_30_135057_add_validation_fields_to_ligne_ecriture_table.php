@@ -9,17 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ligne_ecritures', function (Blueprint $table) {
-            // ✅ Nouveau champ pour le statut
+            // Nouveau champ pour le statut
             $table->enum('statut', ['brouillon', 'valide', 'annule'])
                   ->default('brouillon')
                   ->after('Id_Sous_compte');
 
-            // ✅ Date de validation
+            // Date de validation
             $table->timestamp('date_validation')
                   ->nullable()
                   ->after('statut');
 
-            // ✅ Utilisateur qui a validé (optionnel)
+            // Utilisateur qui a validé (optionnel)
             $table->unsignedBigInteger('valide_par')
                   ->nullable()
                   ->after('date_validation');

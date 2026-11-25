@@ -7,6 +7,7 @@ use App\Models\exercice\ExerciceComptable;
 use App\Services\Comptabilite\ClotureService;
 use App\Services\Comptabilite\DotationsService;
 use App\Services\Comptabilite\AffectationService;
+use App\Services\Comptabilite\Audit;
 use App\Services\Comptabilite\EcritureGuard;
 use App\Services\Comptabilite\PeriodesService;
 use Carbon\Carbon;
@@ -42,10 +43,22 @@ class ClotureController extends Controller
         ));
     }
 
-    /** POST /api/exercices/{id}/annuler-cloture */
-    public function annuler(int $id)
+    /**
+     * POST /api/exercices/{id}/annuler-cloture — { motif }
+     * Une clôture est définitive : seul un administrateur peut l'annuler, avec
+     * un motif écrit, inscrit dans la piste d'audit.
+     */
+    public function annuler(Request $request, int $id)
     {
-        return response()->json($this->cloture->annuler(ExerciceComptable::findOrFail($id)));
+        if (!$request->user()?->is_admin) {
+            abort(403, "Seul un administrateur peut annuler la clôture d'un exercice.");
+        }
+        $data = $request->validate(['motif' => 'required|string|min:10|max:500'], [
+            'motif.required' => "Indiquez le motif de l'annulation (il sera conservé dans la piste d'audit).",
+            'motif.min' => 'Le motif doit faire au moins 10 caractères.',
+        ]);
+
+        return response()->json($this->cloture->annuler(ExerciceComptable::findOrFail($id), trim($data['motif'])));
     }
 
     /** GET /api/exercices/{id}/periodes — mois de l'exercice et leur statut. */
@@ -84,7 +97,11 @@ class ClotureController extends Controller
         if ($motif = $suivant->motifRefusOuverture()) {
             throw ValidationException::withMessages(['exercice' => [$motif]]);
         }
-        $suivant->ouvrir(); // enregistre aussi un exercice nouvellement créé
+        DB::transaction(function () use ($suivant) {
+            $suivant->ouvrir(); // enregistre aussi un exercice nouvellement créé
+            Audit::enregistrer(Audit::EXERCICE_OUVERTURE, 'exercice', $suivant->Id_Exercice_comptable,
+                "Exercice {$suivant->Annee_fiscale}", null, null, ['motif' => 'Saisie de N+1 pendant les travaux de clôture']);
+        });
 
         return response()->json([
             'message' => "Exercice {$suivant->Annee_fiscale} ouvert : la saisie courante peut s'y faire pendant les travaux de clôture.",
@@ -120,7 +137,7 @@ class ClotureController extends Controller
             $data['repartition'], (bool) ($data['valider'] ?? false), $request->user()?->id);
 
         return response()->json([
-            'message' => "Affectation du résultat {$exercice->Annee_fiscale} enregistrée (pièce {$piece->Numero_piece}).",
+            'message' => "Affectation du résultat {$exercice->Annee_fiscale} enregistrée (pièce {$piece->numeroAffiche()}).",
             'affectation' => $service->preparation($exercice->fresh()),
         ], 201);
     }
@@ -140,16 +157,16 @@ class ClotureController extends Controller
         $piece = DB::transaction(function () use ($exercice, $request, $data) {
             $piece = $this->dotations->generer($exercice, $request->user()?->id);
             if ($data['valider'] ?? false) {
-                EcritureGuard::validerPiece($piece->fresh('lignes'), $request->user()?->id);
+                EcritureGuard::validerPiece($piece->load('lignes'), $request->user()?->id);
             }
             return $piece;
         });
 
         return response()->json([
             'message' => ($data['valider'] ?? false)
-                ? "Dotations {$exercice->Annee_fiscale} passées et validées (pièce {$piece->Numero_piece})."
-                : "Pièce de dotations {$piece->Numero_piece} générée en brouillon : relisez-la puis validez-la.",
-            'piece' => ['id' => $piece->Id_Mouvement_ecriture, 'numero' => $piece->Numero_piece],
+                ? "Dotations {$exercice->Annee_fiscale} passées et validées (pièce {$piece->numeroAffiche()})."
+                : "Pièce de dotations {$piece->numeroAffiche()} générée en brouillon : relisez-la puis validez-la.",
+            'piece' => ['id' => $piece->Id_Mouvement_ecriture, 'numero' => $piece->numeroAffiche()],
             'plan' => $this->dotations->calcul($exercice),
         ], 201);
     }

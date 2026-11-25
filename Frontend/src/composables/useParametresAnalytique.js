@@ -12,7 +12,7 @@ export function useParametresAnalytique() {
   const loading = ref(false);
   const error = ref(null);
 
-  // 📌 Récupérer tous les indicateurs avec leurs interprétations
+  // Récupérer tous les indicateurs avec leurs interprétations
   const fetchIndicateursComplets = async () => {
     try {
       loading.value = true;
@@ -36,7 +36,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Récupérer les détails d'un indicateur avec ses interprétations
+  // Récupérer les détails d'un indicateur avec ses interprétations
   const fetchIndicateurDetails = async (id) => {
     try {
       loading.value = true;
@@ -63,7 +63,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Créer un nouvel indicateur
+  // Créer un nouvel indicateur
   const createIndicateur = async (data) => {
     try {
       loading.value = true;
@@ -80,7 +80,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Mettre à jour un indicateur
+  // Mettre à jour un indicateur
   const updateIndicateur = async (id, data) => {
     try {
       loading.value = true;
@@ -108,7 +108,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Supprimer un indicateur
+  // Supprimer un indicateur
   const deleteIndicateur = async (id) => {
     try {
       loading.value = true;
@@ -134,7 +134,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Créer une nouvelle interprétation
+  // Créer une nouvelle interprétation
   const createInterpretation = async (data) => {
     try {
       loading.value = true;
@@ -151,7 +151,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Mettre à jour une interprétation
+  // Mettre à jour une interprétation
   const updateInterpretation = async (id, data) => {
     try {
       loading.value = true;
@@ -174,7 +174,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Supprimer une interprétation
+  // Supprimer une interprétation
   const deleteInterpretation = async (id) => {
     try {
       loading.value = true;
@@ -194,7 +194,7 @@ export function useParametresAnalytique() {
     }
   };
 
-  // 📌 Récupérer les niveaux d'alerte
+  // Récupérer les niveaux d'alerte
   const fetchNiveauxAlerte = async () => {
     try {
       const response = await axios.get(`${API_URL}/niveaux-alerte`);

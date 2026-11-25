@@ -24,6 +24,12 @@ class SimulationLigne extends Model
         'id_sous_compte'
     ];
 
+    protected $casts = [
+        'moyenne_historique' => 'float', // montant de référence annuel
+        'coefficient' => 'float',
+        'montant_simule' => 'float',
+    ];
+
     public function simulation()
     {
         return $this->belongsTo(Simulation::class, 'id_simulation', 'id_simulation');

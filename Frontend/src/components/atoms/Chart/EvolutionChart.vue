@@ -110,7 +110,7 @@ const centresList = computed(() => {
     if (centre.premierPoint && centre.dernierPoint && centre.premierPoint.montant > 0) {
       centre.evolution = ((centre.dernierPoint.montant - centre.premierPoint.montant) / centre.premierPoint.montant) * 100;
 
-      console.log(`📈 ${centre.name}: ` +
+      console.log(`${centre.name}: ` +
         `${centre.premierPoint.date.toLocaleDateString('fr-FR')} = ${centre.premierPoint.montant.toLocaleString()}Ar → ` +
         `${centre.dernierPoint.date.toLocaleDateString('fr-FR')} = ${centre.dernierPoint.montant.toLocaleString()}Ar → ` +
         `${centre.evolution.toFixed(1)}%`);
@@ -331,7 +331,7 @@ const chartOptions = computed(() => {
 
 // Transformer les données pour ApexCharts
 const transformData = (data) => {
-  console.log('🔹 Transformation des données pour area chart:', data);
+  console.log('Transformation des données pour area chart:', data);
 
   if (!data || data.length === 0) {
     series.value = [];
@@ -362,7 +362,7 @@ const transformData = (data) => {
     data: centres[centre].sort((a, b) => a.x - b.x)
   }));
 
-  console.log('🔹 Séries area chart:', series.value);
+  console.log('Séries area chart:', series.value);
 };
 
 // Méthodes utilitaires

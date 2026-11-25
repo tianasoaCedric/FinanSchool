@@ -111,7 +111,7 @@ public function AnalyseCoutEtProfit(Request $request)
         ];
     }
 
-    // 🔥 AJOUT : Calcul des montants non affectés
+    // AJOUT : Calcul des montants non affectés
     // Pour les produits (id_type = 2)
     if ($totalProduits > 0) {
         $totalVentileProduits = $totalVentileParType[2] ?? 0;
@@ -154,11 +154,11 @@ public function AnalyseCoutEtProfit(Request $request)
         }
     }
 
-    // 🔥 CORRECTION : Calcul des totaux ventilés et bruts INCLUANT les non affectés
+    // CORRECTION : Calcul des totaux ventilés et bruts INCLUANT les non affectés
     $totalVentile = array_sum(array_column($data, 'montant_ventile'));
     $totalBrut = array_sum(array_column($data, 'montant_brut'));
 
-    // 🔥 MODIFICATION : Calcul des totaux par type incluant les non affectés
+    // MODIFICATION : Calcul des totaux par type incluant les non affectés
     $totalVentileParTypeAvecNonAffecte = [
         1 => 0,
         2 => 0
@@ -170,7 +170,7 @@ public function AnalyseCoutEtProfit(Request $request)
         }
     }
 
-    // 🔥 MODIFICATION : Appliquer les pourcentages
+    // MODIFICATION : Appliquer les pourcentages
     $results = [];
     foreach ($data as $item) {
         // Calcul du pourcentage ventilé par rapport au total du même type
@@ -192,7 +192,7 @@ public function AnalyseCoutEtProfit(Request $request)
 }
 public function AnalyseParAffectationFiltree(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     
     // Paramètres depuis l'URL ou valeurs par défaut
@@ -205,7 +205,7 @@ public function AnalyseParAffectationFiltree(Request $request)
     $idType = $request->input('id_type');
     $idCode = $request->input('id_code'); // ← NOUVEAU : filtre par code analytique
 
-    // 🔥 AJOUT : Calcul des totaux produits et charges
+    // AJOUT : Calcul des totaux produits et charges
     $totalProduits = UtilesController::calculerTotalCategorieGroupe([
         'CA', 'PRODSTOCK', 'PRODIMMO', 'SUBVENT', 'AUTPRODOP', 
         'PRODFIN', 'PRODEXCEPT', 'REPRISEPROV'
@@ -218,9 +218,9 @@ public function AnalyseParAffectationFiltree(Request $request)
 
     $results = collect(); // Initialiser une collection vide
 
-    // 🔥 MODIFICATION : Si pas de id_centre, on affiche SEULEMENT les non affectés
+    // MODIFICATION : Si pas de id_centre, on affiche SEULEMENT les non affectés
     if (!$idCentre) {
-        // 🔥 ÉTAPE 1 : Calculer les totaux ventilés par type
+        // ÉTAPE 1 : Calculer les totaux ventilés par type
         $totalVentileParType = [1 => 0, 2 => 0];
         
         // On peut quand même calculer les totaux ventilés si besoin
@@ -249,7 +249,7 @@ public function AnalyseParAffectationFiltree(Request $request)
             }
         }
         
-        // 🔥 ÉTAPE 2 : Déterminer quels types inclure
+        // ÉTAPE 2 : Déterminer quels types inclure
         $typesToInclude = [];
         if (!$idType) {
             $typesToInclude = [1, 2]; // Les deux types si pas de filtre
@@ -257,7 +257,7 @@ public function AnalyseParAffectationFiltree(Request $request)
             $typesToInclude = [$idType]; // Seulement le type spécifié
         }
         
-        // 🔥 ÉTAPE 3 : Ajouter les sous-comptes non affectés
+        // ÉTAPE 3 : Ajouter les sous-comptes non affectés
         foreach ($typesToInclude as $typeId) {
             // Calculer le montant non affecté pour ce type
             $totalType = ($typeId == 1) ? $totalCharges : $totalProduits;
@@ -288,7 +288,7 @@ public function AnalyseParAffectationFiltree(Request $request)
             }
         }
     } else {
-        // 🔥 ÉTAPE 1 : Requête pour les écritures AVEC affectation analytique (si id_centre est spécifié)
+        // ÉTAPE 1 : Requête pour les écritures AVEC affectation analytique (si id_centre est spécifié)
         $query = DB::table('ligne_ecritures as le')
             ->select(
                 'aa.id_type',
@@ -299,7 +299,7 @@ public function AnalyseParAffectationFiltree(Request $request)
                 'sc.Libelle as libelle_sous_compte',
                 'aa.id_code',
                 'co.code',
-                // 🔥 CORRECTION : ABS() POUR AVOIR DES MONTANTS POSITIFS
+                // CORRECTION : ABS() POUR AVOIR DES MONTANTS POSITIFS
                 DB::raw('ABS(SUM((le."Debit" - le."Credit") * (aa.taux / 100.0))) as montant_ventile'),
                 DB::raw('ABS(SUM(le."Debit" - le."Credit")) as montant_brut'),
                 DB::raw('ROUND(ABS(SUM((le."Debit" - le."Credit") * (aa.taux / 100.0))) * 100.0 / NULLIF(SUM(ABS(SUM((le."Debit" - le."Credit") * (aa.taux / 100.0)))) OVER (), 0), 2) as pourcentage_ventile'),
@@ -401,7 +401,7 @@ public function AnalyseParAffectationFiltree(Request $request)
         }
     }
 
-    // 🔥 ÉTAPE 4 : Recalculer les pourcentages si on a des non affectés
+    // ÉTAPE 4 : Recalculer les pourcentages si on a des non affectés
     if ($results->count() > 0 && (!$idCentre || $idCentre == 0)) {
         // Calculer les totaux pour les pourcentages
         $totalVentile = $results->sum('montant_ventile');
@@ -428,10 +428,10 @@ public function AnalyseParAffectationFiltree(Request $request)
         });
     }
 
-    // 🔥 ÉTAPE 5 : Trier par montant ventilé décroissant
+    // ÉTAPE 5 : Trier par montant ventilé décroissant
     $results = $results->sortByDesc('montant_ventile')->values();
 
-    // 🔥 ÉTAPE 6 : Appliquer les filtres de montant
+    // ÉTAPE 6 : Appliquer les filtres de montant
     if ($montantMin) {
         $results = $results->where('montant_ventile', '>=', $montantMin);
     }
@@ -443,7 +443,7 @@ public function AnalyseParAffectationFiltree(Request $request)
     return response()->json($results->values());
 }
 
-// 🔥 MODIFICATION : Ajout du paramètre $idSousCompte
+// MODIFICATION : Ajout du paramètre $idSousCompte
 private function getSousComptesNonAffectesDetails($idtype, $dateStart, $dateEnd, $idSousCompte = null)
 {
     // Récupérer les sous-comptes non affectés
@@ -493,7 +493,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
     $idType = $request->input('id_type');
     $idCode = $request->input('id_code', null);
 
-    // 🔥 OPTIM: Requête simplifiée sans calculs complexes
+    // OPTIM: Requête simplifiée sans calculs complexes
     $baseQuery = DB::table('ligne_ecritures as le')
         ->join('sous_comptes as sc', 'le.Id_Sous_compte', '=', 'sc.Id_Sous_compte')
         ->join('affectationanalytique as aa', 'le.Id_Sous_compte', '=', 'aa.Id_Sous_compte')
@@ -525,7 +525,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
 
     $rawData = $baseQuery->get();
 
-    // 🔥 OPTIM: Calculs en mémoire PHP
+    // OPTIM: Calculs en mémoire PHP
     $groupedData = [];
     
     foreach ($rawData as $item) {
@@ -576,7 +576,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
         ];
     }
 
-    // 🔥 OPTIM: Tri en PHP
+    // OPTIM: Tri en PHP
     usort($results, function ($a, $b) {
         if ($a['Code_sous_compte'] === $b['Code_sous_compte']) {
             return $b['montant_ventile'] <=> $a['montant_ventile'];
@@ -584,7 +584,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
         return $a['Code_sous_compte'] <=> $b['Code_sous_compte'];
     });
 
-    // 🔥 OPTIM: Event après le traitement
+    // OPTIM: Event après le traitement
     event(new MouvementCreated());
 
     return response()->json($results);
@@ -593,7 +593,7 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
     // Fonction pour vérifier la cohérence des ventilations
     public function VerificationVentilations(Request $request)
     {
-        // 🔥 Déclencher l'événement
+        // Déclencher l'événement
         event(new MouvementCreated());
         $dateStart = $request->input('date_start', '2025-01-01');
         $dateEnd   = $request->input('date_end', '2025-12-31');
@@ -624,10 +624,10 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
         return response()->json($results);
     }
 
-    // 🔥 ANALYSE MENSUELLE AVEC VUE MATERIALISÉE
+    // ANALYSE MENSUELLE AVEC VUE MATERIALISÉE
     public function donneesMensuellesOptimise(Request $request)
     {
-        // 🔥 Déclencher l'événement
+        // Déclencher l'événement
         event(new MouvementCreated());
         $year = $request->input('year', date('Y'));
         $idCentre = $request->input('id_centre');
@@ -655,10 +655,10 @@ public function AnalyseParSousCompteAvecVentilation(Request $request)
         return response()->json($results);
     }
 
-// 🔥 ANALYSE TRIMESTRIELLE OPTIMISÉE AVEC VUE MATERIALISÉE
+// ANALYSE TRIMESTRIELLE OPTIMISÉE AVEC VUE MATERIALISÉE
 public function AnalyseTrimestrielleParCentreOptimise(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $year = $request->input('year', date('Y'));
     $idCentre = $request->input('id_centre');
@@ -681,10 +681,10 @@ public function AnalyseTrimestrielleParCentreOptimise(Request $request)
     return response()->json($results);
 }
 
-// 🔥 STATISTIQUES TRIMESTRIELLES OPTIMISÉES
+// STATISTIQUES TRIMESTRIELLES OPTIMISÉES
 public function statsTrimestriellesOptimise(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $year = $request->input('year', date('Y'));
     $trimestre = $request->input('trimestre');
@@ -708,10 +708,10 @@ public function statsTrimestriellesOptimise(Request $request)
     ]);
 }
 
-// 🔥 DONNÉES TRIMESTRIELLES POUR GRAPHIQUE
+// DONNÉES TRIMESTRIELLES POUR GRAPHIQUE
 public function donneesTrimestriellesGraphique(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $year = $request->input('year', date('Y'));
     $idType = $request->input('id_type', 1);
@@ -759,10 +759,10 @@ public function donneesTrimestriellesGraphique(Request $request)
     ]);
 }
 
-// 🔥 COMPARAISON ANNUELLE AVEC VUE MATERIALISÉE
+// COMPARAISON ANNUELLE AVEC VUE MATERIALISÉE
 public function donneesComparaisonAnnuelleOptimise(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $annee1 = $request->input('annee1', date('Y') - 1);
     $annee2 = $request->input('annee2', date('Y'));
@@ -788,7 +788,7 @@ public function donneesComparaisonAnnuelleOptimise(Request $request)
 
 public function getEvolutionsCentres(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $year = $request->input('year', date('Y'));
     $idType = $request->input('id_type', 1);
@@ -831,7 +831,7 @@ public function getEvolutionsCentres(Request $request)
 
 public function getClassementCentres(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $year = $request->input('year', date('Y'));
     $idType = $request->input('id_type', 1);
@@ -875,7 +875,7 @@ public function getClassementCentresLocal($year, $idType)
 
 public function getAlertesAutomatiques(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $seuil = $request->input('seuil', -20); // -20% par défaut
     $year = $request->input('year', date('Y'));
@@ -921,10 +921,10 @@ public function getAlertesAutomatiques(Request $request)
     return response()->json($alertes);
 }
 
-// 🔥 ÉVOLUTION 12 MOIS AVEC VUE MATERIALISÉE
+// ÉVOLUTION 12 MOIS AVEC VUE MATERIALISÉE
 public function donneesEvolution12MoisOptimise(Request $request)
 {
-    // 🔥 Déclencher l'événement
+    // Déclencher l'événement
     event(new MouvementCreated());
     $idCentre = $request->input('id_centre');
     $idType = $request->input('id_type', 1);
@@ -947,9 +947,9 @@ public function donneesEvolution12MoisOptimise(Request $request)
 
 // COUTS VS PROFITS 
 
-// 🔥 COMPARAISON COÛTS VS PROFITS AVEC VUE MATERIALISÉE
+// COMPARAISON COÛTS VS PROFITS AVEC VUE MATERIALISÉE
 public function getComparaisonCoutProfit(Request $request)
-{// 🔥 Déclencher l'événement
+{// Déclencher l'événement
     event(new MouvementCreated());
     $annee = $request->input('annee');
     $mois = $request->input('mois');
@@ -984,9 +984,9 @@ public function getComparaisonCoutProfit(Request $request)
     return response()->json($results);
 }
 
-// 🔥 RÉSUMÉ ANNUEL COÛTS VS PROFITS
+// RÉSUMÉ ANNUEL COÛTS VS PROFITS
 public function getResumeAnnuelCoutProfit(Request $request)
-{// 🔥 Déclencher l'événement
+{// Déclencher l'événement
     event(new MouvementCreated());
     $annee = $request->input('annee');
 
@@ -1015,9 +1015,9 @@ public function getResumeAnnuelCoutProfit(Request $request)
     return response()->json($results);
 }
 
-// 🔥 ANALYSE RENTABILITÉ PAR TYPE
+// ANALYSE RENTABILITÉ PAR TYPE
 public function getAnalyseRentabiliteParType(Request $request)
-{// 🔥 Déclencher l'événement
+{// Déclencher l'événement
     event(new MouvementCreated());
     $annee = $request->input('annee', date('Y'));
 
@@ -1038,9 +1038,9 @@ public function getAnalyseRentabiliteParType(Request $request)
     return response()->json($results);
 }
 
-// 🔥 ÉVOLUTION MENSUELLE COÛTS VS PROFITS
+// ÉVOLUTION MENSUELLE COÛTS VS PROFITS
 public function getEvolutionMensuelleCoutProfit(Request $request)
-{// 🔥 Déclencher l'événement
+{// Déclencher l'événement
     event(new MouvementCreated());
     $idType = $request->input('id_type');
     $annee = $request->input('annee', date('Y'));
@@ -1080,7 +1080,7 @@ public function classementSousCompte(Request $request)
     $montantMax = $request->input('montant_max');
     $idType = $request->input('id_type');
 
-    // 🔥 VERSION SIMPLIFIÉE : Utiliser la même structure que votre fonction originale
+    // VERSION SIMPLIFIÉE : Utiliser la même structure que votre fonction originale
     // mais avec les index créés, ça ira déjà beaucoup plus vite !
     
     $query = DB::table('ligne_ecritures as le')
@@ -1110,7 +1110,7 @@ public function classementSousCompte(Request $request)
         ->limit(10)
         ->get();
 
-    // 🔥 OPTIMISATION : Calcul des pourcentages en PHP
+    // OPTIMISATION : Calcul des pourcentages en PHP
     $totalVentile = $results->sum('montant_ventile');
     $totalBrut = $results->sum('montant_brut');
 
@@ -1168,7 +1168,7 @@ public function classementSousCompteLocal($idType,$dateStart,$dateEnd,$idCentre,
         $query->where('sc.Id_Sous_compte', $idSousCompte);
     }
 
-    // 🔥 Filtrer par type spécifique
+    // Filtrer par type spécifique
     if ($idType) {
         $query->where('aa.id_type', $idType);
     }

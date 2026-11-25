@@ -36,7 +36,7 @@ export const useDashboard = {
     }
   },
 
-  // 🔥 NOUVELLES FONCTIONS POUR COÛTS VS PROFITS
+  // NOUVELLES FONCTIONS POUR COÛTS VS PROFITS
   async getComparaisonCoutProfit(filters = {}) {
     try {
       const params = new URLSearchParams();

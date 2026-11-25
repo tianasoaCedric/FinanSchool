@@ -64,7 +64,7 @@ class AffectationService
             ] : null,
             'piece' => $piece ? [
                 'id' => $piece->Id_Mouvement_ecriture,
-                'numero' => $piece->Numero_piece,
+                'numero' => $piece->numeroAffiche(),
                 'validee' => $piece->lignes->isNotEmpty() && $piece->lignes->every(fn ($l) => $l->statut === EcritureGuard::STATUT_VALIDE),
             ] : null,
             'motif_blocage' => $motif,
@@ -108,6 +108,11 @@ class AffectationService
         return DB::transaction(function () use ($exercice, $date, $reference, $lignes, $benefice, $attendu, $destinations, $valider, $userId, $prep) {
             EcritureGuard::exerciceOuvertPour($date);
             if ($prep['piece']) {
+                $ancienne = MouvementEcriture::find($prep['piece']['id']);
+                if ($ancienne) {
+                    Audit::piece(Audit::PIECE_SUPPRESSION, $ancienne, Audit::etatPiece($ancienne),
+                        ['motif' => "Remplacée par une nouvelle affectation du résultat"]);
+                }
                 LigneEcriture::where('Id_Mouvement_ecriture', $prep['piece']['id'])->delete();
                 MouvementEcriture::whereKey($prep['piece']['id'])->delete();
             }
@@ -118,7 +123,6 @@ class AffectationService
             $piece = MouvementEcriture::create([
                 'Date_mouvement' => $date,
                 'Id_Journal' => $journal->Id_Journal,
-                'Numero_piece' => EcritureGuard::prochainNumeroPiece($journal, (int) substr($date, 0, 4)),
                 'Libelle' => $libelle,
                 'Reference' => mb_substr($reference, 0, 100),
                 'type_piece' => MouvementEcriture::TYPE_AFFECTATION,
@@ -141,8 +145,13 @@ class AffectationService
                     'Debit' => $benefice ? 0 : $r['montant'], 'Credit' => $benefice ? $r['montant'] : 0,
                 ]);
             }
+            Audit::piece(Audit::RESULTAT_AFFECTATION, $piece, null, [
+                'exercice' => $exercice->Annee_fiscale,
+                'reference' => $reference,
+                'repartition' => collect($lignes)->map(fn ($r) => ['compte' => $r['code'], 'montant' => (float) $r['montant']])->values()->all(),
+            ]);
             if ($valider) {
-                EcritureGuard::validerPiece($piece->fresh('lignes'), $userId);
+                EcritureGuard::validerPiece($piece->load('lignes'), $userId);
             }
             $exercice->update(['id_piece_affectation' => $piece->Id_Mouvement_ecriture]);
             return $piece;

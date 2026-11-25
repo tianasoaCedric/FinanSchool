@@ -192,7 +192,7 @@ const deleteJournal = async (id) => {
       await axios.delete(`${API_BASE}/journals/${id}`);
       fetchJournals();
     } catch (error) {
-      console.error("Erreur lors de la suppression du journal:", error);
+      alert(error.response?.data?.message || "Erreur lors de la suppression du journal");
     }
   }
 };

@@ -39,7 +39,7 @@ const {
   fetchClassement,
   fetchSousComptesVentiles,
 
-  // 🔥 NOUVELLES FONCTIONS
+  // NOUVELLES FONCTIONS
   initializeData,
   changeExercice,
   resetFilters,
@@ -68,7 +68,7 @@ const handleExerciceChange = async (event) => {
 const activeTab = ref('centres');
 const showGlobalView = ref(true);
 
-// 🔥 MODIFICATION : Utiliser les données filtrées pour les charts
+// MODIFICATION : Utiliser les données filtrées pour les charts
 const centresChartData = computed(() => ({
   data: centresFiltres.value.map(c => parseFloat(c.montant_ventile) || 0),
   labels: centresFiltres.value.map(c => c.centre),
@@ -110,7 +110,7 @@ const handleFetchAffectations = async (centre) => {
   selectedCentre.value = centre.centre;
   showGlobalView.value = false;
   activeTab.value = 'affectations';
-  // 🔥 Réinitialiser le filtre de recherche des affectations
+  // Réinitialiser le filtre de recherche des affectations
   filters.searchAffectation = "";
 };
 
@@ -119,12 +119,12 @@ const handleBackToGlobal = () => {
   selectedCentre.value = '';
   showGlobalView.value = true;
   activeTab.value = 'centres';
-  // 🔥 Réinitialiser les filtres de recherche
+  // Réinitialiser les filtres de recherche
   filters.searchCentre = "";
   filters.searchAffectation = "";
 };
 
-// 🔥 CORRECTION : FONCTION POUR RÉINITIALISER TOUT
+// CORRECTION : FONCTION POUR RÉINITIALISER TOUT
 const handleReset = async () => {
   await resetFilters();
   // S'assurer qu'on revient à la vue globale
@@ -147,7 +147,7 @@ onMounted(async () => {
     <div class="main">
       <!-- Bouton retour vers la vue globale -->
 
-      <!-- 🔥 FILTRES PRINCIPAUX (DATES ET CENTRES) - DYNAMIQUES -->
+      <!-- FILTRES PRINCIPAUX (DATES ET CENTRES) - DYNAMIQUES -->
       <div class="filtres">
         <BoutonIcon v-if="!showGlobalView" @click="handleBackToGlobal" icon-name="arrow-left" :type="'cancel-stroke'"
           :texte="'Retour à la vue globale'" />
@@ -275,7 +275,7 @@ onMounted(async () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- 🔥 MODIFICATION : Utiliser centresFiltres au lieu de centres -->
+                  <!-- MODIFICATION : Utiliser centresFiltres au lieu de centres -->
                   <tr v-for="centre in centresFiltres" :key="centre.id_centre" class="cursor-pointer hover:bg-gray-100">
                     <td class="col">{{ centre.centre }}</td>
                     
@@ -315,7 +315,7 @@ onMounted(async () => {
                   
                 </thead>
                 <tbody>
-                  <!-- 🔥 MODIFICATION : Utiliser affectationsFiltrees au lieu de affectations -->
+                  <!-- MODIFICATION : Utiliser affectationsFiltrees au lieu de affectations -->
                   <tr v-for="a in affectationsFiltrees" :key="a.affectation_description">
                     <td class="col">{{ a.code || 'N/A' }}</td>
                     <td class="col">{{ a.libelle_sous_compte || 'N/A' }}</td>

@@ -36,7 +36,7 @@ class ComptesMappingSeeder extends Seeder
                 ->whereRaw("Code_compte BETWEEN ? AND ?", [$intervalle->compte_debut, $intervalle->compte_fin])
                 ->get();
 
-            echo "📊 Catégorie '{$intervalle->code_categorie}' ({$intervalle->libelle_categorie}) : ";
+            echo "Catégorie '{$intervalle->code_categorie}' ({$intervalle->libelle_categorie}) : ";
             echo "{$comptes->count()} comptes trouvés dans [{$intervalle->compte_debut}-{$intervalle->compte_fin}]\n";
 
             // 3. Mapper chaque COMPTE à la catégorie
@@ -70,8 +70,8 @@ class ComptesMappingSeeder extends Seeder
             }
         }
 
-        echo "\n🎉 MAPPING TERMINÉ !\n";
-        echo "✅ {$totalComptesMappes} comptes mappés\n";
-        echo "✅ {$totalSousComptesMappes} sous-comptes trouvés\n";
+        echo "\nMAPPING TERMINÉ !\n";
+        echo "{$totalComptesMappes} comptes mappés\n";
+        echo "{$totalSousComptesMappes} sous-comptes trouvés\n";
     }
 }

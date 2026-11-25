@@ -14,7 +14,7 @@ export function useIndicateurPedagogique(filters) {
   const loading = ref(false);
   const loadingTable = ref(false);
 
-  // 📌 NOUVEAU : Données de l'année N-1 (comme useIndicateurGeneral)
+  // NOUVEAU : Données de l'année N-1 (comme useIndicateurGeneral)
   const previousYearData = ref({
     coutFonctionnement: null,
     chiffreAffaires: null,
@@ -22,7 +22,7 @@ export function useIndicateurPedagogique(filters) {
     margeParEleve: null
   });
 
-  // 📌 Fonction pour obtenir les dates de l'année précédente (identique à useIndicateurGeneral)
+  // Fonction pour obtenir les dates de l'année précédente (identique à useIndicateurGeneral)
   const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     // Étape 1 : convertir en date "pure" (sans heures)
     const start = new Date(currentDateStart);
@@ -48,7 +48,7 @@ export function useIndicateurPedagogique(filters) {
     };
   };
 
-  // 📌 Récupérer les données de l'année N-1 (simplifié comme useIndicateurGeneral)
+  // Récupérer les données de l'année N-1 (simplifié comme useIndicateurGeneral)
   const fetchPreviousYearData = async (currentDateStart, currentDateEnd) => {
     try {
       loadingTable.value = true;
@@ -103,7 +103,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Fonction de comparaison entre N et N-1 (identique à useIndicateurGeneral)
+  // Fonction de comparaison entre N et N-1 (identique à useIndicateurGeneral)
   const getComparison = (currentValue, previousValue, type = 'montant') => {
     if (!currentValue || !previousValue) {
       return {
@@ -143,7 +143,7 @@ export function useIndicateurPedagogique(filters) {
     };
   };
 
-  // 📌 Computed pour les comparaisons N vs N-1 (comme useIndicateurGeneral)
+  // Computed pour les comparaisons N vs N-1 (comme useIndicateurGeneral)
   const comparisons = computed(() => {
     return {
       coutFonctionnement: getComparison(
@@ -169,7 +169,7 @@ export function useIndicateurPedagogique(filters) {
     };
   });
 
-  // 📌 Fonction pour formater le format de date (identique à useIndicateurGeneral)
+  // Fonction pour formater le format de date (identique à useIndicateurGeneral)
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
@@ -182,7 +182,7 @@ export function useIndicateurPedagogique(filters) {
     return '';
   };
 
-  // 📌 Récupérer tous les exercices (identique à useIndicateurGeneral)
+  // Récupérer tous les exercices (identique à useIndicateurGeneral)
   const fetchExercicesList = async () => {
     try {
       const response = await axios.get(`${API_URL}/exercices`);
@@ -207,7 +207,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Récupérer l'exercice et mettre à jour les dates (identique à useIndicateurGeneral)
+  // Récupérer l'exercice et mettre à jour les dates (identique à useIndicateurGeneral)
   const fetchExercice = async (idExercice = null) => {
     try {
       loading.value = true;
@@ -240,7 +240,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Changer d'exercice (identique à useIndicateurGeneral)
+  // Changer d'exercice (identique à useIndicateurGeneral)
   const changeExercice = async (idExercice) => {
     try {
       if (!idExercice) {
@@ -254,7 +254,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Récupérer les indicateurs individuels (inchangé)
+  // Récupérer les indicateurs individuels (inchangé)
   const getCoutFonctionnement = async () => {
     try {
       const response = await axios.get(`${API_URL}/analyse/cout-fonctionnement-par-eleve`, {
@@ -318,7 +318,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Fonction pour rafraîchir toutes les données (avec N-1)
+  // Fonction pour rafraîchir toutes les données (avec N-1)
   const refreshAllData = async () => {
     try {
       loading.value = true;
@@ -338,7 +338,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 📌 Chargement initial avec exercice (identique à useIndicateurGeneral)
+  // Chargement initial avec exercice (identique à useIndicateurGeneral)
   const initializeData = async () => {
     try {
       loading.value = true;
@@ -352,7 +352,7 @@ export function useIndicateurPedagogique(filters) {
     }
   };
 
-  // 🔥 INFORMATIONS SUR L'EXERCICE (identique à useIndicateurGeneral)
+  // INFORMATIONS SUR L'EXERCICE (identique à useIndicateurGeneral)
   const infoExercice = computed(() => {
     if (!exercice.value) return null;
     
@@ -368,7 +368,7 @@ export function useIndicateurPedagogique(filters) {
     };
   });
 
-  // 🔥 LISTE DES EXERCICES FORMATÉE POUR LE SELECT (identique à useIndicateurGeneral)
+  // LISTE DES EXERCICES FORMATÉE POUR LE SELECT (identique à useIndicateurGeneral)
   const exercicesOptions = computed(() => {
     return exercicesList.value.map(exo => ({
       value: exo.Id_Exercice_comptable,
@@ -388,13 +388,13 @@ export function useIndicateurPedagogique(filters) {
     partMasseSalariale,
     margeParEleve,
     loading,
-    previousYearData, // 📌 NOUVEAU : Données N-1
+    previousYearData, // NOUVEAU : Données N-1
     loadingTable,
     
     // Computed
     infoExercice,
     exercicesOptions,
-    comparisons, // 📌 NOUVEAU : Comparaisons N vs N-1
+    comparisons, // NOUVEAU : Comparaisons N vs N-1
     
     // Fonctions
     getCoutFonctionnement,
@@ -406,7 +406,7 @@ export function useIndicateurPedagogique(filters) {
     changeExercice,
     fetchExercicesList,
     formatDateForInput,
-    getComparison, // 📌 NOUVEAU : Fonction de comparaison
-    fetchPreviousYearData // 📌 NOUVEAU : Récupération données N-1
+    getComparison, // NOUVEAU : Fonction de comparaison
+    fetchPreviousYearData // NOUVEAU : Récupération données N-1
   };
 }

@@ -115,7 +115,7 @@ const chartOptions = computed(() => {
                 : props.colors[index % props.colors.length]
         ),
         labels: props.labels,
-        // ⭐⭐ IMPORTANT : Désactiver la légende dans le chart
+        // IMPORTANT : Désactiver la légende dans le chart
         legend: {
             show: !props.separateLegend,
             position: 'bottom'

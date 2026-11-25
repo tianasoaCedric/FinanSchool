@@ -40,7 +40,7 @@ const {
   fetchClassement,
   fetchSousComptesVentiles,
 
-  // 🔥 NOUVELLES FONCTIONS
+  // NOUVELLES FONCTIONS
   initializeData,
   changeExercice,
   resetFilters,
@@ -111,7 +111,7 @@ const handleExerciceChange = async (event) => {
 const activeTab = ref('centres');
 const showGlobalView = ref(true);
 
-// 🔥 MODIFICATION : Utiliser les données filtrées pour les charts
+// MODIFICATION : Utiliser les données filtrées pour les charts
 const centresChartData = computed(() => ({
   data: centresFiltres.value.map(c => parseFloat(c.montant_ventile) || 0),
   labels: centresFiltres.value.map(c => c.centre),
@@ -153,7 +153,7 @@ const handleFetchAffectations = async (centre) => {
   selectedCentre.value = centre.centre;
   showGlobalView.value = false;
   activeTab.value = 'affectations';
-  // 🔥 Réinitialiser le filtre de recherche des affectations
+  // Réinitialiser le filtre de recherche des affectations
   filters.searchAffectation = "";
 };
 
@@ -162,12 +162,12 @@ const handleBackToGlobal = () => {
   selectedCentre.value = '';
   showGlobalView.value = true;
   activeTab.value = 'centres';
-  // 🔥 Réinitialiser les filtres de recherche
+  // Réinitialiser les filtres de recherche
   filters.searchCentre = "";
   filters.searchAffectation = "";
 };
 
-// 🔥 CORRECTION : FONCTION POUR RÉINITIALISER TOUT
+// CORRECTION : FONCTION POUR RÉINITIALISER TOUT
 const handleReset = async () => {
   await resetFilters();
   // S'assurer qu'on revient à la vue globale

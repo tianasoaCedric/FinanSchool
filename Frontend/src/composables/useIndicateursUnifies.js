@@ -11,13 +11,13 @@ export function useIndicateursUnifies(filters) {
   const loading = ref(false);
   const loadingTable = ref(false);
 
-  // 📊 INDICATEURS GÉNÉRAUX
+  // INDICATEURS GÉNÉRAUX
   const totalProduits = ref(null);
   const totalCharges = ref(null);
   const resultatNet = ref(null);
   const TresorerieNette = ref(null);
 
-  // 📌 Données de l'année N-1 pour tous les indicateurs
+  // Données de l'année N-1 pour tous les indicateurs
   const previousYearData = ref({
     // Général
     totalProduits: null,
@@ -26,7 +26,7 @@ export function useIndicateursUnifies(filters) {
     TresorerieNette: null
   });
 
-  // 📌 Fonction pour obtenir les dates de l'année précédente
+  // Fonction pour obtenir les dates de l'année précédente
   const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     const start = new Date(currentDateStart);
     const end = new Date(currentDateEnd);
@@ -48,7 +48,7 @@ export function useIndicateursUnifies(filters) {
     };
   };
 
-  // 📌 Récupérer TOUTES les données de l'année N-1
+  // Récupérer TOUTES les données de l'année N-1
   const fetchPreviousYearData = async (currentDateStart, currentDateEnd) => {
     try {
       loadingTable.value = true;
@@ -94,7 +94,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Fonction de comparaison entre N et N-1
+  // Fonction de comparaison entre N et N-1
   const getComparison = (currentValue, previousValue, type = 'montant') => {
     if (!currentValue || !previousValue) {
       return {
@@ -134,7 +134,7 @@ export function useIndicateursUnifies(filters) {
     };
   };
 
-  // 📌 Computed pour TOUTES les comparaisons
+  // Computed pour TOUTES les comparaisons
   const comparisons = computed(() => {
     return {
       // Indicateurs Généraux
@@ -157,7 +157,7 @@ export function useIndicateursUnifies(filters) {
     };
   });
 
-  // 📌 Fonction pour formater le format de date
+  // Fonction pour formater le format de date
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
@@ -170,7 +170,7 @@ export function useIndicateursUnifies(filters) {
     return '';
   };
 
-  // 📌 Récupérer tous les exercices
+  // Récupérer tous les exercices
   const fetchExercicesList = async () => {
     try {
       const response = await axios.get(`${API_URL}/exercices`);
@@ -193,7 +193,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Récupérer l'exercice et mettre à jour les dates
+  // Récupérer l'exercice et mettre à jour les dates
   const fetchExercice = async (idExercice = null) => {
     try {
       loading.value = true;
@@ -260,7 +260,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Changer d'exercice
+  // Changer d'exercice
   const changeExercice = async (idExercice) => {
     try {
       if (!idExercice) {
@@ -274,7 +274,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Fonctions pour récupérer TOUS les indicateurs
+  // Fonctions pour récupérer TOUS les indicateurs
   const getAllIndicateurs = async () => {
     try {
       const [
@@ -310,7 +310,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Fonction pour rafraîchir TOUTES les données
+  // Fonction pour rafraîchir TOUTES les données
   const refreshAllData = async () => {
     try {
       loading.value = true;
@@ -326,7 +326,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 📌 Chargement initial avec exercice
+  // Chargement initial avec exercice
   const initializeData = async () => {
     try {
       loading.value = true;
@@ -340,7 +340,7 @@ export function useIndicateursUnifies(filters) {
     }
   };
 
-  // 🔥 INFORMATIONS SUR L'EXERCICE
+  // INFORMATIONS SUR L'EXERCICE
   const infoExercice = computed(() => {
     if (!exercice.value) return null;
     
@@ -356,7 +356,7 @@ export function useIndicateursUnifies(filters) {
     };
   });
 
-  // 🔥 LISTE DES EXERCICES FORMATÉE POUR LE SELECT
+  // LISTE DES EXERCICES FORMATÉE POUR LE SELECT
   const exercicesOptions = computed(() => {
     return exercicesList.value.map(exo => ({
       value: exo.Id_Exercice_comptable,
@@ -379,7 +379,7 @@ export function useIndicateursUnifies(filters) {
     exercicesOptions,
 convertYearToExerciseDates,
   fetchExerciceByYear,
-    // 📊 TOUS LES INDICATEURS
+    // TOUS LES INDICATEURS
     // Général
     totalProduits,
     totalCharges,

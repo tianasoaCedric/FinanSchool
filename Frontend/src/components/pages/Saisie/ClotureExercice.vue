@@ -161,7 +161,8 @@
               Les écritures déjà saisies dans {{ suivant.annee }} sont conservées. Impossible une fois un mois de {{ suivant.annee }} clôturé
               ou le résultat affecté.
             </p>
-            <UiButton variant="soft-danger" icon="bi-unlock" :loading="action === 'annuler'" @click="annuler">Annuler la clôture</UiButton>
+            <UiButton v-if="estAdmin" variant="soft-danger" icon="bi-unlock" :loading="action === 'annuler'" @click="ouvrirAnnulation">Annuler la clôture</UiButton>
+            <span v-else class="ce-bloque"><i class="bi bi-shield-lock" aria-hidden="true"></i> Clôture définitive : seul un administrateur peut l'annuler.</span>
           </div>
         </section>
       </template>
@@ -303,6 +304,34 @@
         </p>
       </section>
     </template>
+
+    <!-- Annulation de clôture : administrateur, motif obligatoire, confirmation -->
+    <div v-if="modaleAnnulation" class="modal-overlay" @click.self="modaleAnnulation = false">
+      <div class="modal" role="dialog" aria-labelledby="ce-annul-titre">
+        <div class="modal-header">
+          <h2 id="ce-annul-titre" class="modal-title">Annuler la clôture de {{ ex.annee }}</h2>
+          <UiButton variant="ghost" icon="bi-x-lg" icon-only aria-label="Fermer" @click="modaleAnnulation = false" />
+        </div>
+        <form class="modal-body ce-annul" @submit.prevent="annuler">
+          <p class="ce-aide">
+            L'écriture de clôture, les à-nouveaux et les extournes automatiques seront supprimés et l'exercice {{ ex.annee }} rouvert.
+            Cette action exceptionnelle est inscrite dans la piste d'audit avec votre nom et le motif.
+          </p>
+          <label class="ce-annul__label" for="ce-annul-motif">Motif de l'annulation</label>
+          <textarea
+            id="ce-annul-motif" v-model="motifAnnulation" class="fs-input ce-annul__motif" rows="3" maxlength="500" required
+            placeholder="Ex. : écriture de régularisation oubliée, à passer avant le dépôt des états financiers"
+          ></textarea>
+          <small class="ce-annul__aide">10 caractères minimum ({{ motifAnnulation.trim().length }}/500)</small>
+          <label class="ce-annul__label" for="ce-annul-annee">Pour confirmer, saisissez l'année {{ ex.annee }}</label>
+          <input id="ce-annul-annee" v-model="confirmationAnnee" class="fs-input" inputmode="numeric" autocomplete="off" required />
+          <div class="modal-footer">
+            <UiButton variant="ghost" @click="modaleAnnulation = false">Retour</UiButton>
+            <UiButton type="submit" variant="danger" icon="bi-unlock" :loading="action === 'annuler'" :disabled="!annulationPossible">Annuler la clôture</UiButton>
+          </div>
+        </form>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
@@ -434,9 +463,27 @@ async function cloturer() {
   if (await executer('cloturer', () => axios.post(`${API_BASE}/exercices/${exerciceId.value}/cloturer`, { ignorer_dotations: ignorerDotations.value }), 'Clôture impossible.')) await recharger();
 }
 
+// Annulation de clôture : réservée à un administrateur, motif écrit + saisie de l'année
+const modaleAnnulation = ref(false);
+const motifAnnulation = ref('');
+const confirmationAnnee = ref('');
+const estAdmin = computed(() => !!user.value?.is_admin);
+const annulationPossible = computed(() =>
+  motifAnnulation.value.trim().length >= 10 && confirmationAnnee.value.trim() === String(ex.value.annee));
+
+function ouvrirAnnulation() {
+  motifAnnulation.value = '';
+  confirmationAnnee.value = '';
+  modaleAnnulation.value = true;
+}
+
 async function annuler() {
-  if (!confirm(`Annuler la clôture de ${ex.value.annee} ? L'écriture de clôture, les à-nouveaux et les extournes automatiques seront supprimés et l'exercice rouvert.`)) return;
-  if (await executer('annuler', () => axios.post(`${API_BASE}/exercices/${exerciceId.value}/annuler-cloture`), 'Annulation impossible.')) await recharger();
+  if (!annulationPossible.value) return;
+  const ok = await executer('annuler',
+    () => axios.post(`${API_BASE}/exercices/${exerciceId.value}/annuler-cloture`, { motif: motifAnnulation.value.trim() }),
+    'Annulation impossible.');
+  modaleAnnulation.value = false;
+  if (ok) await recharger();
 }
 
 async function affecter(valider) {
@@ -507,6 +554,10 @@ onMounted(async () => {
 .ce-liens { display: flex; gap: 10px; flex-wrap: wrap; }
 .ce-bloque { margin-right: auto; font-size: 13.5px; color: var(--fs-danger, #dc2626); }
 .ce-bloque--bloc { margin: 0 0 12px; }
+.ce-annul { display: flex; flex-direction: column; gap: 8px; }
+.ce-annul__label { font-size: 13px; font-weight: 600; color: var(--fs-text); margin-top: 6px; }
+.ce-annul__motif { resize: vertical; min-height: 72px; font-family: inherit; }
+.ce-annul__aide { font-size: 12px; color: var(--fs-muted); }
 
 .ce-mois { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
 .ce-mois li {

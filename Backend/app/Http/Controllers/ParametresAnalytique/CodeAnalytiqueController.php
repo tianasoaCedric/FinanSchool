@@ -9,13 +9,13 @@ use App\Http\Controllers\Controller;
 
 class CodeAnalytiqueController extends Controller
 {
-    // 🔍 Liste tous les codes analytiques
+    // Liste tous les codes analytiques
     public function index()
     {
         return response()->json(CodeAnalytique::all());
     }
 
-    // ➕ Crée un nouveau code analytique
+    // Crée un nouveau code analytique
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -28,14 +28,14 @@ class CodeAnalytiqueController extends Controller
         return response()->json($code, 201);
     }
 
-    // 📄 Affiche un code analytique spécifique
+    // Affiche un code analytique spécifique
     public function show($id)
     {
         $code = CodeAnalytique::findOrFail($id);
         return response()->json($code);
     }
 
-    // ✏️ Met à jour un code analytique
+    // Met à jour un code analytique
     public function update(Request $request, $id)
     {
         $code = CodeAnalytique::findOrFail($id);
@@ -50,7 +50,7 @@ class CodeAnalytiqueController extends Controller
         return response()->json($code);
     }
 
-    // ❌ Supprime un code analytique
+    // Supprime un code analytique
     public function destroy($id)
     {
         $code = CodeAnalytique::findOrFail($id);

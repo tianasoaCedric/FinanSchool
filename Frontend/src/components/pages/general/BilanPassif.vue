@@ -208,7 +208,7 @@ const fetchBilanPassif = async () => {
 };
 
 
-// ✅ Affiche la valeur absolue (comme dans le compte de résultat)
+// Affiche la valeur absolue (comme dans le compte de résultat)
 const formatMontant = n => {
   if (n === null || n === undefined) return "";
   return Number(n).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -260,7 +260,7 @@ const exportToPDF = () => {
       </div>
     </div>`;
 
-  // ✅ Détection des négatifs pour le PDF
+  // Détection des négatifs pour le PDF
   const tableRows = listeComplete.value.map(l => {
     const isNegativeN = l.montantN < 0;
     const isNegativeN1 = l.montantN1 < 0;
@@ -427,7 +427,7 @@ const exportToExcel = async () => {
     };
   });
 
-  // ✅ Détection des négatifs pour Excel
+  // Détection des négatifs pour Excel
   const firstDataRow = 14;
   for (let i = 0; i < dataRows.length; ++i) {
     const rowIdx = firstDataRow + i;

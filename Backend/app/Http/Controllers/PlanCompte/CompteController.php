@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PlanCompte;
 use App\Http\Controllers\Controller;
 use App\Models\PlanCompte\Compte;
 use App\Models\PlanCompte\Rubrique;
+use App\Services\Comptabilite\PlanComptableGuard;
 use Illuminate\Http\Request;
 
 class CompteController extends Controller
@@ -80,6 +81,7 @@ public function update(Request $request, $id)
     public function destroy($id)
     {
         $compte = Compte::findOrFail($id);
+        PlanComptableGuard::assertCompteSupprimable($compte);
         $compte->delete();
 
         return response()->json(['message' => 'Compte supprimé']);

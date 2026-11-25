@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PlanCompte;
 use App\Http\Controllers\Controller;
 use App\Models\PlanCompte\Rubrique;
+use App\Services\Comptabilite\PlanComptableGuard;
 use Illuminate\Http\Request;
 
 class RubriqueController extends Controller
@@ -75,6 +76,7 @@ public function update(Request $request, $id)
     public function destroy($id)
     {
         $rubrique = Rubrique::findOrFail($id);
+        PlanComptableGuard::assertRubriqueSupprimable($rubrique);
         $rubrique->delete();
 
         return response()->json(['message' => 'Rubrique supprimée']);

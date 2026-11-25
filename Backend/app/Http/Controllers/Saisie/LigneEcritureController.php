@@ -9,6 +9,7 @@ use App\Models\Saisie\MouvementEcriture;
 use App\Models\Saisie\Journal;
 use App\Models\PlanCompte\SousCompte;
 use App\Models\Saisie\ModePaiement;
+use App\Services\Comptabilite\Audit;
 use App\Services\Comptabilite\EcritureGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,8 @@ class LigneEcritureController extends Controller
             ->filter(fn ($v) => $v !== null && $v !== '')
             ->all();
 
-        $modifiees = DB::transaction(function () use ($request, $data) {
+        $pieces = LigneEcriture::whereIn('Id_Ligne_ecriture', $request->ids)->pluck('Id_Mouvement_ecriture')->all();
+        $modifiees = Audit::modifierPiece($pieces, function () use ($request, $data) {
             $lignes = LigneEcriture::whereIn('Id_Ligne_ecriture', $request->ids)->get();
             foreach ($lignes as $ligne) {
                 EcritureGuard::assertLigneBrouillon(array_merge($ligne->only(self::CHAMPS_LIGNE), $data), $ligne);
@@ -183,6 +185,7 @@ class LigneEcritureController extends Controller
         EcritureGuard::assertPieceModifiable($mouvement);
 
         DB::transaction(function () use ($mouvement) {
+            Audit::piece(Audit::PIECE_SUPPRESSION, $mouvement, Audit::etatPiece($mouvement));
             $mouvement->lignes()->delete();
             $mouvement->delete();
         });
@@ -231,7 +234,7 @@ class LigneEcritureController extends Controller
             return response()->json(['error' => 'Aucun compte de contrepartie défini pour le journal.'], 400);
         }
 
-        $ligne = LigneEcriture::create([
+        $ligne = Audit::modifierPiece($mouvement->Id_Mouvement_ecriture, fn () => LigneEcriture::create([
             'Libelle' => $mouvement->lignes->count() > 0 ? $mouvement->lignes[0]->Libelle : 'Soldé',
             'Debit' => $solde < 0 ? abs($solde) : 0,
             'Credit' => $solde > 0 ? abs($solde) : 0,
@@ -242,7 +245,7 @@ class LigneEcritureController extends Controller
             'Id_Journal' => $mouvement->Id_Journal,
             'Id_Sous_compte' => $idSousCompteContrepartie,
             'statut' => EcritureGuard::STATUT_BROUILLON,
-        ]);
+        ]));
 
         return response()->json([
             'message' => 'Mouvement soldé avec contrepartie.',
@@ -261,7 +264,10 @@ class LigneEcritureController extends Controller
         $data = $request->only(self::CHAMPS_LIGNE);
         EcritureGuard::assertLigneBrouillon($data);
 
-        $ligne = LigneEcriture::create($data + ['statut' => EcritureGuard::STATUT_BROUILLON]);
+        $ligne = Audit::modifierPiece(
+            (int) $data['Id_Mouvement_ecriture'],
+            fn () => LigneEcriture::create($data + ['statut' => EcritureGuard::STATUT_BROUILLON])
+        );
 
         return response()->json([
             'message' => 'Ligne créée avec succès',
@@ -276,7 +282,7 @@ class LigneEcritureController extends Controller
         $data = $request->only(self::CHAMPS_LIGNE);
         EcritureGuard::assertLigneBrouillon($data, $ligne);
 
-        $ligne->update($data);
+        Audit::modifierPiece((int) $ligne->Id_Mouvement_ecriture, fn () => $ligne->update($data));
 
         return response()->json([
             'message' => 'Ligne mise à jour avec succès',
@@ -293,7 +299,7 @@ class LigneEcritureController extends Controller
         $mouvement = MouvementEcriture::with('lignes')->findOrFail($ligne->Id_Mouvement_ecriture);
         EcritureGuard::assertPieceModifiable($mouvement);
 
-        $ligne->delete();
+        Audit::modifierPiece((int) $mouvement->Id_Mouvement_ecriture, fn () => $ligne->delete());
 
         return response()->json(['message' => 'Ligne supprimée avec succès']);
     }
@@ -319,7 +325,8 @@ class LigneEcritureController extends Controller
             validator($ligneData, self::REGLES_LIGNE)->validate();
         }
 
-        $results = DB::transaction(function () use ($lignes) {
+        $pieces = collect($lignes)->pluck('Id_Mouvement_ecriture')->filter()->all();
+        $results = Audit::modifierPiece($pieces, function () use ($lignes) {
             $results = [];
             foreach ($lignes as $ligneData) {
                 $data = collect($ligneData)->only(self::CHAMPS_LIGNE)->all();
@@ -397,7 +404,7 @@ class LigneEcritureController extends Controller
                 foreach ($mouvements as $mouvement) {
                     $motif = EcritureGuard::controlerPieceValidable($mouvement);
                     if ($motif !== null) {
-                        $ignorees[] = ['numero' => $mouvement->Numero_piece, 'motif' => $motif];
+                        $ignorees[] = ['numero' => $mouvement->numeroAffiche(), 'motif' => $motif];
                         continue;
                     }
                     $lignesValidees += DB::transaction(fn () => EcritureGuard::validerPiece($mouvement, $userId));

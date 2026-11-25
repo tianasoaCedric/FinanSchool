@@ -116,9 +116,14 @@ class OrganisationComptableTest extends TestCase
 
     public function test_la_reference_du_justificatif_est_exigee_a_la_validation(): void
     {
-        $this->piece('411999', '706999', 1_000, entete: ['Reference' => null])
+        // Pièce refusée : elle n'a pas reçu de numéro définitif (BR-{id} provisoire)
+        $message = $this->piece('411999', '706999', 1_000, entete: ['Reference' => null])
             ->assertStatus(422)
-            ->assertJsonFragment(['message' => 'Validation impossible (' . 'TOC2090-0001' . ') : Référence de la pièce justificative manquante (n° de facture, reçu, relevé…).']);
+            ->json('message');
+        $this->assertMatchesRegularExpression(
+            '/^Validation impossible \(BR-\d+\) : Référence de la pièce justificative manquante \(n° de facture, reçu, relevé…\)\.$/u',
+            $message
+        );
 
         // En brouillon, la référence peut attendre
         $p = $this->piece('411999', '706999', 1_000, action: 'brouillon', entete: ['Reference' => ''])->assertCreated()->json('piece');
@@ -208,8 +213,17 @@ class OrganisationComptableTest extends TestCase
         // La charge de N reste en N ; l'extourne la neutralise dans N+1
         $this->assertEquals(40_000, (new EtatsFinanciers())->resultatNet('2091-01-01', '2091-12-31'));
 
-        $this->postJson($this->url($this->n, '/annuler-cloture'))->assertOk();
+        $this->annulerCloture()->assertOk();
         $this->assertNull(MouvementEcriture::find($ext->Id_Mouvement_ecriture));
+    }
+
+    /** Annulation de clôture : réservée à un administrateur, avec un motif. */
+    private function annulerCloture()
+    {
+        $admin = User::factory()->create();
+        $admin->forceFill(['is_admin' => true])->save();
+        Sanctum::actingAs($admin);
+        return $this->postJson($this->url($this->n, '/annuler-cloture'), ['motif' => 'Correction avant dépôt des états financiers']);
     }
 
     // ------------------------------------------------------------------
@@ -244,7 +258,7 @@ class OrganisationComptableTest extends TestCase
         // Le 12 est soldé dans N+1
         $this->assertEquals(round($avant120, 2), (new EtatsFinanciers())->soldesCumules('2091-12-31')['120000'] ?? 0.0);
         $this->postJson($url, ['date' => '2091-06-30', 'reference' => 'PV AG', 'repartition' => $repartition])->assertStatus(422); // déjà affecté
-        $this->postJson($this->url($this->n, '/annuler-cloture'))->assertStatus(422);
+        $this->annulerCloture()->assertStatus(422);
         $this->assertTrue((new EtatsFinanciers())->controles('2091-01-01', '2091-12-31')['equilibre_bilan']['ok']);
     }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="produits">
-    <h2>🛒 Liste des Produits</h2>
+    <h2>Liste des Produits</h2>
 
     <table>
       <thead>

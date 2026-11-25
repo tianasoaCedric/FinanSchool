@@ -13,6 +13,7 @@ use App\Models\PlanCompte\SousCompte;
 use Illuminate\Support\Facades\Auth;
 use App\Models\import\ImportHistory;
 use App\Models\exercice\ExerciceComptable;
+use App\Services\Comptabilite\Audit;
 use App\Services\Comptabilite\EcritureGuard;
 use Exception;
 use App\Console\Commands\NotificationImport;
@@ -62,6 +63,14 @@ class ImportEcritureController extends Controller
                     'message' => 'Aucune donnée n\'a été importée'
                 ], 422);
             }
+
+            $nomFichier = $request->file('file_ecritures')->getClientOriginalName();
+            Audit::enregistrer(Audit::IMPORT_ECRITURES, 'import', null, "Import {$nomFichier}", null, null, [
+                'fichier' => $nomFichier,
+                'pieces' => $stats['mouvements'],
+                'lignes' => $stats['lignes'],
+                'statut' => 'brouillon',
+            ]);
 
             DB::commit();
 
@@ -231,7 +240,6 @@ class ImportEcritureController extends Controller
             $journal = $journaux[$piece['journal']];
             $mouvement = MouvementEcriture::create([
                 'Date_mouvement' => $piece['date'],
-                'Numero_piece'   => EcritureGuard::prochainNumeroPiece($journal, (int) date('Y', strtotime($piece['date']))),
                 'Id_Journal'     => $journal->Id_Journal,
                 // Référence de la pièce justificative (exigée à la validation)
                 'Reference'      => $piece['reference'] !== '' ? $piece['reference'] : null,

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Saisie\MouvementEcriture;
 use App\Models\Saisie\Journal;
+use App\Services\Comptabilite\Audit;
 use App\Services\Comptabilite\EcritureGuard;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MouvementEcritureController extends Controller
@@ -22,8 +24,8 @@ class MouvementEcritureController extends Controller
     }
 
     /**
-     * Création d'une pièce : date dans l'exercice ouvert, numéro séquentiel
-     * par journal et par année ({CODE}{AAAA}-{NNNN}).
+     * Création d'une pièce en brouillon, datée dans l'exercice ouvert. Le
+     * numéro définitif ({CODE}{AAAA}-{NNNN}) est attribué à la validation.
      */
     public function store(Request $request)
     {
@@ -35,14 +37,13 @@ class MouvementEcritureController extends Controller
         EcritureGuard::exerciceOuvertPour($request->Date_mouvement);
 
         $mouvement = DB::transaction(function () use ($request) {
-            $journal = Journal::findOrFail($request->Id_Journal);
-            $annee = (int) date('Y', strtotime($request->Date_mouvement));
-
-            return MouvementEcriture::create([
+            $mouvement = MouvementEcriture::create([
                 'Date_mouvement' => $request->Date_mouvement,
-                'Id_Journal' => $journal->Id_Journal,
-                'Numero_piece' => EcritureGuard::prochainNumeroPiece($journal, $annee),
+                'Id_Journal' => Journal::findOrFail($request->Id_Journal)->Id_Journal,
+                'created_by' => Auth::id(),
             ]);
+            Audit::piece(Audit::PIECE_CREATION, $mouvement);
+            return $mouvement->unsetRelations();
         });
 
         return response()->json([
@@ -69,7 +70,7 @@ class MouvementEcritureController extends Controller
             EcritureGuard::exerciceOuvertPour($data['Date_mouvement']);
         }
 
-        DB::transaction(function () use ($mouvement, $data) {
+        Audit::modifierPiece($mouvement->Id_Mouvement_ecriture, function () use ($mouvement, $data) {
             $mouvement->update($data);
             // Les lignes suivent le journal de leur pièce
             if (isset($data['Id_Journal'])) {
@@ -89,6 +90,7 @@ class MouvementEcritureController extends Controller
         EcritureGuard::assertPieceModifiable($mouvement);
 
         DB::transaction(function () use ($mouvement) {
+            Audit::piece(Audit::PIECE_SUPPRESSION, $mouvement, Audit::etatPiece($mouvement));
             $mouvement->lignes()->delete();
             $mouvement->delete();
         });

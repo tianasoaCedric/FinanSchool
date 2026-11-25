@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PlanCompte;
 
 use App\Http\Controllers\Controller;
 use App\Models\PlanCompte\SousCompte;
+use App\Services\Comptabilite\PlanComptableGuard;
 use Illuminate\Http\Request;
 
 class SousCompteController extends Controller
@@ -74,6 +75,7 @@ class SousCompteController extends Controller
     public function destroy($id)
     {
         $sousCompte = SousCompte::findOrFail($id);
+        PlanComptableGuard::assertSousCompteSupprimable($sousCompte);
         $sousCompte->delete();
 
         return response()->json(['message' => 'Sous-compte supprimé']);

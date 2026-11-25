@@ -10,7 +10,7 @@ export function useNiveauxAlerte() {
   const loading = ref(false);
   const error = ref(null);
 
-  // 📌 Récupérer tous les niveaux
+  // Récupérer tous les niveaux
   const fetchNiveaux = async () => {
     try {
       loading.value = true;
@@ -27,7 +27,7 @@ export function useNiveauxAlerte() {
     }
   };
 
-  // 📌 Récupérer un niveau par ID
+  // Récupérer un niveau par ID
   const fetchNiveauById = async (id) => {
     try {
       loading.value = true;
@@ -44,7 +44,7 @@ export function useNiveauxAlerte() {
     }
   };
 
-  // 📌 Créer un nouveau niveau
+  // Créer un nouveau niveau
   const createNiveau = async (data) => {
     try {
       loading.value = true;
@@ -61,7 +61,7 @@ export function useNiveauxAlerte() {
     }
   };
 
-  // 📌 Mettre à jour un niveau
+  // Mettre à jour un niveau
   const updateNiveau = async (id, data) => {
     try {
       loading.value = true;
@@ -89,7 +89,7 @@ export function useNiveauxAlerte() {
     }
   };
 
-  // 📌 Supprimer un niveau
+  // Supprimer un niveau
   const deleteNiveau = async (id) => {
     try {
       loading.value = true;

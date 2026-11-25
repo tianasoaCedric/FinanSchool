@@ -103,7 +103,12 @@ class PeriodesService
             $this->refuser("{$m['libelle']} contient {$desequilibrees} pièce(s) déséquilibrée(s).");
         }
 
-        $exercice->update(['periode_cloturee_au' => $m['fin']]);
+        DB::transaction(function () use ($exercice, $m, $mois) {
+            $exercice->update(['periode_cloturee_au' => $m['fin']]);
+            Audit::enregistrer(Audit::PERIODE_CLOTURE, 'exercice', $exercice->Id_Exercice_comptable,
+                "{$m['libelle']} (exercice {$exercice->Annee_fiscale})", null, null,
+                ['mois' => $mois, 'cloture_jusqu_au' => $m['fin']]);
+        });
 
         return ['message' => "{$m['libelle']} clôturé : plus aucune écriture ne peut être datée du {$this->fr($m['fin'])} ou avant."];
     }

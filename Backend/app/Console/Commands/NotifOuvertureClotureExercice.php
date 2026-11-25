@@ -41,7 +41,7 @@ class NotifOuvertureClotureExercice extends Command
                     'statut' => 'non_lu'
                 ]);
                 event(new NotificationCreee($notification));
-                $this->info("✅ Notif ouverture envoyée : Exercice {$exercice->Annee_fiscale}");
+                $this->info("Notif ouverture envoyée : Exercice {$exercice->Annee_fiscale}");
             }
 
             // Alerte clôture
@@ -62,7 +62,7 @@ class NotifOuvertureClotureExercice extends Command
                     'statut' => 'non_lu'
                 ]);
                 event(new NotificationCreee($notification));
-                $this->info("✅ Notif clôture envoyée : Exercice {$exercice->Annee_fiscale}");
+                $this->info("Notif clôture envoyée : Exercice {$exercice->Annee_fiscale}");
             }
         }
 

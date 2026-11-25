@@ -90,6 +90,7 @@ const menu = [
       { label: 'Grand livre', icon: 'bi-journals', to: '/liste-grand-livre', match: ['/grand-livres/'] },
       { label: 'Import d\'écritures', icon: 'bi-cloud-arrow-up', to: '/import' },
       { label: 'Clôtures', icon: 'bi-lock', to: '/cloture' },
+      { label: "Piste d'audit", icon: 'bi-clock-history', to: '/audit' },
     ],
   },
   {

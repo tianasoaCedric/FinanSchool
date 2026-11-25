@@ -127,7 +127,12 @@ const saveRubrique = async () => {
 
 const deleteRubrique = async (id) => {
   if (confirm("Supprimer cette rubrique ?")) {
-    await axios.delete(`${API_URL}/rubriques/${id}`)
+    try {
+      await axios.delete(`${API_URL}/rubriques/${id}`)
+    } catch (e) {
+      alert(e.response?.data?.message || "Erreur lors de la suppression")
+      return
+    }
     loadRubriques()
     if (filteredRubriques.value.length <= (currentPage.value - 1) * itemsPerPage) {
       currentPage.value = Math.max(1, currentPage.value - 1)

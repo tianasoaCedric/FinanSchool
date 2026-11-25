@@ -74,14 +74,14 @@ onMounted(async () => {
   nombreLignesLoader.value = indicateurs.value.length || 10;
 });
 
-// 📌 Ouvrir les détails d'un indicateur
+// Ouvrir les détails d'un indicateur
 const openIndicateurDetails = async (indicateur) => {
   await fetchIndicateurDetails(indicateur.id_indicateur_analytique);
   detailsMode.value = 'view';
   showDetails.value = true;
 };
 
-// 📌 GESTION DES INDICATEURS
+// GESTION DES INDICATEURS
 const handleCreateIndicateur = async () => {
   try {
     await createIndicateur(formIndicateur.value);
@@ -136,7 +136,7 @@ const resetFormIndicateur = () => {
   editingIndicateur.value = null;
 };
 
-// 📌 GESTION DES INTERPRÉTATIONS (similaire à AffectationAnalytique)
+// GESTION DES INTERPRÉTATIONS (similaire à AffectationAnalytique)
 const switchToEditMode = () => {
   detailsMode.value = 'edit';
   // Initialiser formInterpretations avec les interprétations actuelles
@@ -219,7 +219,7 @@ const saveTableModifications = async () => {
   }
 };
 
-// 📌 FILTRES
+// FILTRES
 const filteredIndicateurs = computed(() => {
   let filtered = indicateurs.value;
   
@@ -235,7 +235,7 @@ const filteredIndicateurs = computed(() => {
   return filtered;
 });
 
-// 📌 UTILITAIRES
+// UTILITAIRES
 const getNiveauLibelle = (id) => {
   const niveau = niveaux.value.find(n => n.id_niveau_alerte == id);
   return niveau ? niveau.libelle : 'N/A';

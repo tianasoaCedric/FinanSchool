@@ -35,8 +35,7 @@ use App\Http\Controllers\general\VariationsCapitauxController;
 use App\Http\Controllers\import\ImportEcritureController;
 use App\Http\Controllers\tableau\DashboardController;
 use App\Http\Controllers\Saisie\AmortissementController;
-use App\Http\Controllers\ChatBot\ChatsController;
-use App\Http\Controllers\ChatBot\ChatController;
+use App\Http\Controllers\ChatBot\AssistantController;
 use App\Http\Controllers\notifications\NotificationController;
 use App\Http\Controllers\notifications\NotificationsController;
 use App\Http\Controllers\notifications\EvenementController;
@@ -63,14 +62,17 @@ Route::middleware('api')->group(function () {
     Route::get('/test', fn () => response()->json(['message' => 'API is working']));
     Route::post('/example', fn (Request $request) => response()->json(['message' => 'POST request received']));
 
-    Route::post('/chat/sending', [ChatsController::class, 'sendMessage']);
-    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
-    Route::get('/chat/history/{sessionId}', [ChatsController::class, 'getChatHistory']);
-
     // =====================================================================
     // Routes protégées : utilisateur connecté obligatoire
     // =====================================================================
     Route::middleware('auth:sanctum')->group(function () {
+
+        // ---- Assistant (chatbot) : il lit des données comptables ----
+        Route::post('/chat/sending', [AssistantController::class, 'comptabilite']);
+        Route::post('/chat/send', [AssistantController::class, 'analyse']);
+        Route::get('/chat/history/{sessionId}', [AssistantController::class, 'historique']);
+        Route::get('/chat/conversations', [AssistantController::class, 'conversations']);
+        Route::delete('/chat/conversations/{sessionId}', [AssistantController::class, 'supprimer']);
 
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -97,6 +99,14 @@ Route::middleware('api')->group(function () {
         Route::post('/pieces/{id}/contrepasser', [PieceController::class, 'contrepasser']);
         Route::apiResource('pieces', PieceController::class);
         Route::apiResource('modeles-ecriture', ModeleEcritureController::class)->except(['show']);
+
+        // ---- Écran de validation des pièces ----
+        Route::get('/validation/pieces', [\App\Http\Controllers\Saisie\ValidationController::class, 'index']);
+        Route::post('/validation/valider', [\App\Http\Controllers\Saisie\ValidationController::class, 'valider']);
+
+        // ---- Piste d'audit (lecture seule) ----
+        Route::get('/audit/options', [\App\Http\Controllers\Saisie\AuditController::class, 'options']);
+        Route::get('/audit', [\App\Http\Controllers\Saisie\AuditController::class, 'index']);
 
         // ---- Pièces (mouvements) ----
         Route::get('/mouvements-complets', [LigneEcritureController::class, 'getMouvementsComplets']);
@@ -198,6 +208,7 @@ Route::middleware('api')->group(function () {
             Route::post('/', [SimulationController::class, 'store']);
             Route::get('/historical', [SimulationController::class, 'getHistoricalData']);
             Route::get('/{id}', [SimulationController::class, 'show']);
+            Route::put('/{id}', [SimulationController::class, 'update']);
             Route::delete('/{id}', [SimulationController::class, 'destroy']);
         });
     });

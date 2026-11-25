@@ -272,18 +272,6 @@ private static function generateRecommandations($diagnostic)
 }
 
 
-// Méthodes utilitaires
-private static function getEmojiFromAlerte($niveauAlerte)
-{
-    return match($niveauAlerte) {
-        1 => '🔴', // Mauvais
-        2 => '🟡', // Moyen
-        3 => '🟢', // Bon
-        default => '⚪' // Non défini
-    };
-}
-
-    
     public static function getDiagnosticParCentre($dateDebut, $dateFin, $centreId = null)
     {
         $service = new DiagnosticService();
@@ -294,7 +282,7 @@ private static function getEmojiFromAlerte($niveauAlerte)
             return "Je n'ai pas trouvé de données de diagnostic pour la période du {$dateDebut} au {$dateFin}.";
         }
         
-        $response = "📊 Diagnostic par Centre du {$dateDebut} au {$dateFin}\n\n";
+        $response = "Diagnostic par Centre du {$dateDebut} au {$dateFin}\n\n";
         
         // Si un centre spécifique est demandé
         if ($centreId && isset($diagnostic['centres'][$centreId])) {
@@ -306,7 +294,7 @@ private static function getEmojiFromAlerte($niveauAlerte)
             $response .= "Marge : " . ($centre['marge'] ?? 0) . "%\n\n";
             
             if (isset($centre['sous_comptes']) && !empty($centre['sous_comptes'])) {
-                $response .= "📋 Détail par sous-compte :\n";
+                $response .= "Détail par sous-compte :\n";
                 foreach ($centre['sous_comptes'] as $sousCompte) {
                     $response .= "- {$sousCompte['nom']} : " . number_format($sousCompte['montant'] ?? 0, 0, ',', ' ') . " Ar\n";
                 }
@@ -341,21 +329,21 @@ private static function getEmojiFromAlerte($niveauAlerte)
             return "Je n'ai pas trouvé de données de diagnostic pour la période du {$dateDebut} au {$dateFin}.";
         }
         
-        $response = "📈 Résumé du Diagnostic du {$dateDebut} au {$dateFin}\n\n";
+        $response = "Résumé du Diagnostic du {$dateDebut} au {$dateFin}\n\n";
         
         if (isset($diagnostic['resume'])) {
             $resume = $diagnostic['resume'];
             
-            $response .= "💰 Chiffre d'Affaires : " . number_format($resume['chiffre_affaires'] ?? 0, 0, ',', ' ') . " Ar\n";
-            $response .= "📉 Total Dépenses : " . number_format($resume['total_depenses'] ?? 0, 0, ',', ' ') . " Ar\n";
-            $response .= "📊 Total Profits : " . number_format($resume['total_profits'] ?? 0, 0, ',', ' ') . " Ar\n";
-            $response .= "⚖️  Balance Nette : " . number_format($resume['balance'] ?? 0, 0, ',', ' ') . " Ar\n";
-            $response .= "📈 Marge Brute : " . ($resume['marge_brute'] ?? 0) . "%\n";
-            $response .= "📊 Marge Nette : " . ($resume['marge'] ?? 0) . "%\n\n";
+            $response .= "Chiffre d'Affaires : " . number_format($resume['chiffre_affaires'] ?? 0, 0, ',', ' ') . " Ar\n";
+            $response .= "Total Dépenses : " . number_format($resume['total_depenses'] ?? 0, 0, ',', ' ') . " Ar\n";
+            $response .= "Total Profits : " . number_format($resume['total_profits'] ?? 0, 0, ',', ' ') . " Ar\n";
+            $response .= "Balance Nette : " . number_format($resume['balance'] ?? 0, 0, ',', ' ') . " Ar\n";
+            $response .= "Marge Brute : " . ($resume['marge_brute'] ?? 0) . "%\n";
+            $response .= "Marge Nette : " . ($resume['marge'] ?? 0) . "%\n\n";
             
             // Ajouter des indicateurs de performance
             if (isset($resume['evolution'])) {
-                $response .= "📅 Évolution vs Période Précédente :\n";
+                $response .= "Évolution vs Période Précédente :\n";
                 $response .= "CA : " . ($resume['evolution']['ca'] >= 0 ? '+' : '') . $resume['evolution']['ca'] . "%\n";
                 $response .= "Dépenses : " . ($resume['evolution']['depenses'] >= 0 ? '+' : '') . $resume['evolution']['depenses'] . "%\n";
                 $response .= "Profits : " . ($resume['evolution']['profits'] >= 0 ? '+' : '') . $resume['evolution']['profits'] . "%\n";
@@ -376,19 +364,19 @@ private static function getEmojiFromAlerte($niveauAlerte)
         }
         
         if (!isset($diagnostic['alertes']) || empty($diagnostic['alertes'])) {
-            return "✅ Aucune alerte détectée pour la période du {$dateDebut} au {$dateFin}.";
+            return "Aucune alerte détectée pour la période du {$dateDebut} au {$dateFin}.";
         }
         
-        $response = "⚠️ Alertes du Diagnostic du {$dateDebut} au {$dateFin}\n\n";
+        $response = "Alertes du Diagnostic du {$dateDebut} au {$dateFin}\n\n";
         
         $count = 1;
         foreach ($diagnostic['alertes'] as $alerte) {
             $severity = match($alerte['niveau'] ?? 'info') {
-                'critique' => '🔴 CRITIQUE',
-                'haute' => '🟠 HAUTE',
-                'moyenne' => '🟡 MOYENNE',
-                'basse' => '🔵 BASSE',
-                default => 'ℹ️ INFO'
+                'critique' => 'CRITIQUE',
+                'haute' => 'HAUTE',
+                'moyenne' => 'MOYENNE',
+                'basse' => 'BASSE',
+                default => 'INFO'
             };
             
             $response .= "{$count}. {$severity}\n";

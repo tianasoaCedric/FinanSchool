@@ -70,4 +70,14 @@ class MouvementEcriture extends Model
     public function createur() {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Numéro à afficher. Le numéro définitif ({CODE}{AAAA}-{NNNN}) n'est
+     * attribué qu'à la validation (séquence continue, sans trou) ; un
+     * brouillon est désigné par une référence provisoire BR-{id}.
+     */
+    public function numeroAffiche(): string
+    {
+        return $this->Numero_piece ?: 'BR-' . $this->Id_Mouvement_ecriture;
+    }
 }

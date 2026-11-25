@@ -10,7 +10,7 @@ export function useInterpretationsIndicateur() {
   const loading = ref(false);
   const error = ref(null);
 
-  // 📌 Récupérer toutes les interprétations
+  // Récupérer toutes les interprétations
   const fetchInterpretations = async () => {
     try {
       loading.value = true;
@@ -27,7 +27,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Récupérer les interprétations d'un indicateur
+  // Récupérer les interprétations d'un indicateur
   const fetchInterpretationsByIndicateur = async (idIndicateur) => {
     try {
       loading.value = true;
@@ -43,7 +43,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Récupérer une interprétation par ID
+  // Récupérer une interprétation par ID
   const fetchInterpretationById = async (id) => {
     try {
       loading.value = true;
@@ -60,7 +60,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Créer une nouvelle interprétation
+  // Créer une nouvelle interprétation
   const createInterpretation = async (data) => {
     try {
       loading.value = true;
@@ -77,7 +77,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Mettre à jour une interprétation
+  // Mettre à jour une interprétation
   const updateInterpretation = async (id, data) => {
     try {
       loading.value = true;
@@ -105,7 +105,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Supprimer une interprétation
+  // Supprimer une interprétation
   const deleteInterpretation = async (id) => {
     try {
       loading.value = true;
@@ -130,7 +130,7 @@ export function useInterpretationsIndicateur() {
     }
   };
 
-  // 📌 Obtenir l'interprétation pour une valeur donnée
+  // Obtenir l'interprétation pour une valeur donnée
   const getInterpretationForValue = async (idIndicateur, valeur) => {
     try {
       loading.value = true;

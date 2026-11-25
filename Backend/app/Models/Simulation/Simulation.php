@@ -17,8 +17,21 @@ class Simulation extends Model
         'nom_simulation',
         'date_simulation',
         'description',
-        'id_exercice_comptable'
+        'id_exercice_comptable',
+        'annee_cible',
+        'hypotheses',
+        'created_by',
     ];
+
+    protected $casts = [
+        // { produits: %, charges_fixes: %, charges_variables: % }
+        'hypotheses' => 'array',
+    ];
+
+    public function createur()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
 
     public function lignes()
     {

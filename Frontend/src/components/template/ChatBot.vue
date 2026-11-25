@@ -115,7 +115,7 @@ export default {
     },
     addWelcomeMessage() {
       this.messages.push({
-        content: "👋 Bonjour ! Je suis votre assistant financier pour établissements scolaires. Je suis actuellement en phase de configuration, mais je peux déjà répondre à vos questions basiques !",
+        content: "Bonjour ! Je suis votre assistant financier pour établissements scolaires. Je suis actuellement en phase de configuration, mais je peux déjà répondre à vos questions basiques !",
         type: 'bot',
         time: new Date().toLocaleTimeString(),
         // Ajouter un ID unique
@@ -258,7 +258,11 @@ export default {
     },
     
     formatMessage(content) {
-      return content.replace(/\n/g, '<br>');
+      // Texte échappé avant insertion en HTML (les libellés viennent de la base)
+      const echappe = String(content ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      return echappe.replace(/\n/g, '<br>');
     },
     
     scrollToBottom() {
@@ -445,7 +449,7 @@ export default {
         :disabled="loading || !newMessage.trim()"
         class="send-btn"
       >
-        <span v-if="loading">⏳</span>
+        <span v-if="loading"><i class="bi bi-hourglass-split"></i></span>
         <span v-else><i class="bi bi-send-fill"></i></span>
       </button>
       <button

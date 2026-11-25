@@ -15,7 +15,7 @@ export function useIndicateurRentabilite(filters) {
   const loadingTable = ref(false);
 
 
-  // 📌 NOUVEAU : Données de l'année N-1
+  // NOUVEAU : Données de l'année N-1
   const previousYearData = ref({
     MargeBrute: null,
     MargeNette: null,
@@ -23,7 +23,7 @@ export function useIndicateurRentabilite(filters) {
     ROA: null,
   });
 
-  // 📌 Fonction pour obtenir l'année précédente
+  // Fonction pour obtenir l'année précédente
   const getPreviousYear = (currentYear) => {
     return currentYear - 1;
   };
@@ -55,7 +55,7 @@ const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
 };
 
 
-  // 📌 Récupérer les données de l'année N-1
+  // Récupérer les données de l'année N-1
   const fetchPreviousYearData = async (currentDateStart, currentDateEnd) => {
     try {
       loadingTable.value = true;
@@ -95,7 +95,7 @@ const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     }
   };
 
-  // 📌 Fonction de comparaison entre N et N-1
+  // Fonction de comparaison entre N et N-1
   const getComparison = (currentValue, previousValue, type = 'montant' ) => {
     if (!currentValue || !previousValue) {
       return {
@@ -135,7 +135,7 @@ const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     };
   };
 
-  // 📌 Computed pour les comparaisons
+  // Computed pour les comparaisons
   const comparisons = computed(() => {
     return {
       brute: getComparison(
@@ -161,7 +161,7 @@ const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     };
   });
 
-  // 📌 Fonction pour formater le format de date
+  // Fonction pour formater le format de date
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
@@ -174,7 +174,7 @@ const getPreviousYearDates = (currentDateStart, currentDateEnd) => {
     return '';
   };
 
-// 📌 Récupérer tous les exercices
+// Récupérer tous les exercices
 const fetchExercicesList = async () => {
   try {
     const response = await axios.get(`${API_URL}/exercices`);
@@ -200,7 +200,7 @@ const fetchExercicesList = async () => {
 };
 
 
-  // 📌 Récupérer l'exercice et mettre à jour les dates
+  // Récupérer l'exercice et mettre à jour les dates
   const fetchExercice = async (idExercice = null) => {
     try {
       loading.value = true;
@@ -233,7 +233,7 @@ const fetchExercicesList = async () => {
     }
   };
 
-  // 📌 Changer d'exercice
+  // Changer d'exercice
   const changeExercice = async (idExercice) => {
     try {
       if (!idExercice) {
@@ -320,7 +320,7 @@ const fetchExercicesList = async () => {
         fetchPreviousYearData(formatDateForInput(filters.value.dateStart), formatDateForInput(filters.value.dateEnd))
       ]);
       
-      // 📌 NOUVEAU : Récupérer les données de l'année précédente
+      // NOUVEAU : Récupérer les données de l'année précédente
       // if (filters.value.dateStart && filters.value.dateEnd) {
         // await fetchPreviousYearData(formatDateForInput(filters.value.dateStart), formatDateForInput(filters.value.dateEnd));
       // }
@@ -331,7 +331,7 @@ const fetchExercicesList = async () => {
     }
   };
 
-  // 📌 Chargement initial avec exercice
+  // Chargement initial avec exercice
   const initializeData = async () => {
     try {
       loading.value = true;
@@ -353,7 +353,7 @@ const fetchExercicesList = async () => {
   // });
 
 
-  // 🔥 INFORMATIONS SUR L'EXERCICE
+  // INFORMATIONS SUR L'EXERCICE
   const infoExercice = computed(() => {
     if (!exercice.value) return null;
     
@@ -369,7 +369,7 @@ const fetchExercicesList = async () => {
     };
   });
 
-  // 🔥 LISTE DES EXERCICES FORMATÉE POUR LE SELECT
+  // LISTE DES EXERCICES FORMATÉE POUR LE SELECT
   const exercicesOptions = computed(() => {
     return exercicesList.value.map(exo => ({
       value: exo.Id_Exercice_comptable,
@@ -394,7 +394,7 @@ const fetchExercicesList = async () => {
     // Computed
     infoExercice,
     exercicesOptions,
-    comparisons, // 📌 NOUVEAU : Comparaisons N vs N-1
+    comparisons, // NOUVEAU : Comparaisons N vs N-1
 
     // Fonctions
     getbrute,
@@ -406,7 +406,7 @@ const fetchExercicesList = async () => {
     changeExercice,
     fetchExercicesList,
     formatDateForInput,
-    getComparison, // 📌 NOUVEAU : Fonction de comparaison
-    fetchPreviousYearData // 📌 NOUVEAU : Récupération données N-1
+    getComparison, // NOUVEAU : Fonction de comparaison
+    fetchPreviousYearData // NOUVEAU : Récupération données N-1
   };
 }

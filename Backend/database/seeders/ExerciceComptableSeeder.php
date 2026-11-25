@@ -42,11 +42,11 @@ class ExerciceComptableSeeder extends Seeder
         // Afficher l'exercice ouvert
         $exerciceOuvert = collect($exercices)->firstWhere('Statut', 'OUVERT');
         if ($exerciceOuvert) {
-            $this->command->info('✅ ' . count($exercices) . ' exercices comptables créés (2018-2038)');
-            $this->command->info('📅 Exercice OUVERT : ' . $exerciceOuvert['Annee_fiscale'] . 
+            $this->command->info(count($exercices) . ' exercices comptables créés (2018-2038)');
+            $this->command->info('Exercice OUVERT : ' . $exerciceOuvert['Annee_fiscale'] . 
                 ' (' . $exerciceOuvert['Date_debut'] . ' → ' . $exerciceOuvert['Date_fin'] . ')');
         } else {
-            $this->command->warn('⚠️ Aucun exercice ouvert (date actuelle hors période)');
+            $this->command->warn('Aucun exercice ouvert (date actuelle hors période)');
         }
     }
 }

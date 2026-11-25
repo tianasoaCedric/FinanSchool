@@ -76,7 +76,7 @@ class DotationsService
             'immobilisations' => $lignes,
             'piece' => $piece ? [
                 'id' => $piece->Id_Mouvement_ecriture,
-                'numero' => $piece->Numero_piece,
+                'numero' => $piece->numeroAffiche(),
                 'validee' => $this->estValidee($piece),
             ] : null,
         ];
@@ -98,6 +98,8 @@ class DotationsService
                 if ($this->estValidee($existante)) {
                     throw ValidationException::withMessages(['dotations' => ["Les dotations {$exercice->Annee_fiscale} sont déjà validées (pièce {$existante->Numero_piece})."]]);
                 }
+                Audit::piece(Audit::PIECE_SUPPRESSION, $existante, Audit::etatPiece($existante),
+                    ['motif' => 'Remplacée par une nouvelle génération des dotations']);
                 $existante->lignes()->delete();
                 $existante->delete();
             }
@@ -109,7 +111,6 @@ class DotationsService
             $piece = MouvementEcriture::create([
                 'Date_mouvement' => $fin,
                 'Id_Journal' => $journal->Id_Journal,
-                'Numero_piece' => EcritureGuard::prochainNumeroPiece($journal, (int) $exercice->Annee_fiscale),
                 'Libelle' => "Dotations aux amortissements {$exercice->Annee_fiscale}",
                 'Reference' => "DOT-{$exercice->Annee_fiscale}",
                 'type_piece' => MouvementEcriture::TYPE_DOTATION,
@@ -128,6 +129,11 @@ class DotationsService
                 LigneEcriture::create($commun + ['Id_Sous_compte' => $compteDotation->Id_Sous_compte, 'Debit' => $l['dotation'], 'Credit' => 0]);
                 LigneEcriture::create($commun + ['Id_Sous_compte' => $compteAmort->Id_Sous_compte, 'Debit' => 0, 'Credit' => $l['dotation']]);
             }
+
+            Audit::piece(Audit::DOTATIONS_GENERATION, $piece, null, [
+                'exercice' => $exercice->Annee_fiscale,
+                'immobilisations' => count($aPasser),
+            ]);
 
             return $piece;
         });

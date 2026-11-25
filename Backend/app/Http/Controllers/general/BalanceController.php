@@ -57,7 +57,7 @@ class BalanceController extends Controller
 
 
 
-    // 🔍 Afficher un sous-compte précis
+    // Afficher un sous-compte précis
     public function show($codeSousCompte)
     {
         $sousCompte = Balance::where('code_sous_compte', $codeSousCompte)->first();

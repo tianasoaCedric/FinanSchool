@@ -12,7 +12,7 @@ class DiagnosticService {
     
     async getDashboardComplet(dateDebut, dateFin) {
         try {
-            console.log('📊 Chargement dashboard:', { dateDebut, dateFin });
+            console.log('Chargement dashboard:', { dateDebut, dateFin });
             
             const response = await this.api.get('/dashboard/complet', {
                 params: { date_debut: dateDebut, date_fin: dateFin }
@@ -25,7 +25,7 @@ class DiagnosticService {
             return this.formaterDashboard(response.data);
             
         } catch (error) {
-            console.error('❌ Erreur dashboard:', error);
+            console.error('Erreur dashboard:', error);
             throw new Error(`Impossible de charger le dashboard: ${error.message}`);
         }
     }

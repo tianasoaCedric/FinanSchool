@@ -75,7 +75,7 @@
   
   // Transformer les données pour ApexCharts (version avec catégories)
   const transformData = (data) => {
-    console.log('🔹 Transformation des données coûts vs profits:', data);
+    console.log('Transformation des données coûts vs profits:', data);
     
     if (!data || data.length === 0) {
       series.value = [];
@@ -103,7 +103,7 @@
     });
     
     periodesOriginales.value = periodes;
-    console.log('🔹 Périodes triées:', periodes);
+    console.log('Périodes triées:', periodes);
 
     // 3. Créer les catégories pour l'axe X (noms des mois)
     xaxisCategories.value = periodes.map(periode => {
@@ -125,7 +125,7 @@
       });
     });
     
-    console.log('🔹 Catégories X:', xaxisCategories.value);
+    console.log('Catégories X:', xaxisCategories.value);
 
     // 4. Calculer les totaux pour chaque période
     const profitsData = periodes.map(periode => {
@@ -170,10 +170,10 @@
       }
     ];
 
-    console.log('🔹 Séries préparées:', series.value);
-    console.log('🔹 Profits:', profitsData);
-    console.log('🔹 Coûts:', costsData);
-    console.log('🔹 Solde:', soldeData);
+    console.log('Séries préparées:', series.value);
+    console.log('Profits:', profitsData);
+    console.log('Coûts:', costsData);
+    console.log('Solde:', soldeData);
   };
   
   // Options du graphique

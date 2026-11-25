@@ -70,7 +70,8 @@ class SaisiePieceTest extends TestCase
     {
         $r = $this->postJson('/api/pieces', $this->piece($this->equilibree()))->assertCreated();
 
-        $this->assertSame('TSP2025-0001', $r->json('piece.numero'));
+        // Pas de numéro définitif avant la validation : référence provisoire BR-{id}
+        $this->assertSame('BR-' . $r->json('piece.id'), $r->json('piece.numero'));
         $this->assertSame('brouillon', $r->json('piece.statut'));
         $this->assertCount(2, $r->json('piece.lignes'));
         // Libellé de la pièce repris sur les lignes sans libellé
@@ -81,6 +82,8 @@ class SaisiePieceTest extends TestCase
     {
         $r = $this->postJson('/api/pieces', $this->piece($this->equilibree(), 'valider'))->assertCreated();
         $this->assertSame('valide', $r->json('piece.statut'));
+        $this->assertSame('TSP2025-0001', $r->json('piece.numero'));
+        $this->assertStringContainsString('TSP2025-0001', $r->json('message'));
         $this->assertSame(['valide'], LigneEcriture::where('Id_Mouvement_ecriture', $r->json('piece.id'))->pluck('statut')->unique()->values()->all());
     }
 
@@ -101,13 +104,13 @@ class SaisiePieceTest extends TestCase
         $this->postJson('/api/pieces', $this->piece($lignes))->assertStatus(422);
     }
 
-    public function test_modifier_un_brouillon_remplace_les_lignes_et_garde_le_numero(): void
+    public function test_modifier_un_brouillon_remplace_les_lignes_sans_le_numeroter(): void
     {
         $id = $this->postJson('/api/pieces', $this->piece($this->equilibree()))->json('piece.id');
 
         $r = $this->putJson("/api/pieces/{$id}", $this->piece($this->equilibree(400), 'brouillon', ['Libelle' => 'Corrigé']))->assertOk();
 
-        $this->assertSame('TSP2025-0001', $r->json('piece.numero'));
+        $this->assertSame("BR-{$id}", $r->json('piece.numero'));
         $this->assertSame('Corrigé', $r->json('piece.Libelle'));
         $this->assertEquals(400, $r->json('piece.total_debit'));
         $this->assertSame(2, LigneEcriture::where('Id_Mouvement_ecriture', $id)->count());
