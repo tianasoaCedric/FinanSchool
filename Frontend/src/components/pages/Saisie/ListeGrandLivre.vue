@@ -66,12 +66,21 @@ const loadRubriques = async () => {
   }
 }
 
+const loading = ref(true)
+const saving = ref(false)
+const notice = ref({ open: false, tone: 'danger', title: '', message: '' })
+const alert = (message, tone = 'danger') => {
+  notice.value = { open: true, tone, title: tone === 'success' ? 'Succès' : 'Erreur', message }
+}
+
 const loadComptes = async () => {
   try {
     const response = await axios.get(`${API_URL}/comptes`)
     comptes.value = response.data.data || response.data
   } catch (error) {
     console.error('Erreur chargement comptes:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -97,21 +106,6 @@ const totalPages = computed(() => {
   return Math.ceil(filteredComptes.value.length / itemsPerPage)
 })
 
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const goToPage = (page) => {
-  currentPage.value = page
-}
 
 const debounceSearch = debounce((val) => {
   filters.value.search = val
@@ -168,13 +162,14 @@ const saveCompte = async () => {
     return
   }
 
+  saving.value = true
   try {
     if (isEditing.value) {
       await axios.put(`${API_URL}/comptes/${form.value.id}`, form.value)
-      alert('Compte modifié avec succès')
+      alert('Compte modifié avec succès', 'success')
     } else {
       await axios.post(`${API_URL}/comptes`, form.value)
-      alert('Compte créé avec succès')
+      alert('Compte créé avec succès', 'success')
     }
     showModal.value = false
     loadComptes()
@@ -182,6 +177,8 @@ const saveCompte = async () => {
   } catch (error) {
     console.error('Erreur enregistrement compte:', error.response?.data || error.message)
     alert(error.response?.data?.message || 'Erreur enregistrement compte')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -189,7 +186,7 @@ const deleteCompte = async (id) => {
   if (confirm('Voulez-vous vraiment supprimer ce compte ?')) {
     try {
       await axios.delete(`${API_URL}/comptes/${id}`)
-      alert('Compte supprimé avec succès')
+      alert('Compte supprimé avec succès', 'success')
       loadComptes()
       if (filteredComptes.value.length <= (currentPage.value - 1) * itemsPerPage) {
         currentPage.value = Math.max(1, currentPage.value - 1)
@@ -235,175 +232,104 @@ onMounted(async () => {
     subtitle="Tous les comptes mouvementés et leurs soldes"
     section="Saisie"
   >
-<div class="card card-form">
-        
-        <div class="card-body">
-          <div class="d-flex flex-column md:flex-row gap-3 mb-4">
-            <div class="form-group w-full">
-              <label for="classe" class="form-label">Classe</label>
-              <select v-model="filters.classe_id" class="form-select w-full">
-                <option value="">Toutes les classes</option>
-                <option v-for="classe in classes" :key="classe.id" :value="classe.Id_Classe">
-                  {{ classe.Code }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group w-full">
-              <label for="rubrique" class="form-label">Rubrique</label>
-              <select v-model="filters.rubrique_id" class="form-select w-full">
-                <option value="">Toutes les rubriques</option>
-                <option v-for="rubrique in rubriques" :key="rubrique.id" :value="rubrique.Id_Rubrique">
-                  {{ rubrique.Code_rubrique }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group w-full">
-              <label for="search" class="form-label">Recherche</label>
-              <input
-                :value="filters.search"
-                @input="debounceSearch($event.target.value)"
-                type="text"
-                placeholder="Rechercher un compte..."
-                class="form-input w-full"
-              />
-            </div>
-          </div>
-          <UiButton variant="primary" @click="openCreateModal" class="mb-4">
-            Nouveau compte
-          </UiButton>
-          
-          <div class="table-container" style="margin-top: 20px;">
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-sm">Numéro</th>
-                  <th class="text-sm">Nom</th>
-                  <th class="text-sm">Classe</th>
-                  <th class="text-sm">Rubrique</th>
-                  <th class="text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="compte in paginatedComptes" :key="compte.id" class="fade-in">
-                  <td>{{ compte.Code_compte }}</td>
-                  <td>{{ compte.Libelle }}</td>
-                  <td>{{ compte.rubrique?.classe?.Code }}</td>
-                  <td>{{ compte.rubrique?.Libelle }}</td>
-                  <td class="d-flex gap-2">
-                    <UiButton variant="soft-primary" @click="viewGrandlivre(compte)" size="sm">
-                      Consulter
-                    </UiButton>
-                    
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <br>
-          <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
-              <i class="bi bi-chevron-left"></i>
-            </UiButton>
-            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
-              {{ page }}
-            </UiButton>
-            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
-              <i class="bi bi-chevron-right"></i>
-            </UiButton>
-          </div>
-          <div v-if="showModal" class="modal-overlay">
-            <div class="modal">
-              <div class="modal-header">
-                <h2 class="modal-title">
-                  {{ isEditing ? 'Modifier le compte' : 'Nouveau compte' }}
-                </h2>
-                <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
-              </div>
-              <form @submit.prevent="saveCompte" class="modal-body">
-                <div class="form-group">
-                  <label for="rubrique" class="form-label required">Rubrique</label>
-                  <select
-                    v-model="form.Id_Rubrique"
-                    @change="updateCode"
-                    class="form-select w-full"
-                    required
-                  >
-                    <option value="">Sélectionner une rubrique</option>
-                    <option
-                      v-for="rubrique in rubriques"
-                      :key="rubrique.Id_Rubrique"
-                      :value="rubrique.Id_Rubrique"
-                    >
-                      {{ rubrique.Code_rubrique }} - {{ rubrique.Libelle }}
-                    </option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="suffixe" class="form-label required">Suffixe</label>
-                  <input
-                    type="text"
-                    v-model="form.suffixe"
-                    @input="updateCode"
-                    maxlength="1"
-                    placeholder="1"
-                    class="form-input w-full"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="code-compte" class="form-label">Code complet</label>
-                  <input
-                    type="text"
-                    v-model="form.Code_compte"
-                    readonly
-                    class="form-input w-full"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="libelle" class="form-label required">Libellé</label>
-                  <input
-                    type="text"
-                    v-model="form.Libelle"
-                    class="form-input w-full"
-                    required
-                  />
-                </div>
-                <div class="modal-footer">
-                  <UiButton variant="ghost" @click="showModal = false">
-                    Annuler
-                  </UiButton>
-                  <UiButton variant="primary" type="submit">
-                    {{ isEditing ? 'Modifier' : 'Enregistrer' }}
-                  </UiButton>
-                </div>
-              </form>
-            </div>
-          </div>
+    <template #actions>
+      <UiButton icon="bi-plus-lg" @click="openCreateModal">Nouveau compte</UiButton>
+    </template>
+
+    <div class="fs-stack">
+      <section class="fs-card fs-filters" aria-label="Filtres">
+        <div class="fs-field">
+          <label for="f-classe" class="fs-label">Classe</label>
+          <select id="f-classe" v-model="filters.classe_id" class="fs-select" @change="currentPage = 1">
+            <option value="">Toutes les classes</option>
+            <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">{{ classe.Code }}</option>
+          </select>
         </div>
-        
-      </div>
+        <div class="fs-field">
+          <label for="f-rubrique" class="fs-label">Rubrique</label>
+          <select id="f-rubrique" v-model="filters.rubrique_id" class="fs-select" @change="currentPage = 1">
+            <option value="">Toutes les rubriques</option>
+            <option v-for="rubrique in rubriques" :key="rubrique.Id_Rubrique" :value="rubrique.Id_Rubrique">{{ rubrique.Code_rubrique }}</option>
+          </select>
+        </div>
+        <div class="fs-field">
+          <label for="f-search" class="fs-label">Recherche</label>
+          <input id="f-search" :value="filters.search" @input="debounceSearch($event.target.value)" type="search" placeholder="Code ou libellé…" class="fs-input" />
+        </div>
+      </section>
+
+      <section class="fs-card fs-table-card">
+        <div class="fs-table-card__head">
+          <h2 class="fs-table-card__title">Comptes</h2>
+          <span class="fs-table-card__hint">Cliquez sur « Consulter » pour ouvrir le grand livre du compte</span>
+        </div>
+        <UiSkeleton v-if="loading" variant="table" :rows="8" :cols="5" />
+        <div v-else class="fs-table-wrap">
+          <table class="fs-table">
+            <thead>
+              <tr>
+                <th>Numéro</th>
+                <th>Nom</th>
+                <th>Classe</th>
+                <th>Rubrique</th>
+                <th class="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="compte in paginatedComptes" :key="compte.Id_Compte" class="detail-row">
+                <td class="font-bold">{{ compte.Code_compte }}</td>
+                <td>{{ compte.Libelle }}</td>
+                <td><UiBadge size="sm">{{ compte.rubrique?.classe?.Code }}</UiBadge></td>
+                <td>{{ compte.rubrique?.Libelle }}</td>
+                <td class="actions">
+                  <div class="fs-row-actions">
+                    <UiButton variant="soft-primary" size="sm" icon-right="bi-arrow-right" @click="viewGrandlivre(compte)">Consulter</UiButton>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!paginatedComptes.length">
+                <td colspan="5" class="fs-empty">Aucun compte ne correspond aux filtres.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <UiPagination v-model="currentPage" :total-pages="totalPages" :total="filteredComptes.length" :per-page="itemsPerPage" />
+      </section>
+    </div>
+
+    <UiModal v-model="showModal" :title="isEditing ? 'Modifier le compte' : 'Nouveau compte'" :icon="isEditing ? 'bi-pencil' : 'bi-plus-lg'">
+      <form id="form-compte-gl" class="ui-form" @submit.prevent="saveCompte">
+        <div class="ui-field ui-field--full">
+          <label class="required" for="m-rubrique">Rubrique</label>
+          <select id="m-rubrique" v-model="form.Id_Rubrique" @change="updateCode" required>
+            <option value="">Sélectionner une rubrique</option>
+            <option v-for="rubrique in rubriques" :key="rubrique.Id_Rubrique" :value="rubrique.Id_Rubrique">
+              {{ rubrique.Code_rubrique }} - {{ rubrique.Libelle }}
+            </option>
+          </select>
+        </div>
+        <div class="ui-field">
+          <label class="required" for="m-suffixe">Suffixe</label>
+          <input id="m-suffixe" type="text" v-model="form.suffixe" @input="updateCode" maxlength="1" placeholder="1" required />
+        </div>
+        <div class="ui-field">
+          <label for="m-code">Code complet</label>
+          <input id="m-code" type="text" v-model="form.Code_compte" readonly />
+        </div>
+        <div class="ui-field ui-field--full">
+          <label class="required" for="m-libelle">Libellé</label>
+          <input id="m-libelle" type="text" v-model="form.Libelle" required />
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="form-compte-gl" :loading="saving">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
+      </template>
+    </UiModal>
+
+    <UiModal v-model="notice.open" :tone="notice.tone" :title="notice.title" size="sm">
+      <p class="ui-modal__message">{{ notice.message }}</p>
+      <template #footer><UiButton variant="primary" @click="notice.open = false">OK</UiButton></template>
+    </UiModal>
   </AppLayout>
 </template>
-
-<style scoped>
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
-  background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-}
-</style>

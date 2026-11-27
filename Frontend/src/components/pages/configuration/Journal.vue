@@ -6,93 +6,86 @@
     subtitle="Journaux comptables de l'établissement"
     section="Saisie"
   >
-<div class="card card-form">
-        <div class="p-6">
-          
+    <template #actions>
+      <UiButton variant="primary" icon="bi-plus-lg" @click="openCreate">Nouveau journal</UiButton>
+    </template>
 
-          <!-- Formulaire stylisé -->
-          <form @submit.prevent="saveJournal" class="card-form">
-            <div class="form-group" >
-              <label class="form-label required">Code</label>
-              <input v-model="form.Code" type="text" class="form-input" required />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label required">Libellé</label>
-              <input v-model="form.Libelle" type="text" class="form-input" required />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label required">Type Journal</label>
-              <select v-model="form.Id_Type_Journal" class="form-select" required>
-                <option value="">-- Sélectionner --</option>
-                <option v-for="type in typeJournals" :key="type.Id_Type_Journal" :value="type.Id_Type_Journal">
-                  {{ type.Type }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Sous-compte (optionnel)</label>
-              <select v-model="form.Id_Sous_compte" class="form-select">
-                <option value="">-- Sélectionner --</option>
-                <option v-for="compte in sousComptes" :key="compte.Id_Sous_compte" :value="compte.Id_Sous_compte">
-                  {{ compte.Code_sous_compte }} - {{ compte.Libelle }}
-                </option>
-              </select>
-            </div>
-
-            <div class="d-flex gap-2">
-              <UiButton variant="primary" type="submit">
-                {{ isEditing ? "Mettre à jour" : "Ajouter" }}
-              </UiButton>
-              <UiButton v-if="isEditing" @click="cancelEdit">
-                Annuler
-              </UiButton>
-            </div>
-          </form>
-
-          <!-- Tableau stylisé -->
-          <div class="table-container mt-6">
-            <table class="table table-bordered table-striped w-full">
-              <thead>
-                <tr>
-                  <th class="text-base p-4">#</th>
-                  <th class="text-base p-4">Code</th>
-                  <th class="text-base p-4">Libellé</th>
-                  <th class="text-base p-4">Type Journal</th>
-                  <th class="text-base p-4">Sous-compte</th>
-                  <th class="text-base p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="journals.length" v-for="journal in journals" :key="journal.Id_Journal">
-                  <td class="p-4 text-base">{{ journal.Id_Journal }}</td>
-                  <td class="p-4 text-base">{{ journal.Code }}</td>
-                  <td class="p-4 text-base">{{ journal.Libelle }}</td>
-                  <td class="p-4 text-base">{{ journal.type_journal?.Type || '-' }}</td>
-                  <td class="p-4 text-base">{{ journal.sous_compte?.Libelle || '-' }}</td>
-                  <td class="text-center">
-                    <UiButton variant="soft-primary" @click="editJournal(journal)" size="sm">Modifier</UiButton>
-                    <UiButton variant="soft-danger" @click="deleteJournal(journal.Id_Journal)" size="sm" style="margin-left: 20px;">Desactiver</UiButton>
-                    <UiButton variant="soft-primary" @click="viewEcritures(journal.Id_Journal)" size="sm" style="margin-left: 20px;">Voir Écritures</UiButton>
-                  </td>
-                </tr>
-                <tr v-else>
-                  <td colspan="6" class="p-4 text-center text-base">Aucune donnée disponible</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-          
-
-                    <!-- Bouton flottant pour ChatBot - hors du flux principal -->
-          
-         
-
-        </div>
+    <section class="fs-card fs-table-card">
+      <div class="fs-table-card__head">
+        <h2 class="fs-table-card__title">Liste des journaux</h2>
+        <UiBadge tone="primary">{{ journals.length }} journal(aux)</UiBadge>
       </div>
+      <UiSkeleton v-if="loading" variant="table" :rows="5" :cols="6" />
+      <div v-else class="fs-table-wrap">
+        <table class="fs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Code</th>
+              <th>Libellé</th>
+              <th>Type</th>
+              <th>Sous-compte</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="journal in journals" :key="journal.Id_Journal">
+              <td>{{ journal.Id_Journal }}</td>
+              <td><UiBadge size="sm" tone="primary">{{ journal.Code }}</UiBadge></td>
+              <td class="font-bold">{{ journal.Libelle }}</td>
+              <td>{{ journal.type_journal?.Type || '—' }}</td>
+              <td>{{ journal.sous_compte?.Libelle || '—' }}</td>
+              <td class="actions">
+                <div class="fs-row-actions">
+                  <UiButton size="sm" icon="bi-eye" @click="viewEcritures(journal.Id_Journal)">Écritures</UiButton>
+                  <UiButton variant="soft-primary" size="sm" icon="bi-pencil" @click="editJournal(journal)">Modifier</UiButton>
+                  <UiButton variant="soft-danger" size="sm" icon="bi-slash-circle" @click="deleteJournal(journal.Id_Journal)">Désactiver</UiButton>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="!journals.length"><td colspan="6" class="fs-empty">Aucun journal.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <UiModal v-model="showModal" :title="isEditing ? 'Modifier le journal' : 'Nouveau journal'" :icon="isEditing ? 'bi-pencil' : 'bi-plus-lg'">
+      <form id="form-journal" class="ui-form" @submit.prevent="saveJournal">
+        <div class="ui-field">
+          <label class="required" for="j-code">Code</label>
+          <input id="j-code" v-model="form.Code" type="text" placeholder="AC" required />
+        </div>
+        <div class="ui-field">
+          <label class="required" for="j-type">Type de journal</label>
+          <select id="j-type" v-model="form.Id_Type_Journal" required>
+            <option value="">— Sélectionner —</option>
+            <option v-for="type in typeJournals" :key="type.Id_Type_Journal" :value="type.Id_Type_Journal">{{ type.Type }}</option>
+          </select>
+        </div>
+        <div class="ui-field ui-field--full">
+          <label class="required" for="j-libelle">Libellé</label>
+          <input id="j-libelle" v-model="form.Libelle" type="text" placeholder="Journal des achats" required />
+        </div>
+        <div class="ui-field ui-field--full">
+          <label for="j-sc">Sous-compte (optionnel)</label>
+          <select id="j-sc" v-model="form.Id_Sous_compte">
+            <option value="">— Aucun —</option>
+            <option v-for="compte in sousComptes" :key="compte.Id_Sous_compte" :value="compte.Id_Sous_compte">
+              {{ compte.Code_sous_compte }} - {{ compte.Libelle }}
+            </option>
+          </select>
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="form-journal" :loading="saving">{{ isEditing ? 'Mettre à jour' : 'Ajouter' }}</UiButton>
+      </template>
+    </UiModal>
+
+    <UiModal v-model="errorOpen" tone="danger" title="Erreur" size="sm">
+      <p class="ui-modal__message">{{ errorMessage }}</p>
+      <template #footer><UiButton variant="primary" @click="errorOpen = false">OK</UiButton></template>
+    </UiModal>
   </AppLayout>
 </template>
 
@@ -107,28 +100,22 @@ import { getUser } from "../../../services/Auth";
 const router = useRouter();
 const user = ref(null);
 
-const showChat = ref(false);
-
-const handleNavigation = (item) => {
-  router.push(item.route);
-};
-
 const journals = ref([]);
 const typeJournals = ref([]);
 const sousComptes = ref([]);
 
-const form = ref({
-  Code: "",
-  Libelle: "",
-  Id_Type_Journal: "",
-  Id_Sous_compte: "",
-});
+const form = ref({ Code: "", Libelle: "", Id_Type_Journal: "", Id_Sous_compte: "" });
 
 const isEditing = ref(false);
 const editingId = ref(null);
+const showModal = ref(false);
+const loading = ref(true);
+const saving = ref(false);
+const errorOpen = ref(false);
+const errorMessage = ref('');
+const showError = (e, defaut) => { errorMessage.value = e?.response?.data?.message || defaut; errorOpen.value = true; };
 
 const token = localStorage.getItem("token");
-
 if (!token) {
   window.location.href = "/";
 } else {
@@ -139,35 +126,50 @@ const fetchJournals = async () => {
   try {
     const res = await axios.get(`${API_BASE}/journals`);
     journals.value = res.data;
-    console.log("Journaux chargés:", journals.value);
   } catch (error) {
     console.error("Erreur lors du chargement des journaux:", error);
-    journals.value = []; // Ensure journals is empty on error
+    journals.value = [];
+  } finally {
+    loading.value = false;
   }
 };
 
 const fetchOptions = async () => {
   try {
-    const types = await axios.get(`${API_BASE}/type-journals`);
+    const [types, comptes] = await Promise.all([
+      axios.get(`${API_BASE}/type-journals`),
+      axios.get(`${API_BASE}/sous-comptes`),
+    ]);
     typeJournals.value = types.data;
-    const comptes = await axios.get(`${API_BASE}/sous-comptes`);
     sousComptes.value = comptes.data;
   } catch (error) {
     console.error("Erreur lors du chargement des options:", error);
   }
 };
 
+const resetForm = () => {
+  form.value = { Code: "", Libelle: "", Id_Type_Journal: "", Id_Sous_compte: "" };
+  isEditing.value = false;
+  editingId.value = null;
+};
+
+const openCreate = () => { resetForm(); showModal.value = true; };
+
 const saveJournal = async () => {
+  saving.value = true;
   try {
     if (isEditing.value) {
       await axios.put(`${API_BASE}/journals/${editingId.value}`, form.value);
     } else {
       await axios.post(`${API_BASE}/journals`, form.value);
     }
+    showModal.value = false;
     resetForm();
     fetchJournals();
   } catch (error) {
-    console.error("Erreur lors de l'enregistrement du journal:", error);
+    showError(error, "Erreur lors de l'enregistrement du journal");
+  } finally {
+    saving.value = false;
   }
 };
 
@@ -180,164 +182,31 @@ const editJournal = (journal) => {
   };
   isEditing.value = true;
   editingId.value = journal.Id_Journal;
-};
-
-const cancelEdit = () => {
-  resetForm();
+  showModal.value = true;
 };
 
 const deleteJournal = async (id) => {
-  if (confirm("Supprimer ce journal ?")) {
-    try {
-      await axios.delete(`${API_BASE}/journals/${id}`);
-      fetchJournals();
-    } catch (error) {
-      alert(error.response?.data?.message || "Erreur lors de la suppression du journal");
-    }
-  }
-};
-
-const viewEcritures = (id) => {
+  if (!confirm("Désactiver ce journal ?")) return;
   try {
-    console.log("Navigating to /ecritures-journal/" + id);
-    router.push(`/ecritures-journal/${id}`);
+    await axios.delete(`${API_BASE}/journals/${id}`);
+    fetchJournals();
   } catch (error) {
-    console.error("Erreur lors de la navigation:", error);
+    showError(error, "Erreur lors de la suppression du journal");
   }
 };
 
-const resetForm = () => {
-  form.value = { Code: "", Libelle: "", Id_Type_Journal: "", Id_Sous_compte: "" };
-  isEditing.value = false;
-  editingId.value = null;
-};
+const viewEcritures = (id) => router.push(`/ecritures-journal/${id}`);
 
 onMounted(async () => {
-  console.log("Token récupéré :", token); // Vérifie si le token existe
-  
-  if (!token) {
-    console.log("Pas de token → Redirection vers /");
+  if (!token) return;
+  try {
+    user.value = (await getUser(token)).data;
+  } catch (err) {
+    localStorage.removeItem("token");
     window.location.href = "/";
-  } else {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    try {
-      console.log("Appel getUser en cours...");
-      const res = await getUser(token);
-      user.value = res.data;
-      console.log("User récupéré :", user.value);
-    } catch (err) {
-      console.error("Erreur lors de getUser :", err);
-      localStorage.removeItem("token");
-      window.location.href = "/";
-      return; // Important : arrête l'exécution
-    }
-    fetchJournals();
+    return;
+  }
+  fetchJournals();
   fetchOptions();
-  }
 });
-
 </script>
-
-<style scoped>
-@font-face {
-  font-family: 'Stara';
-  src: url('../../../../public/fonts/Stara-Black.woff') format('truetype'); /* Adjust the file name and extension if needed */
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Stara';
-  src: url('../../../../public/fonts/Stara-Black.woff') format('woff'); /* Include bold variant if needed */
-  font-weight: bold;
-  font-style: normal;
-}
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  font-family: 'Stara', sans-serif;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
-  background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
-  font-family: 'Stara', sans-serif;
-}
-
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 100;
-  background: var(--fs-surface);
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Animation d'apparition */
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-
-  .dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }
-}
-
-
-</style>

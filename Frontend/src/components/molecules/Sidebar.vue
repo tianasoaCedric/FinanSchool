@@ -78,6 +78,7 @@ const menu = [
           { label: 'Pièces', to: '/pieces', match: ['/ecriture/'] },
           { label: 'Toutes les lignes', to: '/liste-ecriture' },
           { label: 'Validation', to: '/validation' },
+          { label: 'Importer des écritures', to: '/import' },
         ],
       },
       {
@@ -88,9 +89,16 @@ const menu = [
         ],
       },
       { label: 'Grand livre', icon: 'bi-journals', to: '/liste-grand-livre', match: ['/grand-livres/'] },
-      { label: 'Import d\'écritures', icon: 'bi-cloud-arrow-up', to: '/import' },
       { label: 'Clôtures', icon: 'bi-lock', to: '/cloture' },
       { label: "Piste d'audit", icon: 'bi-clock-history', to: '/audit' },
+    ],
+  },
+  {
+    title: 'Tiers',
+    items: [
+      { label: 'Clients et fournisseurs', icon: 'bi-people', to: '/tiers', match: ['/tiers/'] },
+      { label: 'Lettrage', icon: 'bi-link-45deg', to: '/lettrage' },
+      { label: 'Balance âgée', icon: 'bi-hourglass-split', to: '/balance-agee' },
     ],
   },
   {
@@ -102,14 +110,7 @@ const menu = [
           { label: 'Rubriques', to: '/rubrique' },
           { label: 'Comptes', to: '/compte' },
           { label: 'Sous-comptes', to: '/souscompte' },
-        ],
-      },
-      {
-        label: 'Référentiels', icon: 'bi-book',
-        children: [
-          { label: 'Devises', to: '/devise' },
-          { label: 'Modes de paiement', to: '/paiement-mode' },
-          { label: 'Amortissements', to: '/amortissement' },
+          { label: 'Importer / exporter', to: '/plan-comptable/import' },
         ],
       },
     ],
@@ -139,11 +140,16 @@ const menu = [
           { label: 'Variation des capitaux propres', to: '/variation-capitaux' },
         ],
       },
+      { label: 'Immobilisations et amortissements', icon: 'bi-building-gear', to: '/amortissement' },
     ],
   },
   {
     title: 'Outils',
     items: [{ label: 'Simulations', icon: 'bi-magic', to: '/simulations' }],
+  },
+  {
+    title: 'Administration',
+    items: [{ label: 'Paramètres', icon: 'bi-gear', to: '/reglages' }],
   },
 ];
 

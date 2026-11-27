@@ -36313,3 +36313,969 @@ HINT:  Perhaps you meant to reference the column \"j.Libelle\". at /var/www/html
         "id": 42
     }
 }  
+[2026-11-25 08:38:37] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 43,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:38:37.000000Z",
+        "created_at": "2026-11-25T08:38:37.000000Z",
+        "id": 43
+    }
+}  
+[2026-11-25 08:38:37] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 44,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T08:38:37.000000Z",
+        "created_at": "2026-11-25T08:38:37.000000Z",
+        "id": 44
+    }
+}  
+[2026-11-25 12:58:05] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 45,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T12:58:05.000000Z",
+        "created_at": "2026-11-25T12:58:05.000000Z",
+        "id": 45
+    }
+}  
+[2026-11-25 12:58:05] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 46,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T12:58:05.000000Z",
+        "created_at": "2026-11-25T12:58:05.000000Z",
+        "id": 46
+    }
+}  
+[2026-11-25 12:59:51] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 47,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T12:59:51.000000Z",
+        "created_at": "2026-11-25T12:59:51.000000Z",
+        "id": 47
+    }
+}  
+[2026-11-25 12:59:51] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 48,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-25T12:59:51.000000Z",
+        "created_at": "2026-11-25T12:59:51.000000Z",
+        "id": 48
+    }
+}  
+[2026-11-25 13:11:28] local.ERROR: Unexpected end of input {"exception":"[object] (InvalidArgumentException(code: 0): Unexpected end of input at /var/www/html/vendor/psy/psysh/src/Shell.php:891)
+[stacktrace]
+#0 /var/www/html/vendor/psy/psysh/src/Shell.php(1390): Psy\\Shell->setCode('require', true)
+#1 /var/www/html/vendor/laravel/tinker/src/Console/TinkerCommand.php(76): Psy\\Shell->execute('require')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#8 /var/www/html/vendor/symfony/console/Command/Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#10 /var/www/html/vendor/symfony/console/Application.php(1110): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#11 /var/www/html/vendor/symfony/console/Application.php(359): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#12 /var/www/html/vendor/symfony/console/Application.php(194): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1234): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#15 /var/www/html/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#16 {main}
+"} 
+[2026-11-27 05:16:21] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 49,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:16:20.000000Z",
+        "created_at": "2026-11-27T05:16:20.000000Z",
+        "id": 49
+    }
+}  
+[2026-11-27 05:16:21] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 50,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:16:21.000000Z",
+        "created_at": "2026-11-27T05:16:21.000000Z",
+        "id": 50
+    }
+}  
+[2026-11-27 05:27:33] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 51,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:27:33.000000Z",
+        "created_at": "2026-11-27T05:27:33.000000Z",
+        "id": 51
+    }
+}  
+[2026-11-27 05:27:33] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 52,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:27:33.000000Z",
+        "created_at": "2026-11-27T05:27:33.000000Z",
+        "id": 52
+    }
+}  
+[2026-11-27 05:39:24] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 53,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce du 15\/06\/2025 r\u00e9f. REF-1 (lignes 2, 3) : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:39:24.000000Z",
+        "created_at": "2026-11-27T05:39:24.000000Z",
+        "id": 53
+    }
+}  
+[2026-11-27 05:39:24] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 54,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T05:39:24.000000Z",
+        "created_at": "2026-11-27T05:39:24.000000Z",
+        "id": 54
+    }
+}  
+[2026-11-27 07:09:08] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 55,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:08.000000Z",
+        "created_at": "2026-11-27T07:09:08.000000Z",
+        "id": 55
+    }
+}  
+[2026-11-27 07:09:08] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 56,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:08.000000Z",
+        "created_at": "2026-11-27T07:09:08.000000Z",
+        "id": 56
+    }
+}  
+[2026-11-27 07:09:08] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 57,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:08.000000Z",
+        "created_at": "2026-11-27T07:09:08.000000Z",
+        "id": 57
+    }
+}  
+[2026-11-27 07:09:09] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 58,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:09.000000Z",
+        "created_at": "2026-11-27T07:09:09.000000Z",
+        "id": 58
+    }
+}  
+[2026-11-27 07:09:09] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 59,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:09.000000Z",
+        "created_at": "2026-11-27T07:09:09.000000Z",
+        "id": 59
+    }
+}  
+[2026-11-27 07:09:18] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 60,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:18.000000Z",
+        "created_at": "2026-11-27T07:09:18.000000Z",
+        "id": 60
+    }
+}  
+[2026-11-27 07:09:18] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 61,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:09:18.000000Z",
+        "created_at": "2026-11-27T07:09:18.000000Z",
+        "id": 61
+    }
+}  
+[2026-11-27 07:13:16] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 62,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:15.000000Z",
+        "created_at": "2026-11-27T07:13:15.000000Z",
+        "id": 62
+    }
+}  
+[2026-11-27 07:13:16] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 63,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:16.000000Z",
+        "created_at": "2026-11-27T07:13:16.000000Z",
+        "id": 63
+    }
+}  
+[2026-11-27 07:13:16] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 64,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:16.000000Z",
+        "created_at": "2026-11-27T07:13:16.000000Z",
+        "id": 64
+    }
+}  
+[2026-11-27 07:13:16] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 65,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:16.000000Z",
+        "created_at": "2026-11-27T07:13:16.000000Z",
+        "id": 65
+    }
+}  
+[2026-11-27 07:13:17] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 66,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:17.000000Z",
+        "created_at": "2026-11-27T07:13:17.000000Z",
+        "id": 66
+    }
+}  
+[2026-11-27 07:13:24] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 67,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:24.000000Z",
+        "created_at": "2026-11-27T07:13:24.000000Z",
+        "id": 67
+    }
+}  
+[2026-11-27 07:13:25] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 68,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:13:25.000000Z",
+        "created_at": "2026-11-27T07:13:25.000000Z",
+        "id": 68
+    }
+}  
+[2026-11-27 07:55:42] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 75,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:42.000000Z",
+        "created_at": "2026-11-27T07:55:42.000000Z",
+        "id": 75
+    }
+}  
+[2026-11-27 07:55:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 76,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:43.000000Z",
+        "created_at": "2026-11-27T07:55:43.000000Z",
+        "id": 76
+    }
+}  
+[2026-11-27 07:55:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 77,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:43.000000Z",
+        "created_at": "2026-11-27T07:55:43.000000Z",
+        "id": 77
+    }
+}  
+[2026-11-27 07:55:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 78,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:43.000000Z",
+        "created_at": "2026-11-27T07:55:43.000000Z",
+        "id": 78
+    }
+}  
+[2026-11-27 07:55:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 79,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:43.000000Z",
+        "created_at": "2026-11-27T07:55:43.000000Z",
+        "id": 79
+    }
+}  
+[2026-11-27 07:55:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 80,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:54.000000Z",
+        "created_at": "2026-11-27T07:55:54.000000Z",
+        "id": 80
+    }
+}  
+[2026-11-27 07:55:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 81,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T07:55:54.000000Z",
+        "created_at": "2026-11-27T07:55:54.000000Z",
+        "id": 81
+    }
+}  
+[2026-11-27 08:06:40] local.ERROR: SQLSTATE[42P01]: Undefined table: 7 ERROR:  relation "notification_utilisateur" does not exist
+LINE 1: ...nt(*) as aggregate from "notifications" left join "notificat...
+                                                             ^ (Connection: pgsql, SQL: select count(*) as aggregate from "notifications" left join "notification_utilisateur" as "nu" on "nu"."notification_id" = "notifications"."id" and "nu"."user_id" = 1 where "nu"."supprime_a" is null) {"userId":1,"exception":"[object] (Illuminate\\Database\\QueryException(code: 42P01): SQLSTATE[42P01]: Undefined table: 7 ERROR:  relation \"notification_utilisateur\" does not exist
+LINE 1: ...nt(*) as aggregate from \"notifications\" left join \"notificat...
+                                                             ^ (Connection: pgsql, SQL: select count(*) as aggregate from \"notifications\" left join \"notification_utilisateur\" as \"nu\" on \"nu\".\"notification_id\" = \"notifications\".\"id\" and \"nu\".\"user_id\" = 1 where \"nu\".\"supprime_a\" is null) at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('select count(*)...', Array, Object(Closure))
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('select count(*)...', Array, Object(Closure))
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3188): Illuminate\\Database\\Connection->select('select count(*)...', Array, true)
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3173): Illuminate\\Database\\Query\\Builder->runSelect()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3763): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3172): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3367): Illuminate\\Database\\Query\\Builder->get()
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3326): Illuminate\\Database\\Query\\Builder->runPaginationCountQuery(Array)
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1105): Illuminate\\Database\\Query\\Builder->getCountForPagination()
+#9 /var/www/html/app/Http/Controllers/notifications/CentreNotificationsController.php(40): Illuminate\\Database\\Eloquent\\Builder->paginate('15')
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\notifications\\CentreNotificationsController->index(Object(Illuminate\\Http\\Request))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\notifications\\CentreNotificationsController), 'index')
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#15 /var/www/html/app/Http/Middleware/ControleAcces.php(43): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\ControleAcces->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1219): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#50 /var/www/html/public/index.php(20): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/html/p...')
+#52 {main}
+
+[previous exception] [object] (PDOException(code: 42P01): SQLSTATE[42P01]: Undefined table: 7 ERROR:  relation \"notification_utilisateur\" does not exist
+LINE 1: ...nt(*) as aggregate from \"notifications\" left join \"notificat...
+                                                             ^ at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(411): PDOStatement->execute()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(811): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('select count(*)...', Array)
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('select count(*)...', Array, Object(Closure))
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(397): Illuminate\\Database\\Connection->run('select count(*)...', Array, Object(Closure))
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3188): Illuminate\\Database\\Connection->select('select count(*)...', Array, true)
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3173): Illuminate\\Database\\Query\\Builder->runSelect()
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3763): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3172): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3367): Illuminate\\Database\\Query\\Builder->get()
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3326): Illuminate\\Database\\Query\\Builder->runPaginationCountQuery(Array)
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1105): Illuminate\\Database\\Query\\Builder->getCountForPagination()
+#11 /var/www/html/app/Http/Controllers/notifications/CentreNotificationsController.php(40): Illuminate\\Database\\Eloquent\\Builder->paginate('15')
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\notifications\\CentreNotificationsController->index(Object(Illuminate\\Http\\Request))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\notifications\\CentreNotificationsController), 'index')
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\\Routing\\Route->runController()
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#17 /var/www/html/app/Http/Middleware/ControleAcces.php(43): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\\Http\\Middleware\\ControleAcces->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1219): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#52 /var/www/html/public/index.php(20): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/html/p...')
+#54 {main}
+"} 
+[2026-11-27 08:09:01] local.ERROR: Unexpected end of input {"exception":"[object] (InvalidArgumentException(code: 0): Unexpected end of input at /var/www/html/vendor/psy/psysh/src/Shell.php:891)
+[stacktrace]
+#0 /var/www/html/vendor/psy/psysh/src/Shell.php(1390): Psy\\Shell->setCode('echo json_encod...', true)
+#1 /var/www/html/vendor/laravel/tinker/src/Console/TinkerCommand.php(76): Psy\\Shell->execute('echo json_encod...')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#8 /var/www/html/vendor/symfony/console/Command/Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#10 /var/www/html/vendor/symfony/console/Application.php(1110): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#11 /var/www/html/vendor/symfony/console/Application.php(359): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#12 /var/www/html/vendor/symfony/console/Application.php(194): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1234): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#15 /var/www/html/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#16 {main}
+"} 
+[2026-11-27 08:09:48] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 98,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:09:48.000000Z",
+        "created_at": "2026-11-27T08:09:48.000000Z",
+        "id": 98
+    }
+}  
+[2026-11-27 08:09:48] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 99,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:09:48.000000Z",
+        "created_at": "2026-11-27T08:09:48.000000Z",
+        "id": 99
+    }
+}  
+[2026-11-27 08:09:49] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 100,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:09:49.000000Z",
+        "created_at": "2026-11-27T08:09:49.000000Z",
+        "id": 100
+    }
+}  
+[2026-11-27 08:09:49] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 101,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:09:49.000000Z",
+        "created_at": "2026-11-27T08:09:49.000000Z",
+        "id": 101
+    }
+}  
+[2026-11-27 08:09:49] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 102,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:09:49.000000Z",
+        "created_at": "2026-11-27T08:09:49.000000Z",
+        "id": 102
+    }
+}  
+[2026-11-27 08:10:00] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 103,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:10:00.000000Z",
+        "created_at": "2026-11-27T08:10:00.000000Z",
+        "id": 103
+    }
+}  
+[2026-11-27 08:10:00] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 104,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:10:00.000000Z",
+        "created_at": "2026-11-27T08:10:00.000000Z",
+        "id": 104
+    }
+}  
+[2026-11-27 08:18:42] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 113,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:42.000000Z",
+        "created_at": "2026-11-27T08:18:42.000000Z",
+        "id": 113
+    }
+}  
+[2026-11-27 08:18:42] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 114,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:42.000000Z",
+        "created_at": "2026-11-27T08:18:42.000000Z",
+        "id": 114
+    }
+}  
+[2026-11-27 08:18:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 115,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:43.000000Z",
+        "created_at": "2026-11-27T08:18:43.000000Z",
+        "id": 115
+    }
+}  
+[2026-11-27 08:18:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 116,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:43.000000Z",
+        "created_at": "2026-11-27T08:18:43.000000Z",
+        "id": 116
+    }
+}  
+[2026-11-27 08:18:43] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 117,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:43.000000Z",
+        "created_at": "2026-11-27T08:18:43.000000Z",
+        "id": 117
+    }
+}  
+[2026-11-27 08:18:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 118,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:54.000000Z",
+        "created_at": "2026-11-27T08:18:54.000000Z",
+        "id": 118
+    }
+}  
+[2026-11-27 08:18:54] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 119,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:18:54.000000Z",
+        "created_at": "2026-11-27T08:18:54.000000Z",
+        "id": 119
+    }
+}  
+[2026-11-27 08:29:46] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 128,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:46.000000Z",
+        "created_at": "2026-11-27T08:29:46.000000Z",
+        "id": 128
+    }
+}  
+[2026-11-27 08:29:46] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 129,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:46.000000Z",
+        "created_at": "2026-11-27T08:29:46.000000Z",
+        "id": 129
+    }
+}  
+[2026-11-27 08:29:47] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 130,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:47.000000Z",
+        "created_at": "2026-11-27T08:29:47.000000Z",
+        "id": 130
+    }
+}  
+[2026-11-27 08:29:47] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 131,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:47.000000Z",
+        "created_at": "2026-11-27T08:29:47.000000Z",
+        "id": 131
+    }
+}  
+[2026-11-27 08:29:48] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 132,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:48.000000Z",
+        "created_at": "2026-11-27T08:29:48.000000Z",
+        "id": 132
+    }
+}  
+[2026-11-27 08:29:58] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 133,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:58.000000Z",
+        "created_at": "2026-11-27T08:29:58.000000Z",
+        "id": 133
+    }
+}  
+[2026-11-27 08:29:59] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 134,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T08:29:59.000000Z",
+        "created_at": "2026-11-27T08:29:59.000000Z",
+        "id": 134
+    }
+}  
+[2026-11-27 12:49:56] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 143,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'juin.xlsx' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:49:56.000000Z",
+        "created_at": "2026-11-27T12:49:56.000000Z",
+        "id": 143
+    }
+}  
+[2026-11-27 12:49:56] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 144,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'faux.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:49:56.000000Z",
+        "created_at": "2026-11-27T12:49:56.000000Z",
+        "id": 144
+    }
+}  
+[2026-11-27 12:49:57] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 145,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'a-annuler.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:49:57.000000Z",
+        "created_at": "2026-11-27T12:49:57.000000Z",
+        "id": 145
+    }
+}  
+[2026-11-27 12:49:57] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 146,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'valide.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:49:57.000000Z",
+        "created_at": "2026-11-27T12:49:57.000000Z",
+        "id": 146
+    }
+}  
+[2026-11-27 12:49:57] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 147,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'histo-unique.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 2 mouvements, 4 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:49:57.000000Z",
+        "created_at": "2026-11-27T12:49:57.000000Z",
+        "id": 147
+    }
+}  
+[2026-11-27 12:50:08] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 148,
+        "niveau_urgence_id": 3,
+        "titre": "\u00c9chec importation",
+        "message": "Erreur lors de l'import du fichier 'import.csv'\u202f: Pi\u00e8ce 1 (lignes 1, 2) : Pi\u00e8ce d\u00e9s\u00e9quilibr\u00e9e : d\u00e9bit 1 000,00 \u2260 cr\u00e9dit 900,00.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:50:08.000000Z",
+        "created_at": "2026-11-27T12:50:08.000000Z",
+        "id": 148
+    }
+}  
+[2026-11-27 12:50:08] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 149,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 'import.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:50:08.000000Z",
+        "created_at": "2026-11-27T12:50:08.000000Z",
+        "id": 149
+    }
+}  
+[2026-11-27 12:50:25] testing.INFO: Broadcasting [App\Events\NotificationCreee] on channels [notifications] with payload:
+{
+    "notification": {
+        "evenement_id": 150,
+        "niveau_urgence_id": 1,
+        "titre": "Importation r\u00e9ussie",
+        "message": "Le fichier 't.csv' a \u00e9t\u00e9 import\u00e9 avec succ\u00e8s\u202f: 1 mouvements, 2 lignes.",
+        "statut": "non_lu",
+        "updated_at": "2026-11-27T12:50:25.000000Z",
+        "created_at": "2026-11-27T12:50:25.000000Z",
+        "id": 150
+    }
+}  

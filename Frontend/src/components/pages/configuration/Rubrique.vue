@@ -39,8 +39,12 @@ const loadClasses = async () => {
 }
 
 const loadRubriques = async () => {
-  const res = await axios.get(`${API_URL}/rubriques`)
-  rubriques.value = res.data.data || res.data
+  try {
+    const res = await axios.get(`${API_URL}/rubriques`)
+    rubriques.value = res.data.data || res.data
+  } finally {
+    loading.value = false
+  }
 }
 
 const filteredRubriques = computed(() => {
@@ -67,23 +71,13 @@ const totalPages = computed(() => {
   return Math.ceil(filteredRubriques.value.length / itemsPerPage)
 })
 
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
+const loading = ref(true)
+const saving = ref(false)
+const errorMessage = ref('')
+const showErrorModal = ref(false)
+const showError = (msg) => { errorMessage.value = msg; showErrorModal.value = true }
 
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const goToPage = (page) => {
-  currentPage.value = page
-}
-
-const debounceSearch = debounce((val) => filters.value.search = val, 300)
+const debounceSearch = debounce((val) => { filters.value.search = val; currentPage.value = 1 }, 300)
 
 const openCreateModal = () => {
   isEditing.value = false
@@ -111,6 +105,7 @@ const updateCode = () => {
 }
 
 const saveRubrique = async () => {
+  saving.value = true
   try {
     if (isEditing.value) {
       await axios.put(`${API_URL}/rubriques/${form.value.id}`, form.value)
@@ -121,7 +116,9 @@ const saveRubrique = async () => {
     showModal.value = false
     currentPage.value = 1
   } catch (e) {
-    alert(e.response?.data?.message || "Erreur")
+    showError(e.response?.data?.message || "Erreur lors de l'enregistrement")
+  } finally {
+    saving.value = false
   }
 }
 
@@ -130,7 +127,7 @@ const deleteRubrique = async (id) => {
     try {
       await axios.delete(`${API_URL}/rubriques/${id}`)
     } catch (e) {
-      alert(e.response?.data?.message || "Erreur lors de la suppression")
+      showError(e.response?.data?.message || "Erreur lors de la suppression")
       return
     }
     loadRubriques()
@@ -175,261 +172,97 @@ onMounted(async () => {
     subtitle="Regroupements des comptes par classe du plan comptable"
     section="Structure"
   >
-<div class="card card-form">
-        
-        
-        <div class="card-body">
-          <div class="d-flex justify-between mb-6 gap-4 flex-column md:flex-row">
-            <div class="form-group w-full">
-              <input
-                type="text"
-                placeholder="Rechercher..."
-                @input="debounceSearch($event.target.value)"
-                class="form-input w-full text-base rounded-md"
-              />
-            </div>
+    <template #actions>
+      <UiButton variant="primary" icon="bi-plus-lg" @click="openCreateModal">Nouvelle rubrique</UiButton>
+    </template>
 
-            <div class="form-group w-full">
-              <select v-model="filters.classe" class="form-select w-full text-base rounded-md">
-                <option value="">Toutes les classes</option>
-                <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">
-                  {{ classe.Code }} - {{ classe.Libelle }}
-                </option>
-              </select>
-            </div>
-
-            <UiButton variant="success" @click="openCreateModal">
-              <i class="bi bi-plus-circle mr-1"></i> Nouvelle Rubrique
-            </UiButton>
-          </div>
-          <br>
-          
-          <div class="table-container mt-6">
-            <table class="table table-bordered table-striped w-full">
-              <thead>
-                <tr>
-                  <th class="text-base p-4">Code</th>
-                  <th class="text-base p-4">Libellé</th>
-                  <th class="text-base p-4">Classe</th>
-                  <th class="text-base p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="rubrique in paginatedRubriques" :key="rubrique.Id_Rubrique" class="fade-in">
-                  <td class="p-4 text-base">{{ rubrique.Code_rubrique }}</td>
-                  <td class="p-4 text-base">{{ rubrique.Libelle }}</td>
-                  <td class="p-4 text-base">{{ rubrique.classe?.Code }} - {{ rubrique.classe?.Libelle }}</td>
-                  <td class="d-flex gap-2 p-4">
-                    <UiButton variant="soft-primary" @click="openEditModal(rubrique)" size="sm">
-                      <i class="bi bi-pencil mr-1"></i> Modifier
-                    </UiButton>
-                    <UiButton variant="soft-danger" @click="deleteRubrique(rubrique.Id_Rubrique)" size="sm">
-                      <i class="bi bi-trash mr-1"></i> Supprimer
-                    </UiButton>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <br>
-          <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
-              <i class="bi bi-chevron-left"></i>
-            </UiButton>
-            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
-              {{ page }}
-            </UiButton>
-            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
-              <i class="bi bi-chevron-right"></i>
-            </UiButton>
-          </div>
-
-          <div v-if="showModal" class="modal-overlay">
-            <div class="modal">
-              <div class="modal-header">
-                <h2 class="modal-title text-2xl">
-                  {{ isEditing ? 'Modifier Rubrique' : 'Nouvelle Rubrique' }}
-                </h2>
-                <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
-              </div>
-
-              <form @submit.prevent="saveRubrique" class="modal-body space-y-4">
-                <div class="form-group">
-                  <label for="classe" class="form-label required text-base">Classe</label>
-                  <select
-                    v-if="!isEditing"
-                    v-model="form.Id_Classe"
-                    @change="updateCode"
-                    class="form-select w-full text-base rounded-md"
-                    required
-                  >
-                    <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">
-                      {{ classe.Code }} - {{ classe.Libelle }}
-                    </option>
-                  </select>
-                  <select
-                    v-if="isEditing"
-                    v-model="form.Id_Classe"
-                    @change="updateCode"
-                    class="form-select w-full text-base rounded-md d-none"
-                  >
-                    <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">
-                      {{ classe.Code }} - {{ classe.Libelle }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="suffixe" class="form-label required text-base">Suffixe</label>
-                  <input
-                    type="text"
-                    v-model="form.suffixe"
-                    @input="updateCode"
-                    maxlength="1"
-                    placeholder="01"
-                    class="form-input w-full text-base rounded-md"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="code-rubrique" class="form-label text-base">Code complet</label>
-                  <input
-                    type="text"
-                    v-model="form.Code_rubrique"
-                    readonly
-                    class="form-input w-full text-base rounded-md"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="libelle" class="form-label required text-base">Libellé</label>
-                  <input
-                    type="text"
-                    v-model="form.Libelle"
-                    class="form-input w-full text-base rounded-md"
-                    required
-                  />
-                </div>
-
-                <div class="modal-footer d-flex justify-end gap-2">
-                  <UiButton variant="ghost" @click="showModal = false">
-                    Annuler
-                  </UiButton>
-                  <UiButton variant="primary" type="submit">
-                    {{ isEditing ? 'Modifier' : 'Enregistrer' }}
-                  </UiButton>
-                </div>
-              </form>
-            </div>
-          </div>
+    <div class="fs-stack">
+      <section class="fs-card fs-filters" aria-label="Filtres">
+        <div class="fs-field">
+          <label for="f-classe" class="fs-label">Classe</label>
+          <select id="f-classe" v-model="filters.classe" class="fs-select" @change="currentPage = 1">
+            <option value="">Toutes les classes</option>
+            <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">
+              {{ classe.Code }} - {{ classe.Libelle }}
+            </option>
+          </select>
         </div>
-        
-        
-      </div>
+        <div class="fs-field">
+          <label for="f-search" class="fs-label">Recherche</label>
+          <input id="f-search" type="search" placeholder="Code ou libellé…" @input="debounceSearch($event.target.value)" class="fs-input" />
+        </div>
+      </section>
+
+      <section class="fs-card fs-table-card">
+        <div class="fs-table-card__head">
+          <h2 class="fs-table-card__title">Liste des rubriques</h2>
+          <UiBadge tone="primary">{{ filteredRubriques.length }} rubrique(s)</UiBadge>
+        </div>
+        <UiSkeleton v-if="loading" variant="table" :rows="8" :cols="4" />
+        <div v-else class="fs-table-wrap">
+          <table class="fs-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Classe</th>
+                <th class="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="rubrique in paginatedRubriques" :key="rubrique.Id_Rubrique">
+                <td class="font-bold">{{ rubrique.Code_rubrique }}</td>
+                <td>{{ rubrique.Libelle }}</td>
+                <td><UiBadge size="sm">{{ rubrique.classe?.Code }}</UiBadge> {{ rubrique.classe?.Libelle }}</td>
+                <td class="actions">
+                  <div class="fs-row-actions">
+                    <UiButton variant="soft-primary" size="sm" icon="bi-pencil" @click="openEditModal(rubrique)">Modifier</UiButton>
+                    <UiButton variant="soft-danger" size="sm" icon="bi-trash" @click="deleteRubrique(rubrique.Id_Rubrique)">Supprimer</UiButton>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!paginatedRubriques.length">
+                <td colspan="4" class="fs-empty">Aucune rubrique ne correspond aux filtres.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <UiPagination v-model="currentPage" :total-pages="totalPages" :total="filteredRubriques.length" :per-page="itemsPerPage" />
+      </section>
+    </div>
+
+    <UiModal v-model="showModal" :title="isEditing ? 'Modifier la rubrique' : 'Nouvelle rubrique'" :icon="isEditing ? 'bi-pencil' : 'bi-plus-lg'">
+      <form id="form-rubrique" class="ui-form" @submit.prevent="saveRubrique">
+        <div v-if="!isEditing" class="ui-field ui-field--full">
+          <label class="required" for="m-classe">Classe</label>
+          <select id="m-classe" v-model="form.Id_Classe" @change="updateCode" required>
+            <option v-for="classe in classes" :key="classe.Id_Classe" :value="classe.Id_Classe">
+              {{ classe.Code }} - {{ classe.Libelle }}
+            </option>
+          </select>
+        </div>
+        <div class="ui-field">
+          <label class="required" for="m-suffixe">Suffixe</label>
+          <input id="m-suffixe" type="text" inputmode="numeric" pattern="[0-9]" title="Un chiffre" v-model="form.suffixe" @input="updateCode" maxlength="1" placeholder="1" required />
+        </div>
+        <div class="ui-field">
+          <label for="m-code">Code complet</label>
+          <input id="m-code" type="text" v-model="form.Code_rubrique" readonly />
+        </div>
+        <div class="ui-field ui-field--full">
+          <label class="required" for="m-libelle">Libellé</label>
+          <input id="m-libelle" type="text" v-model="form.Libelle" required />
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="form-rubrique" :loading="saving">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
+      </template>
+    </UiModal>
+
+    <UiModal v-model="showErrorModal" tone="danger" title="Erreur" size="sm">
+      <p class="ui-modal__message">{{ errorMessage }}</p>
+      <template #footer><UiButton variant="primary" @click="showErrorModal = false">OK</UiButton></template>
+    </UiModal>
   </AppLayout>
 </template>
-
-<style scoped>
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
-  background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
-}
-
-.filter-container, .export-container {
-  background: var(--fs-surface);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-title,
-.form-label,
-.form-input,
-.form-select,
-.btn,
-.table th,
-.table td {
-  font-family: var(--font-family); /* Use global Stara font from style.css */
-}
-
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 100;
-  background: var(--fs-surface);
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Animation d'apparition */
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-
-  .dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }
-}
-</style>

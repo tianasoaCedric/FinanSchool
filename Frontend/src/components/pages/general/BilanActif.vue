@@ -61,7 +61,8 @@ import FinancialStatementLayout from "@/components/template/FinancialStatementLa
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import html2pdf from 'html2pdf.js';
+import { exporterEtatPdf, infosExercice, typeLigne } from '@/utils/exportEtatPdf';
+import { parametres } from '@/stores/parametres';
 import * as XLSX from 'xlsx-js-style';
 import { getUser } from "../../../services/Auth";
 
@@ -82,18 +83,6 @@ const exerciceInfo = ref({
   statut: ""
 });
 
-// ------ LOGO PDF ------
-const logoBase64 = ref(null);
-async function fetchImageAsBase64(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 // --- FILTRE EXERCICE ---
 const exercices = ref([]);
@@ -150,7 +139,6 @@ if (!token) {
 
 // Chargement initial : logo, user, exercices, bilan sur l'exercice courant
 onMounted(async () => {
-  logoBase64.value = await fetchImageAsBase64("/01Raitra kidz 300px.png");
   if (!token) {
     window.location.href = "/";
   } else {
@@ -231,119 +219,22 @@ const formatDate = d => {
 
 // EXPORT PDF avec logo et style pro
 const exportToPDF = () => {
-  if (!listeComplete.value.length) {
-    alert("Aucune donnée à exporter !");
-    return;
-  }
-  const now = new Date();
-
-  const bilanHeader = `
-    <div style="display: flex; align-items: flex-start; border-bottom: 3px solid #2980b9; padding-bottom: 16px; margin-bottom: 14px;width : 745px;">
-      <div style="flex: 0 0 80px;">
-        <img src="${logoBase64.value || ''}" style="width: 75px; height: auto;" />
-      </div>
-      <div style="flex: 1; padding-left: 12px;">
-        <div style="font-size: 10px; color: #555;">
-          <div style="font-weight: bold; font-size: 12px; color: #2c3e50;">RAITRA KIDZ</div>
-          <div>Antananarivo, Madagascar</div>
-          <div>+261 XX XX XXX XX</div>
-        </div>
-      </div>
-      <div style="flex: 2; text-align: center;">
-        <h1 style="font-size: 18px; font-weight: bold; color: #1c45bd; margin: 0 0 4px 0;">Bilan - Actif</h1>
-        <div style="font-size: 10px; margin: 2px 0;">
-          Exercice : ${exerciceInfo.value.annee_fiscale || ''}
-        </div>
-        <div style="font-size: 9px;">
-          Période : Du ${formatDate(exerciceInfo.value.date_debut)} au ${formatDate(exerciceInfo.value.date_fin)}
-        </div>
-        <div style="font-size: 9px;">
-          Statut : ${exerciceInfo.value.statut || "-"}
-        </div>
-      </div>
-      <div style="flex: 0 0 120px; text-align: right; font-size: 8px; color: #555;">
-        <div><strong>Date édition:</strong></div>
-        <div>${now.toLocaleDateString('fr-FR')} ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-      </div>
-    </div>`;
-
-  // tableau dynamique avec colonnes ajustées pour portrait
-  const tableRows = listeComplete.value.map(l =>
-    `<tr
-      style="
-      width : 745px;
-        ${l.isTitle ? 'background:#dbeafe;font-weight:bold;font-size:10px;color:#1e40af;' : ''}
-        ${l.isSubtitle ? 'background:#f0f9ff;font-style:italic;font-size:9px;color:#0369a1;' : ''}
-        ${l.isTotal ? 'background:#e0e7ff;font-weight:bold;font-size:10px;color:#1e40af;' : ''}
-        ${l.isSubtotal ? 'background:#ede9fe;font-weight:600;font-size:9px;color:#5b21b6;' : ''}
-        ${!l.isTitle && !l.isSubtitle && !l.isTotal && !l.isSubtotal ? 'font-size:8px;' : ''}
-      ">
-      <td style="padding:5px 4px;${l.isSubtitle?'padding-left:16px;':''}${l.isDetail?'padding-left:24px;':''}border:1px solid #ddd;">${l.label}</td>
-      <td style="padding:5px 3px;text-align:center;border:1px solid #ddd;">${l.note || ''}</td>
-      <td style="padding:5px 3px;text-align:right;border:1px solid #ddd;">${formatMontant(l.brutN)}</td>
-      <td style="padding:5px 3px;text-align:right;border:1px solid #ddd;">${formatMontant(l.amortN)}</td>
-      <td style="padding:5px 3px;text-align:right;border:1px solid #ddd;">${formatMontant(l.netN)}</td>
-      <td style="padding:5px 3px;text-align:right;border:1px solid #ddd;">${formatMontant(l.netN1)}</td>
-    </tr>`
-  ).join('');
-  
-  const htmlContent = `
-    <div style="font-family: 'Helvetica', Arial, sans-serif; max-width: 210mm; padding: 0 10px;">
-      ${bilanHeader}
-      <table style="width:745px;border-collapse:collapse;margin-top:10px;font-size:8px;">
-        <thead>
-          <tr style="background: linear-gradient(135deg, #2980b9 0%, #3498db 100%); color: #fff;">
-            <th rowspan="2" style="padding:7px 4px;border:1px solid #2980b9;font-size:9px;">ACTIF</th>
-            <th rowspan="2" style="padding:7px 4px;border:1px solid #2980b9;text-align:center;font-size:9px;">NOTE</th>
-            <th colspan="3" style="padding:7px 4px;border:1px solid #2980b9;text-align:center;font-size:9px;">N</th>
-            <th rowspan="2" style="padding:7px 4px;border:1px solid #2980b9;text-align:center;font-size:9px;">N-1<br>NET</th>
-          </tr>
-          <tr style="background: linear-gradient(135deg, #2980b9 0%, #3498db 100%); color: #fff;">
-            <th style="padding:6px 3px;border:1px solid #2980b9;text-align:right;font-size:8px;">Brut</th>
-            <th style="padding:6px 3px;border:1px solid #2980b9;text-align:right;font-size:8px;">Amort/<br>Prov</th>
-            <th style="padding:6px 3px;border:1px solid #2980b9;text-align:right;font-size:8px;">Net</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      </table>
-      <div style="margin-top:15px;text-align:center;font-size:8px;color:#888;">
-        RAITRA KIDZ © ${now.getFullYear()} | Export PDF Bilan - Actif
-      </div>
-    </div>
-  `;
-
-  const element = document.createElement('div');
-  element.innerHTML = htmlContent;
-  element.style.width = '210mm';
-  element.style.margin = '0';
-  element.style.padding = '0';
-  document.body.appendChild(element);
-
-  html2pdf()
-    .set({
-      margin: [8, 5, 12, 5],
-      filename: `Bilan_Actif_${now.toISOString().split("T")[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true,
-        logging: false
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' // ← PORTRAIT au lieu de landscape
-      }
-    })
-    .from(element)
-    .save()
-    .then(() => document.body.removeChild(element))
-    .catch(err => {
-      console.error('Erreur PDF:', err);
-      document.body.removeChild(element);
-    });
+  if (!listeComplete.value.length) { alert("Aucune donnée à exporter !"); return; }
+  return exporterEtatPdf({
+    titre: 'Bilan — Actif',
+    infos: infosExercice(exerciceInfo.value, formatDate),
+    entetes: [
+      [{ label: 'Actif', rowspan: 2 }, { label: 'Note', rowspan: 2, align: 'center' }, { label: 'Exercice N', colspan: 3 }, { label: 'N-1 net', rowspan: 2, align: 'right' }],
+      [{ label: 'Brut', align: 'right' }, { label: 'Amort. / Prov.', align: 'right' }, { label: 'Net', align: 'right' }],
+    ],
+    alignements: ['left', 'center'],
+    lignes: listeComplete.value.map(l => ({
+      type: typeLigne(l),
+      cellules: [l.label, l.note || '', formatMontant(l.brutN), formatMontant(l.amortN),
+        { v: formatMontant(l.netN), negatif: l.netN < 0 }, { v: formatMontant(l.netN1), negatif: l.netN1 < 0 }],
+    })),
+    fichier: 'Bilan_Actif',
+  });
 };
 
 
@@ -355,15 +246,10 @@ const exportToExcel = async () => {
   }
 
   const now = new Date();
-  const etablissement = {
-    nom: "RAITRA KIDZ",
-    adresse: "Antananarivo, Madagascar",
-    tel: "+261 XX XX XXX XX",
-    email: "contact@raitrakidz.mg"
-  };
+  const etablissement = (await parametres()).societe;
 
   // En-tête informations
-  const titre = [[`BILAN ACTIF – RAITRA KIDZ`]];
+  const titre = [[`BILAN ACTIF – ${etablissement.nom}`]];
   const info = [
     [etablissement.nom],
     [etablissement.adresse],

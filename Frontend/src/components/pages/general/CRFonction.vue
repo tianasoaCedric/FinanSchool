@@ -48,7 +48,8 @@ import FinancialStatementLayout from "@/components/template/FinancialStatementLa
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import html2pdf from 'html2pdf.js';
+import { exporterEtatPdf, infosExercice, typeLigne } from '@/utils/exportEtatPdf';
+import { parametres } from '@/stores/parametres';
 import * as XLSX from 'xlsx-js-style';
 import { getUser } from "../../../services/Auth";
 
@@ -74,18 +75,6 @@ const exercices = ref([]);
 const selectedExercice = ref("");
 const exerciceCourantId = ref("");
 
-// ------ LOGO PDF ------
-const logoBase64 = ref(null);
-async function fetchImageAsBase64(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 const token = localStorage.getItem("token");
 if (!token) {
@@ -133,7 +122,6 @@ const onExerciceChange = () => {
 };
 
 onMounted(async () => {
-  logoBase64.value = await fetchImageAsBase64("/01Raitra kidz 300px.png");
   if (!token) {
     window.location.href = "/";
   } else {
@@ -203,109 +191,29 @@ const formatDate = d => {
 
 
 const exportToPDF = () => {
-  if (!listeComplete.value.length) {
-    alert("Aucune donnée à exporter !");
-    return;
-  }
-  const now = new Date();
-
-  // Header
-  const header = `
-    <div style="display: flex; align-items: flex-start; border-bottom: 3px solid #2980b9; padding-bottom: 13px; margin-bottom: 11px;">
-      <div style="flex: 0 0 75px;">
-        <img src="${logoBase64.value || ''}" style="width: 65px; height: auto;" />
-      </div>
-      <div style="flex: 1; padding-left: 8px;">
-        <div style="font-size: 10px; color: #555;">
-          <div style="font-weight: bold; font-size: 12px; color: #2c3e50;">RAITRA KIDZ</div>
-          <div>Antananarivo, Madagascar</div>
-          <div>+261 XX XX XXX XX</div>
-        </div>
-      </div>
-      <div style="flex: 2; text-align: center;">
-        <h1 style="font-size: 18px; font-weight: bold; color: #1c45bd; margin: 0 0 4px 0;">Compte de Résultat par Fonction</h1>
-        <div style="font-size: 10px;">Exercice : ${exerciceInfo.value.annee_fiscale || ''}</div>
-        <div style="font-size: 9px;">Période : Du ${formatDate(exerciceInfo.value.date_debut)} au ${formatDate(exerciceInfo.value.date_fin)}</div>
-        <div style="font-size: 9px;">Statut : ${exerciceInfo.value.statut || "-"}</div>
-        <div style="font-size: 9px;">Unité monétaire : Ariary (Ar)</div>
-      </div>
-      <div style="flex: 0 0 90px; text-align: right; font-size: 8px; color: #555;">
-        <div><strong>Date édition:</strong></div>
-        <div>${now.toLocaleDateString('fr-FR')} ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-      </div>
-    </div>`;
-
-  // Table rows
-  const tableRows = listeComplete.value.map(l =>
-    `<tr
-      style="${l.isTotal ? 'background:#e0e7ff;font-weight:700;font-size:10px;color:#1e40af;' : 'font-size:9px;'}">
-      <td style="padding:7px 6px;${l.isTotal ? 'font-weight:700;' : 'padding-left:18px;'}border:1px solid #ddd;">${l.label}</td>
-      <td style="padding:7px 3px;text-align:center;border:1px solid #ddd;">${l.note || ''}</td>
-      <td style="padding:7px 3px;text-align:right;${l.isTotal ? 'font-weight:700;' : ''}border:1px solid #ddd;">${formatMontantAbsolu(l.montantN)}</td>
-      <td style="padding:7px 3px;text-align:right;${l.isTotal ? 'font-weight:700;' : ''}border:1px solid #ddd;">${formatMontantAbsolu(l.montantN1)}</td>
-    </tr>`
-  ).join('');
-
-  const htmlContent = `
-    <div style="font-family: 'Helvetica', Arial, sans-serif; max-width: 745px; margin: auto;">
-      ${header}
-      <table style="width:745px;max-width:100%;border-collapse:collapse;margin:10px auto 0 auto;">
-        <thead>
-          <tr style="background:linear-gradient(135deg,#2980b9 0%,#3498db 100%);color:#fff;">
-            <th style="padding:8px 4px;border:1px solid #2980b9;font-size:10px;">POSTE</th>
-            <th style="padding:8px 4px;border:1px solid #2980b9;text-align:center;font-size:10px;">NOTE</th>
-            <th style="padding:8px 4px;border:1px solid #2980b9;text-align:right;font-size:10px;">N</th>
-            <th style="padding:8px 4px;border:1px solid #2980b9;text-align:right;font-size:10px;">N-1</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      </table>
-      <div style="margin-top:13px;text-align:center;font-size:8.5px;color:#888;">
-        RAITRA KIDZ © ${now.getFullYear()} | Compte de Résultat par Fonction - Export PDF
-      </div>
-    </div>
-  `;
-
-  const element = document.createElement('div');
-  element.innerHTML = htmlContent;
-  element.style.width = '745px';
-  element.style.margin = '0 auto';
-  document.body.appendChild(element);
-
-  html2pdf()
-    .set({
-      margin: [8, 5, 14, 5],
-      filename: `Compte_Resultat_Fonction_${now.toISOString().split("T")[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    })
-    .from(element)
-    .save()
-    .then(() => document.body.removeChild(element))
-    .catch(err => {
-      document.body.removeChild(element);
-      alert("Erreur lors de la génération du PDF.");
-      console.error(err);
-    });
+  if (!listeComplete.value.length) { alert("Aucune donnée à exporter !"); return; }
+  return exporterEtatPdf({
+    titre: 'Compte de résultat par fonction',
+    infos: infosExercice(exerciceInfo.value, formatDate),
+    entetes: [[{ label: 'Poste' }, { label: 'Note', align: 'center' }, { label: 'N', align: 'right' }, { label: 'N-1', align: 'right' }]],
+    alignements: ['left', 'center'],
+    lignes: listeComplete.value.map(l => ({
+      type: typeLigne(l),
+      cellules: [l.label, l.note || '', formatMontantAbsolu(l.montantN), formatMontantAbsolu(l.montantN1)],
+    })),
+    fichier: 'Compte_Resultat_Fonction',
+  });
 };
 
 
 
 
-const exportToExcel = () => {
+const exportToExcel = async () => {
   if (!listeComplete.value.length) return alert("Aucune donnée à exporter !");
   const now = new Date();
-  const etablissement = {
-    nom: "RAITRA KIDZ",
-    adresse: "Antananarivo, Madagascar",
-    tel: "+261 XX XX XXX XX",
-    email: "contact@raitrakidz.mg"
-  };
+  const etablissement = (await parametres()).societe;
 
-  const titre = [[`COMPTE DE RESULTAT PAR FONCTION – RAITRA KIDZ`]];
+  const titre = [[`COMPTE DE RESULTAT PAR FONCTION – ${etablissement.nom}`]];
   const info = [
     [etablissement.nom],
     [etablissement.adresse],

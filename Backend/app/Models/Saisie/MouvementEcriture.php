@@ -44,6 +44,8 @@ class MouvementEcriture extends Model
     public const TYPE_EXTOURNE_AUTO = 'extourne_auto';
     /** Affectation du résultat de l'exercice précédent (décision de l'AG). */
     public const TYPE_AFFECTATION = 'affectation';
+    /** Sortie d'une immobilisation (cession ou mise au rebut). */
+    public const TYPE_CESSION = 'cession';
 
     /** Pièces générées par l'application : ni contre-passables ni extournables. */
     public const TYPES_TECHNIQUES = [self::TYPE_A_NOUVEAU, self::TYPE_CLOTURE];

@@ -21,7 +21,7 @@
       <UiButton variant="ghost" size="sm" icon="bi-x-lg" icon-only aria-label="Fermer le message" @click="message = null" />
     </div>
 
-    <div v-if="chargement && !prep" class="fs-card fs-skeleton"><div v-for="n in 6" :key="n" class="fs-skeleton__row"></div></div>
+    <div v-if="chargement && !prep" class="ce-sk"><UiSkeleton variant="cards" :rows="3" /><div class="fs-card"><UiSkeleton variant="lines" :rows="6" /></div></div>
 
     <template v-else-if="prep">
       <!-- Synthèse -->
@@ -173,11 +173,18 @@
           <div class="ce-section__entete">
             <h2 class="ce-section__titre"><span class="ce-etape">1</span> Dotations aux amortissements</h2>
             <UiBadge v-if="!dotations?.total" tone="neutral">Aucune dotation</UiBadge>
-            <UiBadge v-else-if="dotations.piece?.validee" tone="success" dot>Passées — {{ dotations.piece.numero }}</UiBadge>
-            <UiBadge v-else-if="dotations.piece" tone="warning" dot>Brouillon {{ dotations.piece.numero }}</UiBadge>
-            <UiBadge v-else tone="warning" dot>À passer</UiBadge>
+            <UiBadge v-else-if="dotations.piece && !dotations.piece.validee" tone="warning" dot>Brouillon {{ dotations.piece.numero }}</UiBadge>
+            <UiBadge v-else-if="dotations.reste_a_passer > 0" tone="warning" dot>À passer</UiBadge>
+            <UiBadge v-else tone="success" dot>Passées{{ dotations.piece ? ` — ${dotations.piece.numero}` : '' }}</UiBadge>
           </div>
-          <p class="ce-aide">Amortissement linéaire au prorata temporis (jours d'utilisation) : débit 681 / crédit 28x, au {{ formatDate(ex.date_fin) }} dans le journal OD.</p>
+          <p class="ce-aide">Amortissement linéaire au prorata temporis (jours d'utilisation) : débit 681 / crédit 28x, au {{ formatDate(ex.date_fin) }} dans le journal OD.
+            Les dotations déjà comptabilisées (saisie, import) sont déduites : seul le complément est généré.</p>
+          <p v-if="dotations?.deja_comptabilise > 0" class="ce-aide">
+            Déjà comptabilisé : <strong>{{ formatMontant(dotations.deja_comptabilise) }}</strong> — reste à passer : <strong>{{ formatMontant(dotations.reste_a_passer) }}</strong>.
+          </p>
+          <p v-if="dotations?.exces?.length" class="ce-aide ce-alerte">
+            Dotations comptabilisées supérieures au plan sur : {{ dotations.exces.map(e => `${e.compte} (${formatMontant(-e.reste)})`).join(', ') }}.
+          </p>
 
           <div v-if="dotations?.immobilisations?.length" class="fs-table-wrap">
             <table class="fs-table">
@@ -216,10 +223,10 @@
           </div>
           <p v-else class="fs-empty">Aucune immobilisation enregistrée (Structure › Référentiels › Amortissements).</p>
 
-          <div v-if="dotations?.total > 0 && !dotations.piece?.validee" class="ce-pied">
-            <UiButton v-if="dotations.piece" variant="ghost" :to="`/ecriture/${dotations.piece.id}`" icon="bi-eye">Relire la pièce</UiButton>
+          <div v-if="dotations?.reste_a_passer > 0 || (dotations?.piece && !dotations.piece.validee)" class="ce-pied">
+            <UiButton v-if="dotations.piece && !dotations.piece.validee" variant="ghost" :to="`/ecriture/${dotations.piece.id}`" icon="bi-eye">Relire la pièce</UiButton>
             <UiButton :loading="action === 'dotations'" icon="bi-file-earmark-plus" @click="genererDotations(false)">
-              {{ dotations.piece ? 'Régénérer en brouillon' : 'Générer en brouillon' }}
+              {{ dotations.piece && !dotations.piece.validee ? 'Régénérer en brouillon' : 'Générer en brouillon' }}
             </UiButton>
             <UiButton variant="primary" :loading="action === 'dotations-valider'" icon="bi-check2-circle" @click="genererDotations(true)">
               Générer et valider
@@ -306,32 +313,31 @@
     </template>
 
     <!-- Annulation de clôture : administrateur, motif obligatoire, confirmation -->
-    <div v-if="modaleAnnulation" class="modal-overlay" @click.self="modaleAnnulation = false">
-      <div class="modal" role="dialog" aria-labelledby="ce-annul-titre">
-        <div class="modal-header">
-          <h2 id="ce-annul-titre" class="modal-title">Annuler la clôture de {{ ex.annee }}</h2>
-          <UiButton variant="ghost" icon="bi-x-lg" icon-only aria-label="Fermer" @click="modaleAnnulation = false" />
-        </div>
-        <form class="modal-body ce-annul" @submit.prevent="annuler">
-          <p class="ce-aide">
-            L'écriture de clôture, les à-nouveaux et les extournes automatiques seront supprimés et l'exercice {{ ex.annee }} rouvert.
-            Cette action exceptionnelle est inscrite dans la piste d'audit avec votre nom et le motif.
-          </p>
-          <label class="ce-annul__label" for="ce-annul-motif">Motif de l'annulation</label>
+    <UiModal v-model="modaleAnnulation" :title="`Annuler la clôture de ${ex?.annee ?? ''}`" icon="bi-unlock" tone="danger">
+      <p class="fs-alert fs-alert--error ce-annul__intro">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+        <span>L'écriture de clôture, les à-nouveaux et les extournes automatiques seront supprimés et l'exercice {{ ex?.annee }} rouvert.
+        Cette action exceptionnelle est inscrite dans la piste d'audit avec votre nom et le motif.</span>
+      </p>
+      <form id="ce-form-annul" class="ui-form ui-form--1" @submit.prevent="annuler">
+        <div class="ui-field">
+          <label for="ce-annul-motif" class="required">Motif de l'annulation</label>
           <textarea
-            id="ce-annul-motif" v-model="motifAnnulation" class="fs-input ce-annul__motif" rows="3" maxlength="500" required
+            id="ce-annul-motif" v-model="motifAnnulation" rows="3" maxlength="500" required
             placeholder="Ex. : écriture de régularisation oubliée, à passer avant le dépôt des états financiers"
           ></textarea>
-          <small class="ce-annul__aide">10 caractères minimum ({{ motifAnnulation.trim().length }}/500)</small>
-          <label class="ce-annul__label" for="ce-annul-annee">Pour confirmer, saisissez l'année {{ ex.annee }}</label>
-          <input id="ce-annul-annee" v-model="confirmationAnnee" class="fs-input" inputmode="numeric" autocomplete="off" required />
-          <div class="modal-footer">
-            <UiButton variant="ghost" @click="modaleAnnulation = false">Retour</UiButton>
-            <UiButton type="submit" variant="danger" icon="bi-unlock" :loading="action === 'annuler'" :disabled="!annulationPossible">Annuler la clôture</UiButton>
-          </div>
-        </form>
-      </div>
-    </div>
+          <small class="ui-help">10 caractères minimum ({{ motifAnnulation.trim().length }}/500)</small>
+        </div>
+        <div class="ui-field">
+          <label for="ce-annul-annee" class="required">Pour confirmer, saisissez l'année {{ ex?.annee }}</label>
+          <input id="ce-annul-annee" v-model="confirmationAnnee" type="text" inputmode="numeric" autocomplete="off" required />
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="modaleAnnulation = false">Retour</UiButton>
+        <UiButton type="submit" form="ce-form-annul" variant="danger" icon="bi-unlock" :loading="action === 'annuler'" :disabled="!annulationPossible">Annuler la clôture</UiButton>
+      </template>
+    </UiModal>
   </AppLayout>
 </template>
 
@@ -554,10 +560,8 @@ onMounted(async () => {
 .ce-liens { display: flex; gap: 10px; flex-wrap: wrap; }
 .ce-bloque { margin-right: auto; font-size: 13.5px; color: var(--fs-danger, #dc2626); }
 .ce-bloque--bloc { margin: 0 0 12px; }
-.ce-annul { display: flex; flex-direction: column; gap: 8px; }
-.ce-annul__label { font-size: 13px; font-weight: 600; color: var(--fs-text); margin-top: 6px; }
-.ce-annul__motif { resize: vertical; min-height: 72px; font-family: inherit; }
-.ce-annul__aide { font-size: 12px; color: var(--fs-muted); }
+.ce-annul__intro { margin: 0 0 16px; }
+.ce-sk { display: flex; flex-direction: column; gap: 20px; }
 
 .ce-mois { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
 .ce-mois li {
@@ -579,6 +583,7 @@ onMounted(async () => {
 .ce-controles .is-ko .bi:first-child { color: var(--fs-danger, #dc2626); }
 .ce-controles .is-alerte .bi:first-child { color: var(--fs-warning, #d97706); }
 .ce-controles__detail { font-size: 13px; color: var(--fs-text-2); }
+.ce-alerte { color: var(--fs-warning, #b45309); }
 
 .ce-inventaire { margin: 0 0 14px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--fs-text); line-height: 1.55; }
 .ce-compteur { display: block; font-size: 13px; color: var(--fs-text-2); }

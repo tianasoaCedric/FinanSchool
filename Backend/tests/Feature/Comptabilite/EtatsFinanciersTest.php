@@ -35,6 +35,9 @@ class EtatsFinanciersTest extends TestCase
         if (DB::connection()->getDatabaseName() !== 'finance_test') {
             $this->markTestSkipped('Tests à lancer sur la base finance_test (DB_DATABASE=finance_test).');
         }
+        // Les tiers sont testés dans TiersLettrageTest
+        DB::table('parametres')->updateOrInsert(['cle' => 'tiers.obligatoire'], ['valeur' => 'false']);
+        \App\Services\Parametres::oublier();
         ExerciceComptable::where('Annee_fiscale', '!=', 2025)->update(['Statut' => 'CLOTURE']);
         ExerciceComptable::where('Annee_fiscale', 2025)->update(['Statut' => 'OUVERT']);
         Sanctum::actingAs(User::factory()->create());

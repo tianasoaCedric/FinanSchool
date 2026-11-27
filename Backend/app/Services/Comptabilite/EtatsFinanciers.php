@@ -674,7 +674,7 @@ class EtatsFinanciers
         $desequilibrees = DB::table('ligne_ecritures')
             ->where('statut', EcritureGuard::STATUT_VALIDE)
             ->groupBy('Id_Mouvement_ecriture')
-            ->havingRaw('ABS(SUM("Debit") - SUM("Credit")) >= ?', [EcritureGuard::TOLERANCE])
+            ->havingRaw('ABS(SUM("Debit") - SUM("Credit")) >= ?', [EcritureGuard::tolerance()])
             ->select('Id_Mouvement_ecriture')
             ->get()->count();
 
@@ -685,7 +685,7 @@ class EtatsFinanciers
             ->selectRaw('COUNT(*) as lignes, COUNT(DISTINCT m."Id_Mouvement_ecriture") as pieces')
             ->first();
 
-        $ok = fn ($a, $b) => abs($a - $b) < EcritureGuard::TOLERANCE;
+        $ok = fn ($a, $b) => abs($a - $b) < EcritureGuard::tolerance();
         return [
             'equilibre_bilan' => ['ok' => $ok($actif, $passif), 'actif' => $actif, 'passif' => $passif, 'ecart' => round($actif - $passif, 2)],
             'resultat' => [

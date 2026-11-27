@@ -1,4 +1,5 @@
 <script setup>
+import { useParametresStore } from '@/stores/parametres';
 import AppLayout from "@/components/template/AppLayout.vue";
 import { API_BASE } from '@/config/api';
 import { ref, computed, onMounted, watch } from 'vue'
@@ -14,17 +15,20 @@ const router = useRouter()
 const route = useRoute()
 const user = ref(null);
 
+const parametresStore = useParametresStore();
+parametresStore.charger();
+// Coordonnées de l'entreprise (écran « Paramètres »), lues au moment de l'export
 const etablissement = {
-  nom: "RAITRA KIDZ",
-  adresse: "Antananarivo, Madagascar",
-  tel: "+261 XX XX XXX XX",
-  email: "contact@raitrakidz.mg"
-}
+  get nom() { return parametresStore.societe.nom; },
+  get adresse() { return parametresStore.societe.adresse; },
+  get tel() { return parametresStore.societe.tel; },
+  get email() { return parametresStore.societe.email; },
+};
 
 const handleNavigation = (item) => { router.push(item.route) }
 
 const grandLivres = ref([])
-const loading = ref(false)
+const loading = ref(true)
 const filters = ref({
   search: '',
   date_debut: '',
@@ -88,9 +92,6 @@ const paginatedGrandLivres = computed(() => {
 
 const totalPages = computed(() => Math.ceil(filteredGrandLivres.value.length / itemsPerPage))
 
-const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
-const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
-const goToPage = (page) => { currentPage.value = page }
 
 const summary = computed(() => {
   if (!isSingleCompte.value || filteredGrandLivres.value.length === 0) {
@@ -157,7 +158,7 @@ function exportGrandLivre() {
   const periodeText = `${filters.value.date_debut || 'Toutes'} à ${filters.value.date_fin || 'Toutes'}`;
   const firstEntry = filteredGrandLivres.value[0] || {};
   const libelleCompte = firstEntry.libelle_compte || '—';
-  const logoBase64 = logoImg;
+  const logoBase64 = parametresStore.get('societe.logo') || logoImg;
 
   const htmlContent = `
     <div style="font-family:'Helvetica',Arial,sans-serif;max-width:900px;padding:0;margin-left:0;">
@@ -363,257 +364,170 @@ const exportToExcel = async () => {
     icon="bi-journal-richtext"
     :title="isSingleCompte ? `Grand livre — compte ${currentCompte}` : 'Grand livre'"
     subtitle="Détail des mouvements du compte"
-    section="Saisie"
+    section="Grand livre"
+    :back="isSingleCompte"
+    back-label="Liste des comptes"
     wide
+    @back="goBack"
   >
-<div class="card card-form">
-        <div class="card-header">
-          <div class="d-flex justify-between items-center">
-            
-            <div class="d-flex gap-2">
-              <UiButton variant="primary" v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportGrandLivre">
-                <i class="bi bi-file-pdf"></i> Exporter PDF
-              </UiButton>
-              <UiButton variant="success" v-if="isSingleCompte && filteredGrandLivres.length > 0" @click="exportToExcel">
-                <i class="bi bi-file-excel"></i> Exporter Excel
-              </UiButton>
-              <UiButton variant="ghost" v-if="isSingleCompte" @click="goBack">
-                <i class="bi bi-arrow-left"></i> Retour à la liste
-              </UiButton>
-            </div>
-          </div>
+    <template v-if="isSingleCompte && filteredGrandLivres.length > 0" #actions>
+      <UiButton icon="bi-file-earmark-spreadsheet" @click="exportToExcel">Excel</UiButton>
+      <UiButton variant="primary" icon="bi-file-earmark-pdf" @click="exportGrandLivre">Exporter en PDF</UiButton>
+    </template>
+
+    <div class="fs-stack">
+      <form class="fs-card fs-filters" aria-label="Filtres" @submit.prevent="applyDateFilter">
+        <div v-if="!isSingleCompte" class="fs-field">
+          <label for="gl-search" class="fs-label">Recherche</label>
+          <input id="gl-search" :value="filters.search" @input="debounceSearch($event.target.value)" type="search" placeholder="Rechercher dans le grand livre…" class="fs-input" />
         </div>
-        <div class="card-body">
-          <!-- Filtre par date -->
-          <div class="filter-section mb-4">
-            <div class="d-flex flex-column md:flex-row gap-3 align-items-end">
-              <div class="form-group flex-1">
-                <label class="form-label">Date de début</label>
-                <input v-model="filters.date_debut" type="date" class="form-input w-full" />
-              </div>
-              <div class="form-group flex-1">
-                <label class="form-label">Date de fin</label>
-                <input v-model="filters.date_fin" type="date" class="form-input w-full" />
-              </div>
-              <div class="form-group">
-                <UiButton variant="primary" @click="applyDateFilter">
-                  <i class="bi bi-funnel"></i> Appliquer
-                </UiButton>
-              </div>
-              <div class="form-group">
-                <UiButton variant="ghost" @click="resetDateFilter">
-                  <i class="bi bi-x-circle"></i> Réinitialiser
-                </UiButton>
-              </div>
-            </div>
-          </div>
+        <div class="fs-field">
+          <label class="fs-label" for="gl-debut">Date de début</label>
+          <input id="gl-debut" v-model="filters.date_debut" type="date" class="fs-input" />
+        </div>
+        <div class="fs-field">
+          <label class="fs-label" for="gl-fin">Date de fin</label>
+          <input id="gl-fin" v-model="filters.date_fin" type="date" class="fs-input" />
+        </div>
+        <div class="fs-filters__actions">
+          <UiButton variant="primary" type="submit" icon="bi-funnel">Appliquer</UiButton>
+          <UiButton variant="ghost" @click="resetDateFilter">Réinitialiser</UiButton>
+        </div>
+      </form>
 
-          <!-- Recherche pour liste complète -->
-          <div v-if="!isSingleCompte" class="mb-4">
-            <div class="form-group">
-              <label for="search" class="form-label">Recherche</label>
-              <div class="search-input-wrapper">
-                <i class="bi bi-search"></i>
-                <input
-                  :value="filters.search"
-                  @input="debounceSearch($event.target.value)"
-                  type="text"
-                  placeholder="Rechercher dans le grand livre..."
-                  class="form-input w-full pl-10"
-                />
-              </div>
-            </div>
-          </div>
+      <section v-if="loading" class="fs-card fs-table-card">
+        <UiSkeleton variant="table" :rows="10" :cols="6" />
+      </section>
 
-          <!-- Affichage pour un compte unique -->
-          <div v-if="isSingleCompte" class="table-container">
-            <div class="table-responsive">
-              <table class="table table-bordered table-striped table-hover">
+      <!-- Un compte -->
+      <section v-else-if="isSingleCompte" class="fs-card fs-table-card">
+        <div class="fs-table-card__head">
+          <h2 class="fs-table-card__title">Mouvements</h2>
+          <span class="fs-table-card__hint">Montants en Ariary</span>
+        </div>
+        <div class="fs-table-wrap">
+          <table class="fs-table gl-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N° pièce</th>
+                <th>Libellé</th>
+                <th class="text-right">Débit</th>
+                <th class="text-right">Crédit</th>
+                <th class="text-right">Solde progressif</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(gl, index) in paginatedGrandLivres" :key="gl.numero_piece + gl.date_mouvement + index" class="detail-row" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
+                <td class="num">{{ formatDate(gl.date_mouvement) }}</td>
+                <td><UiBadge size="sm" :tone="gl.numero_piece === 'REPORT' ? 'info' : 'neutral'">{{ gl.numero_piece }}</UiBadge></td>
+                <td>{{ gl.libelle_ecriture }}</td>
+                <td class="num" :class="getNumberClass(gl.Debit)">{{ formatNumber(gl.Debit) }}</td>
+                <td class="num" :class="getNumberClass(gl.Credit)">{{ formatNumber(gl.Credit) }}</td>
+                <td class="num font-bold" :class="getNumberClass(calculateSoldeProgressif(gl, paginatedGrandLivres))">
+                  {{ formatNumber(calculateSoldeProgressif(gl, paginatedGrandLivres)) }}
+                </td>
+              </tr>
+              <tr v-if="!paginatedGrandLivres.length"><td colspan="6" class="fs-empty">Aucun mouvement sur la période.</td></tr>
+            </tbody>
+            <tfoot v-if="paginatedGrandLivres.length">
+              <tr>
+                <td colspan="3" class="text-right">{{ totalPages > 1 ? 'Totaux de la page' : 'Totaux' }}</td>
+                <td class="num" :class="getNumberClass(paginatedSummary.total_debit)">{{ formatNumber(paginatedSummary.total_debit) }}</td>
+                <td class="num" :class="getNumberClass(paginatedSummary.total_credit)">{{ formatNumber(paginatedSummary.total_credit) }}</td>
+                <td></td>
+              </tr>
+              <tr v-if="totalPages > 1">
+                <td colspan="3" class="text-right">Totaux généraux</td>
+                <td class="num" :class="getNumberClass(summary.total_debit)">{{ formatNumber(summary.total_debit) }}</td>
+                <td class="num" :class="getNumberClass(summary.total_credit)">{{ formatNumber(summary.total_credit) }}</td>
+                <td class="num" :class="getNumberClass(summary.solde)">{{ formatNumber(summary.solde) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <UiPagination v-model="currentPage" :total-pages="totalPages" :total="filteredGrandLivres.length" :per-page="itemsPerPage" />
+      </section>
+
+      <!-- Tous les comptes -->
+      <template v-else>
+        <section v-for="(compteGroup, codeCompte) in groupedGrandLivres" :key="codeCompte" class="fs-card fs-table-card">
+          <div class="fs-table-card__head">
+            <h2 class="fs-table-card__title"><i class="bi bi-folder2-open" aria-hidden="true"></i> {{ codeCompte }} — {{ compteGroup.libelle_compte }}</h2>
+          </div>
+          <div v-for="(sousCompteGroup, codeSousCompte) in compteGroup.sousComptes" :key="codeSousCompte" class="gl-sous-compte">
+            <h3 class="gl-sous-compte__titre">
+              <UiBadge size="sm" tone="primary">{{ codeSousCompte }}</UiBadge> {{ sousCompteGroup.libelle_sous_compte }}
+            </h3>
+            <div class="fs-table-wrap">
+              <table class="fs-table gl-table">
                 <thead>
                   <tr>
-                    <th class="text-sm">Date Mouvement</th>
-                    <th class="text-sm">Numéro Pièce</th>
-                    <th class="text-sm">Libellé Écriture</th>
-                    <th class="text-sm text-right">Débit</th>
-                    <th class="text-sm text-right">Crédit</th>
-                    <th class="text-sm text-right">Solde Progressif</th>
+                    <th>Date</th>
+                    <th>N° pièce</th>
+                    <th>Libellé</th>
+                    <th class="text-right">Débit</th>
+                    <th class="text-right">Crédit</th>
+                    <th class="text-right">Solde progressif</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(gl, index) in paginatedGrandLivres" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
-                    <td>{{ formatDate(gl.date_mouvement) }}</td>
-                    <td>{{ gl.numero_piece }}</td>
+                  <tr v-for="(gl, index) in sousCompteGroup.entries" :key="gl.numero_piece + gl.date_mouvement + index" class="detail-row" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
+                    <td class="num">{{ formatDate(gl.date_mouvement) }}</td>
+                    <td><UiBadge size="sm" :tone="gl.numero_piece === 'REPORT' ? 'info' : 'neutral'">{{ gl.numero_piece }}</UiBadge></td>
                     <td>{{ gl.libelle_ecriture }}</td>
-                    <td class="text-right" :class="getNumberClass(gl.Debit)">{{ formatNumber(gl.Debit) }}</td>
-                    <td class="text-right" :class="getNumberClass(gl.Credit)">{{ formatNumber(gl.Credit) }}</td>
-                    <td class="text-right font-semibold" :class="getNumberClass(calculateSoldeProgressif(gl, paginatedGrandLivres))">
-                      {{ formatNumber(calculateSoldeProgressif(gl, paginatedGrandLivres)) }}
+                    <td class="num" :class="getNumberClass(gl.Debit)">{{ formatNumber(gl.Debit) }}</td>
+                    <td class="num" :class="getNumberClass(gl.Credit)">{{ formatNumber(gl.Credit) }}</td>
+                    <td class="num font-bold" :class="getNumberClass(calculateSoldeProgressif(gl, sousCompteGroup.entries))">
+                      {{ formatNumber(calculateSoldeProgressif(gl, sousCompteGroup.entries)) }}
                     </td>
                   </tr>
                 </tbody>
-                <tfoot class="table-footer">
+                <tfoot>
                   <tr>
-                    <td colspan="3" class="text-right font-bold">TOTAUX :</td>
-                    <td class="text-right font-bold" :class="getNumberClass(paginatedSummary.total_debit)">
-                      {{ formatNumber(paginatedSummary.total_debit) }}
-                    </td>
-                    <td class="text-right font-bold" :class="getNumberClass(paginatedSummary.total_credit)">
-                      {{ formatNumber(paginatedSummary.total_credit) }}
-                    </td>
-                    <td></td>
-                  </tr>
-                  <tr v-if="totalPages > 1">
-                    <td colspan="3" class="text-right font-bold">TOTAUX GÉNÉRAUX:</td>
-                    <td class="text-right font-bold" :class="getNumberClass(summary.total_debit)">
-                      {{ formatNumber(summary.total_debit) }}
-                    </td>
-                    <td class="text-right font-bold" :class="getNumberClass(summary.total_credit)">
-                      {{ formatNumber(summary.total_credit) }}
-                    </td>
-                    <td class="text-right font-bold" :class="getNumberClass(summary.solde)">
-                      {{ formatNumber(summary.solde) }}
-                    </td>
+                    <td colspan="3" class="text-right">Total sous-compte</td>
+                    <td class="num" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).total_debit)">{{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).total_debit) }}</td>
+                    <td class="num" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).total_credit)">{{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).total_credit) }}</td>
+                    <td class="num" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).solde)">{{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).solde) }}</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
           </div>
-
-          <!-- Affichage pour tous les comptes -->
-          <div v-else>
-            <div v-for="(compteGroup, codeCompte) in groupedGrandLivres" :key="codeCompte" class="mb-8 compte-section">
-              <div class="compte-header">
-                <h2 class="compte-title">
-                  <i class="bi bi-folder2-open"></i>
-                  {{ codeCompte }} - {{ compteGroup.libelle_compte }}
-                </h2>
-              </div>
-              <div v-for="(sousCompteGroup, codeSousCompte) in compteGroup.sousComptes" :key="codeSousCompte" class="mb-6 sous-compte-section">
-                <h3 class="sous-compte-title">
-                  <i class="bi bi-file-text"></i>
-                  {{ codeSousCompte }} - {{ sousCompteGroup.libelle_sous_compte }}
-                </h3>
-                <div class="table-container">
-                  <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover">
-                      <thead>
-                        <tr>
-                          <th class="text-sm">Date Mouvement</th>
-                          <th class="text-sm">Numéro Pièce</th>
-                          <th class="text-sm">Libellé Écriture</th>
-                          <th class="text-sm text-right">Débit</th>
-                          <th class="text-sm text-right">Crédit</th>
-                          <th class="text-sm text-right">Solde Progressif</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(gl, index) in sousCompteGroup.entries" :key="gl.numero_piece + gl.date_mouvement + index" class="fade-in" :class="{ 'gl-report': gl.numero_piece === 'REPORT' }">
-                          <td>{{ formatDate(gl.date_mouvement) }}</td>
-                          <td>{{ gl.numero_piece }}</td>
-                          <td>{{ gl.libelle_ecriture }}</td>
-                          <td class="text-right" :class="getNumberClass(gl.Debit)">{{ formatNumber(gl.Debit) }}</td>
-                          <td class="text-right" :class="getNumberClass(gl.Credit)">{{ formatNumber(gl.Credit) }}</td>
-                          <td class="text-right font-semibold" :class="getNumberClass(calculateSoldeProgressif(gl, sousCompteGroup.entries))">
-                            {{ formatNumber(calculateSoldeProgressif(gl, sousCompteGroup.entries)) }}
-                          </td>
-                        </tr>
-                      </tbody>
-                      <tfoot class="table-footer">
-                        <tr>
-                          <td colspan="3" class="text-right font-bold">TOTAL SOUS-COMPTE:</td>
-                          <td class="text-right font-bold" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).total_debit)">
-                            {{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).total_debit) }}
-                          </td>
-                          <td class="text-right font-bold" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).total_credit)">
-                            {{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).total_credit) }}
-                          </td>
-                          <td class="text-right font-bold" :class="getNumberClass(getSousCompteTotal(sousCompteGroup.entries).solde)">
-                            {{ formatNumber(getSousCompteTotal(sousCompteGroup.entries).solde) }}
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pagination -->
-          <div v-if="totalPages > 1" class="pagination-container">
-            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" aria-label="Page précédente" size="sm">
-              <i class="bi bi-chevron-left"></i> Précédent
-            </UiButton>
-            <div class="pagination-pages">
-              <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined" :aria-label="`Page ${page}`">
-                {{ page }}
-              </UiButton>
-            </div>
-            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" aria-label="Page suivante" size="sm">
-              Suivant <i class="bi bi-chevron-right"></i>
-            </UiButton>
-          </div>
-
-          <!-- Messages -->
-          <div v-if="filteredGrandLivres.length === 0 && !loading" class="empty-state">
-            <i class="bi bi-inbox"></i>
-            <p>Aucune donnée disponible.</p>
-          </div>
-          <div v-if="loading" class="loading-state">
-            <div class="spinner"></div>
-            <p>Chargement des données...</p>
-          </div>
-        </div>
-        
-      </div>
+        </section>
+        <section v-if="filteredGrandLivres.length" class="fs-card">
+          <UiPagination v-model="currentPage" :total-pages="totalPages" :total="filteredGrandLivres.length" :per-page="itemsPerPage" />
+        </section>
+        <section v-else class="fs-card">
+          <p class="fs-empty"><i class="bi bi-inbox" aria-hidden="true"></i> Aucune donnée disponible.</p>
+        </section>
+      </template>
+    </div>
   </AppLayout>
 </template>
-
 
 <style scoped>
 /* Ligne « Report à nouveau » (solde d'ouverture du compte) */
 .gl-report td { font-weight: 600; font-style: italic; background: var(--fs-row-subtitle, var(--fs-surface-2)); }
-.dashboard-container {
+.gl-table tfoot td {
+  padding: 12px 16px;
+  background: var(--fs-row-total);
+  color: var(--fs-text);
+  font-weight: 700;
+  border-top: 1px solid var(--fs-border-strong);
+}
+.gl-sous-compte + .gl-sous-compte { border-top: 1px solid var(--fs-border); }
+.gl-sous-compte__titre {
   display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 20px;
+  font-size: var(--fs-text-base);
+  font-weight: 600;
+  color: var(--fs-text);
   background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
 }
-
-.table-container {
-  margin-top: 20px;
-}
-
-.stat-card {
-  background: var(--fs-surface);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 1rem;
-  color: var(--fs-muted);
-  margin-bottom: 8px;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-}
+.fs-table-card__title .bi { color: var(--fs-muted); margin-right: 6px; }
+.fs-card > .fs-empty { margin: 0; text-align: center; padding: 48px 16px; color: var(--fs-muted); }
 </style>

@@ -263,7 +263,7 @@ class IntegriteEcrituresTest extends TestCase
 
         $this->post('/api/ecritures/import', ['file_ecritures' => UploadedFile::fake()->createWithContent('import.csv', $csv)], ['Accept' => 'application/json'])
             ->assertStatus(422)
-            ->assertJsonFragment(['message' => "Aucune donnée n'a été importée"]);
+            ->assertJsonFragment(['message' => "1 erreur(s) : aucune écriture n'a été importée."]);
 
         $this->assertSame($avant, MouvementEcriture::count());
     }

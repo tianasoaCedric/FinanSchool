@@ -46,6 +46,18 @@
   --fs-font: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fs-sidebar-w: 278px;
 
+  /* ---- Échelle typographique unique (écran) ----
+     xs : libellés, en-têtes de tableau · sm : aides, métadonnées
+     base : texte courant, champs, cellules · md : titres de carte
+     lg : titres de modale / section · xl : titre de page · 2xl : chiffres clés */
+  --fs-text-xs: 12px;
+  --fs-text-sm: 13px;
+  --fs-text-base: 14px;
+  --fs-text-md: 15px;
+  --fs-text-lg: 18px;
+  --fs-text-xl: 24px;
+  --fs-text-2xl: 28px;
+
   /* ---- Variables historiques de style.css, rebranchées sur le thème ---- */
   --primary-color: var(--fs-primary);
   --primary-dark: var(--fs-primary-hover);
@@ -648,6 +660,8 @@
   font-size: 14px;
   line-height: 1.45;
 }
+.fs-alert--warning { background: var(--fs-warning-soft); color: var(--fs-warning); }
+.fs-alert--info { background: var(--fs-primary-soft); color: var(--fs-primary-text); }
 .fs-alert--error { background: var(--fs-negative-soft); color: var(--fs-negative); }
 .fs-alert--success { background: var(--fs-success-soft); color: var(--fs-success); }
 .fs-code { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
@@ -666,3 +680,128 @@
 .fs-steps span.is-done { background: var(--fs-primary); }
 .fs-success-box { text-align: center; margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .fs-success-box .bi { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: var(--fs-success-soft); color: var(--fs-success); font-size: 28px; }
+
+/* =====================================================================
+   Uniformisation (typographie, formulaires de modale, tableaux,
+   alignement badges / boutons, animations)
+   ===================================================================== */
+
+/* Taille de texte de base du contenu */
+.fs-content { font-size: var(--fs-text-base); line-height: 1.5; }
+.fs-content p { font-size: inherit; }
+.fs-content .form-label, .fs-form-label { font-size: var(--fs-text-sm); font-weight: 500; color: var(--fs-text-2); }
+.fs-content .form-label.required::after, .ui-form label.required::after { content: " *"; color: var(--fs-negative); }
+.fs-content .table th, .fs-table thead th { font-size: var(--fs-text-xs); }
+.fs-content .table td { font-size: var(--fs-text-base); }
+.fs-content .text-xs { font-size: var(--fs-text-xs); }
+.fs-content .text-sm { font-size: var(--fs-text-sm); }
+.fs-content .card-title { font-size: var(--fs-text-md); }
+
+/* Champs : même hauteur partout (40px), textarea libre */
+.fs-content .form-input,
+.fs-content .form-select,
+.fs-content .form-control:not(textarea),
+.fs-content input[type="text"],
+.fs-content input[type="number"],
+.fs-content input[type="email"],
+.fs-content input[type="password"],
+.fs-content input[type="date"],
+.fs-content input[type="month"],
+.fs-content input[type="search"],
+.fs-content select:not([multiple]),
+.ui-modal input[type="text"], .ui-modal input[type="number"], .ui-modal input[type="date"],
+.ui-modal input[type="email"], .ui-modal input[type="password"], .ui-modal select:not([multiple]) {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: var(--fs-text-base);
+  line-height: 38px;
+}
+.fs-content textarea, .ui-modal textarea { padding: 10px 12px; font-size: var(--fs-text-base); line-height: 1.5; }
+.fs-content input[type="checkbox"], .fs-content input[type="radio"] { min-height: 0; accent-color: var(--fs-primary); }
+
+/* Formulaire dans une modale : grille 1 ou 2 colonnes, libellés au-dessus */
+.ui-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px 18px; }
+.ui-form--1 { grid-template-columns: 1fr; }
+.ui-form > .form-group, .ui-form .ui-field { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.ui-form .ui-field--full, .ui-form > .form-group--full { grid-column: 1 / -1; }
+.ui-form label { font-size: var(--fs-text-sm); font-weight: 500; color: var(--fs-text-2); }
+.ui-form .ui-help { font-size: var(--fs-text-xs); color: var(--fs-muted); }
+.ui-modal .form-input, .ui-modal .form-select, .ui-modal input, .ui-modal select, .ui-modal textarea {
+  width: 100%;
+  background-color: var(--fs-surface);
+  border: 1px solid var(--fs-border-strong);
+  border-radius: var(--fs-radius-sm);
+  color: var(--fs-text);
+  font-family: var(--fs-font);
+}
+.ui-modal input[type="checkbox"], .ui-modal input[type="radio"] { width: auto; min-height: 0; accent-color: var(--fs-primary); }
+.ui-modal input:focus, .ui-modal select:focus, .ui-modal textarea:focus { outline: none; border-color: var(--fs-primary); box-shadow: 0 0 0 3px var(--fs-primary-soft); }
+.ui-modal input[readonly], .ui-modal input:disabled, .ui-modal select:disabled { background-color: var(--fs-surface-2); color: var(--fs-muted); }
+.ui-modal__message { margin: 0; font-size: var(--fs-text-md); color: var(--fs-text-2); }
+
+/* Tableaux : une cellule d'actions ne casse plus la ligne (td.d-flex),
+   boutons et badges alignés verticalement et espacés régulièrement */
+.fs-content td.d-flex, .fs-content td.flex { display: table-cell; }
+.fs-content td .ui-btn, .fs-content td .ui-badge, .fs-table td .ui-btn, .fs-table td .ui-badge { vertical-align: middle; }
+.fs-content td > .ui-btn + .ui-btn,
+.fs-content td > .ui-badge + .ui-btn,
+.fs-content td > .ui-btn + .ui-badge,
+.fs-content td > .ui-badge + .ui-badge { margin-left: 6px; }
+.fs-content td.actions, .fs-content th.actions, .fs-table td.actions, .fs-table th.actions { text-align: right; white-space: nowrap; width: 1%; }
+.fs-row-actions { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.fs-content .table td { vertical-align: middle; }
+
+/* Barres d'outils : badges et boutons sur une même ligne médiane */
+.fs-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fs-actions > .ui-badge, .fs-inline > .ui-badge { align-self: center; }
+
+/* Pagination dans une carte tableau : collée au bas du tableau */
+.fs-content .table-container + .ui-pag,
+.fs-table-card .ui-pag { margin-top: 0; }
+.fs-content .table-container { overflow: auto; }
+
+/* Animation d'entrée du contenu de page */
+.fs-content { animation: fs-enter 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.fs-content .table tbody tr, .fs-table tbody tr { animation: fs-row-in 0.25s ease both; }
+@keyframes fs-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes fs-row-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Barre de progression de navigation / requêtes (AppLayout) */
+.fs-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 10001;
+  pointer-events: none;
+  overflow: hidden;
+}
+.fs-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--fs-primary), transparent);
+  animation: fs-progress 1.1s ease-in-out infinite;
+}
+@keyframes fs-progress { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-content, .fs-content .table tbody tr, .fs-table tbody tr { animation: none; }
+  .fs-progress::before { animation-duration: 2.5s; }
+}
+
+/* Message global « action non autorisée » (AppLayout) */
+.fs-acces-refuse {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 1200;
+  display: inline-flex; align-items: center; gap: 10px; max-width: calc(100vw - 32px);
+  padding: 10px 10px 10px 16px; border-radius: 10px; box-shadow: var(--fs-shadow-lg);
+  background: var(--fs-text); color: var(--fs-surface); font-size: var(--fs-text-sm); font-weight: 500;
+}
+.fs-acces-refuse .bi-lock-fill { color: var(--fs-warning); }
+.fs-acces-refuse button {
+  display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 6px;
+  background: transparent; color: inherit; cursor: pointer; opacity: 0.7;
+}
+.fs-acces-refuse button:hover { opacity: 1; background: rgba(255, 255, 255, 0.12); }

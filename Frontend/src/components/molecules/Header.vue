@@ -31,49 +31,55 @@
           icon-only
           icon="bi-bell"
           class="hd-notif-btn"
-          aria-label="Notifications"
+          :class="{ 'is-ringing': cloche }"
+          :aria-label="nonLues ? `Notifications, ${nonLues} non lue(s)` : 'Notifications'"
           :aria-expanded="showNotifications"
-          @click="showNotifications = !showNotifications; showProfile = false"
+          @click="basculerNotifications"
         >
-          <span v-if="unreadCount > 0" class="hd-badge">{{ unreadCount }}</span>
+          <span v-if="nonLues > 0" class="hd-badge" :class="{ 'hd-badge--urgent': urgentes > 0 }">{{ nonLues > 99 ? '99+' : nonLues }}</span>
         </UiButton>
 
-        <div v-show="showNotifications" class="hd-dropdown hd-dropdown--notif">
-          <div class="hd-dropdown-head">
-            <h3>Notifications</h3>
-            <UiButton v-if="unreadCount > 0" variant="link" size="sm" @click="markAllAsRead">Tout marquer comme lu</UiButton>
-          </div>
-          <div class="hd-notif-list">
-            <p v-if="notifications.length === 0" class="hd-empty">
-              <i class="bi bi-bell-slash"></i> Aucune notification
-            </p>
-            <div
-              v-for="notification in notifications"
-              :key="notification.id"
-              class="hd-notif"
-              :class="{ 'is-unread': notification.statut !== 'lu' }"
-              @click="handleNotificationClick(notification)"
-            >
-              <div class="hd-notif-icon" :style="getNotificationStyle(notification)">
-                <i :class="['bi', getNotificationIcon(notification)]"></i>
-              </div>
-              <div class="hd-notif-body">
-                <p class="hd-notif-title">{{ notification.titre || notification.title }}</p>
-                <p class="hd-notif-msg">{{ notification.message }}</p>
-                <p class="hd-notif-date">{{ formatDate(notification.created_at) }}</p>
-              </div>
-              <UiButton
-                variant="ghost"
-                size="sm"
-                icon-only
-                icon="bi-x-lg"
-                class="hd-notif-close"
-                aria-label="Retirer de la liste"
-                title="Retirer de la liste"
-                @click.stop="removeFromList(notification.id)"
-              />
+        <div v-show="showNotifications" class="hd-dropdown hd-dropdown--notif" role="dialog" aria-label="Notifications">
+          <div class="hd-notif-head">
+            <div>
+              <h3>Notifications</h3>
+              <p>{{ nonLues ? `${nonLues} non lue(s)` : 'Tout est lu' }}</p>
             </div>
+            <UiButton v-if="nonLues > 0" variant="ghost" size="sm" icon="bi-check2-all" @click="toutLireMenu">Tout lire</UiButton>
           </div>
+
+          <div class="hd-notif-tabs" role="tablist">
+            <button type="button" role="tab" :aria-selected="ongletNotif === 'tous'" :class="{ 'is-active': ongletNotif === 'tous' }" @click="ongletNotif = 'tous'">Toutes</button>
+            <button type="button" role="tab" :aria-selected="ongletNotif === 'non_lu'" :class="{ 'is-active': ongletNotif === 'non_lu' }" @click="ongletNotif = 'non_lu'">
+              Non lues <span v-if="nonLues">{{ nonLues }}</span>
+            </button>
+          </div>
+
+          <div class="hd-notif-list">
+            <div v-if="!notifEtat.charge" class="hd-notif-loading"><UiSkeleton :rows="3" /></div>
+            <div v-else-if="!groupesNotif.length" class="hd-notif-empty">
+              <span><i :class="['bi', ongletNotif === 'non_lu' ? 'bi-check2-circle' : 'bi-bell-slash']"></i></span>
+              <p>{{ ongletNotif === 'non_lu' ? 'Vous êtes à jour' : 'Aucune notification' }}</p>
+              <small>{{ ongletNotif === 'non_lu' ? 'Aucune notification non lue.' : 'Les imports, alertes de clôture et contrôles apparaîtront ici.' }}</small>
+            </div>
+            <template v-else>
+              <section v-for="g in groupesNotif" :key="g.titre" class="hd-notif-group">
+                <h4>{{ g.titre }}</h4>
+                <NotificationItem
+                  v-for="n in g.items"
+                  :key="n.id"
+                  :n="n"
+                  compact
+                  @ouvert="showNotifications = false"
+                  @supprimer="supprimerNotif"
+                />
+              </section>
+            </template>
+          </div>
+
+          <router-link to="/notifications" class="hd-notif-foot" @click="showNotifications = false">
+            Voir toutes les notifications <i class="bi bi-arrow-right"></i>
+          </router-link>
         </div>
       </div>
 
@@ -98,6 +104,12 @@
               <p class="hd-profile-card-mail">{{ user?.email || '' }}</p>
             </div>
           </div>
+          <router-link :to="{ path: '/reglages', query: { section: 'profil' } }" class="hd-menu-item" @click="showProfile = false">
+            <i class="bi bi-person-circle"></i> Mon profil
+          </router-link>
+          <router-link to="/reglages" class="hd-menu-item" @click="showProfile = false">
+            <i class="bi bi-gear"></i> Paramètres
+          </router-link>
           <button type="button" class="hd-menu-item hd-menu-item--danger" @click="handleLogout">
             <i class="bi bi-box-arrow-right"></i> Déconnexion
           </button>
@@ -108,9 +120,9 @@
 </template>
 
 <script>
-import { API_BASE } from '@/config/api';
-import axios from "axios"
 import { useTheme } from '@/composables/useTheme';
+import { grouper, useCentreNotifications } from '@/composables/useCentreNotifications';
+import NotificationItem from '@/components/molecules/notifications/NotificationItem.vue';
 
 export default {
   name: 'AppHeader',
@@ -120,29 +132,45 @@ export default {
       default: () => ({ name: 'Utilisateur', email: 'email@example.com' })
     }
   },
+  components: { NotificationItem },
   setup() {
     const { theme, toggleTheme } = useTheme();
-    return { theme, toggleTheme };
+    const centre = useCentreNotifications();
+    return { theme, toggleTheme, centre, notifEtat: centre.etat, nonLues: centre.nonLues, urgentes: centre.urgentes };
   },
   data() {
     return {
       searchQuery: '',
       showNotifications: false,
       showProfile: false,
-      notifications: []
+      ongletNotif: 'tous',
+      cloche: false,
     }
   },
   computed: {
-    unreadCount() {
-      return this.notifications.filter(n => n.statut !== 'lu').length
+    groupesNotif() {
+      const liste = this.notifEtat.recentes.filter(n => this.ongletNotif === 'tous' || n.statut !== 'lu')
+      return grouper(liste)
+    }
+  },
+  watch: {
+    // Petite animation de la cloche à l'arrivée d'une notification
+    'notifEtat.nouvelles'(n, avant) {
+      if (n > avant) {
+        this.cloche = true
+        setTimeout(() => { this.cloche = false }, 1200)
+      }
     }
   },
   mounted() {
-    this.fetchNotifications()
+    this.centre.demarrer()
     document.addEventListener('click', this.onDocumentClick)
+    document.addEventListener('keydown', this.onKeydown)
   },
   beforeUnmount() {
+    this.centre.arreter()
     document.removeEventListener('click', this.onDocumentClick)
+    document.removeEventListener('keydown', this.onKeydown)
   },
   methods: {
     // Ferme les menus déroulants quand on clique ailleurs
@@ -157,61 +185,30 @@ export default {
         ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
         : 'U'
     },
-    async fetchNotifications() {
-      try {
-        const { data } = await axios.get(`${API_BASE}/notifications`)
-        this.notifications = data
-      } catch (err) {
-        // Optionnel : toasts ou erreur console
+    onKeydown(event) {
+      if (event.key === 'Escape') {
+        this.showNotifications = false
+        this.showProfile = false
       }
     },
-    getNotificationIcon(notification) {
-      return notification.niveau_urgence?.icone || 'bi-info-circle-fill'
-    },
-    getNotificationStyle(notification) {
-      return {
-        background: notification.niveau_urgence?.couleur || '#dbeafe',
-        color: '#1e293b'
+    basculerNotifications() {
+      this.showNotifications = !this.showNotifications
+      this.showProfile = false
+      if (this.showNotifications) {
+        this.centre.rafraichir()
+        this.notifEtat.nouvelles = 0
       }
     },
-    formatDate(dateString) {
-      return new Date(dateString).toLocaleString('fr-FR')
+    async toutLireMenu() {
+      await this.centre.toutLire()
     },
-    async markAsRead(id) {
-      const notif = this.notifications.find(n => n.id === id)
-      if (notif && notif.statut !== 'lu') {
-        try {
-          await axios.patch(`${API_BASE}/notifications/${id}/read`)
-          notif.statut = 'lu'
-        } catch (err) {
-          // Optionnel : toast/alerte
-        }
-      }
-    },
-    async markAllAsRead() {
-      const unreadIds = this.notifications.filter(n => n.statut !== 'lu').map(n => n.id)
-      await Promise.all(unreadIds.map(id => this.markAsRead(id)))
-    },
-    async handleNotificationClick(notification) {
-      await this.markAsRead(notification.id)
-      const url = notification.redirect_url ||
-                  notification.lien_redirection ||
-                  notification.evenement?.donnees_evenement?.lien_redirection
-      if (url) {
-        if (this.$router && url.startsWith('/')) {
-          this.$router.push(url)
-        } else {
-          window.location.href = url
-        }
-      }
+    async supprimerNotif(n) {
+      await this.centre.supprimer(n)
     },
     handleLogout() {
       localStorage.removeItem("token");
       this.$router.push("/")
     },
-    removeFromList(id) {
-      this.notifications = this.notifications.filter(n => n.id !== id)
-    }
   }
 }
 </script>
@@ -278,6 +275,7 @@ export default {
 
 .hd-profile:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: 2px; }
 .hd-notif-btn { position: relative; font-size: 17px; }
+.hd-badge--urgent { background: var(--fs-negative, #dc2626) !important; }
 .hd-badge {
   position: absolute;
   top: 4px;
@@ -286,7 +284,7 @@ export default {
   height: 17px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #ef4444;
+  background: var(--fs-primary, #1c45bd);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -338,57 +336,59 @@ export default {
   box-shadow: 0 20px 40px -16px rgba(15, 23, 42, 0.3);
   overflow: hidden;
 }
-.hd-dropdown--notif { width: 380px; }
+.hd-dropdown--notif { width: 400px; display: flex; flex-direction: column; max-height: min(620px, calc(100vh - 100px)); }
 .hd-dropdown--profile { width: 280px; padding: 8px; }
 
-.hd-dropdown-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--hd-border);
+/* Notifications */
+.hd-notif-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 16px 10px; }
+.hd-notif-head h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--hd-text); }
+.hd-notif-head p { margin: 2px 0 0; font-size: 12px; color: var(--hd-muted); }
+.hd-notif-tabs { display: flex; gap: 16px; padding: 0 16px; border-bottom: 1px solid var(--hd-border); }
+.hd-notif-tabs button {
+  position: relative; display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 0 10px; border: 0; background: none; cursor: pointer;
+  font: 500 13px inherit; font-family: inherit; color: var(--hd-muted);
 }
-.hd-dropdown-head h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--hd-text); }
+.hd-notif-tabs button span {
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; line-height: 18px; text-align: center;
+  background: var(--hd-primary-soft); color: var(--fs-primary-text, #1c45bd); font-size: 11px; font-weight: 600;
+}
+.hd-notif-tabs button.is-active { color: var(--hd-text); }
+.hd-notif-tabs button.is-active::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--hd-primary);
+}
+.hd-notif-tabs button:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: 2px; border-radius: 4px; }
+.hd-notif-list { flex: 1; overflow-y: auto; padding: 4px 6px 6px; overscroll-behavior: contain; }
+.hd-notif-loading { padding: 14px 10px; }
+.hd-notif-group h4 {
+  margin: 0; padding: 12px 10px 4px; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--hd-muted);
+}
+.hd-notif-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 40px 24px; text-align: center; }
+.hd-notif-empty span {
+  display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 8px; border-radius: 50%;
+  background: var(--hd-bg-2); color: var(--hd-muted); font-size: 22px;
+}
+.hd-notif-empty p { margin: 0; font-size: 14px; font-weight: 600; color: var(--hd-text); }
+.hd-notif-empty small { font-size: 12.5px; color: var(--hd-muted); max-width: 260px; }
+.hd-notif-foot {
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px;
+  border-top: 1px solid var(--hd-border); color: var(--fs-primary-text, #1c45bd);
+  font-size: 13px; font-weight: 500; text-decoration: none;
+}
+.hd-notif-foot:hover { background: var(--hd-bg-2); }
+.hd-notif-foot:focus-visible { outline: 2px solid var(--hd-primary); outline-offset: -2px; }
 
-.hd-notif-list { max-height: 420px; overflow-y: auto; }
-.hd-empty { margin: 0; padding: 32px 16px; text-align: center; color: var(--hd-muted); font-size: 14px; }
-.hd-empty .bi { display: block; font-size: 22px; margin-bottom: 6px; }
-.hd-notif {
-  position: relative;
-  display: flex;
-  gap: 12px;
-  padding: 12px 36px 12px 16px;
-  border-bottom: 1px solid var(--hd-border);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-.hd-notif:last-child { border-bottom: 0; }
-.hd-notif:hover { background: var(--hd-bg-2); }
-.hd-notif.is-unread { background: var(--hd-primary-soft); }
-.hd-notif.is-unread::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-  border-radius: 50%;
-  background: var(--hd-primary);
-}
-.hd-notif-icon { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; }
-.hd-notif-body { min-width: 0; }
-.hd-notif-title { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; color: var(--hd-text); }
-.hd-notif-msg { margin: 0 0 4px; font-size: 13px; color: var(--hd-text-2); line-height: 1.4; }
-.hd-notif-date { margin: 0; font-size: 12px; color: var(--hd-muted); }
-/* Le style visuel vient de UiButton ; ici seulement la position et l'apparition au survol */
-.hd-notif-close { position: absolute; top: 6px; right: 6px; opacity: 0; }
-.hd-notif:hover .hd-notif-close, .hd-notif-close:focus-visible { opacity: 1; }
+/* Cloche : légère oscillation à l'arrivée d'une notification */
+.hd-notif-btn.is-ringing :deep(.bi-bell) { animation: hd-ring 0.9s ease; transform-origin: 50% 10%; }
+@keyframes hd-ring { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(14deg); } 40% { transform: rotate(-12deg); } 60% { transform: rotate(8deg); } 80% { transform: rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .hd-notif-btn.is-ringing :deep(.bi-bell) { animation: none; } }
 
 .hd-profile-card { display: flex; align-items: center; gap: 12px; padding: 10px 10px 14px; border-bottom: 1px solid var(--hd-border); margin-bottom: 6px; }
 .hd-profile-card-name { margin: 0; font-size: 14px; font-weight: 600; color: var(--hd-text); }
 .hd-profile-card-mail { margin: 2px 0 0; font-size: 12.5px; color: var(--hd-muted); word-break: break-all; }
 .hd-menu-item {
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 10px;

@@ -136,7 +136,7 @@ class LigneEcritureController extends Controller
                 $mouvement->date_formatted = $mouvement->Date_mouvement
                     ? \Carbon\Carbon::parse($mouvement->Date_mouvement)->format('D j M Y')
                     : null;
-                $mouvement->is_equilibre = $difference < EcritureGuard::TOLERANCE && $totalDebit > 0;
+                $mouvement->is_equilibre = $difference < EcritureGuard::tolerance() && $totalDebit > 0;
                 $mouvement->is_valide = $this->isMouvementValide($mouvement);
                 // Motif empêchant la validation (null si la pièce est validable)
                 $mouvement->motif_non_validable = $mouvement->is_valide
@@ -225,7 +225,7 @@ class LigneEcritureController extends Controller
         $totalCredit = $mouvement->lignes->sum('Credit');
         $solde = round($totalDebit - $totalCredit, 2);
 
-        if (abs($solde) < EcritureGuard::TOLERANCE) {
+        if (abs($solde) < EcritureGuard::tolerance()) {
             return response()->json(['error' => 'Le mouvement est déjà équilibré.'], 400);
         }
 
@@ -453,7 +453,7 @@ class LigneEcritureController extends Controller
                     })
                     ->count(),
                 'mouvements_non_equilibres' => $piecesEnAttente
-                    ->filter(fn ($m) => abs($m->lignes->sum('Debit') - $m->lignes->sum('Credit')) >= EcritureGuard::TOLERANCE)
+                    ->filter(fn ($m) => abs($m->lignes->sum('Debit') - $m->lignes->sum('Credit')) >= EcritureGuard::tolerance())
                     ->count(),
                 'pieces_en_attente' => $piecesEnAttente->count(),
                 'pieces_validables' => $piecesValidables->count(),

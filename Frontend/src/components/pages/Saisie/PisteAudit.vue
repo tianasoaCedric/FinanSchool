@@ -37,7 +37,7 @@
         <h2 class="fs-table-card__title">{{ resultat.total ?? 0 }} action(s)</h2>
         <span class="fs-table-card__hint">Lecture seule — cliquez sur une ligne pour voir le détail</span>
       </div>
-      <div v-if="chargement" class="fs-skeleton"><div v-for="n in 8" :key="n" class="fs-skeleton__row"></div></div>
+      <UiSkeleton v-if="chargement" variant="table" :rows="8" :cols="5" />
       <div v-else class="fs-table-wrap">
         <table class="fs-table">
           <thead>
@@ -100,11 +100,13 @@
           </tbody>
         </table>
       </div>
-      <div v-if="resultat.last_page > 1" class="pa-pagination">
-        <UiButton variant="ghost" size="sm" icon="bi-chevron-left" :disabled="resultat.current_page <= 1" @click="charger(resultat.current_page - 1)">Précédent</UiButton>
-        <span>Page {{ resultat.current_page }} / {{ resultat.last_page }}</span>
-        <UiButton variant="ghost" size="sm" icon-right="bi-chevron-right" :disabled="resultat.current_page >= resultat.last_page" @click="charger(resultat.current_page + 1)">Suivant</UiButton>
-      </div>
+      <UiPagination
+        :model-value="resultat.current_page || 1"
+        :total-pages="resultat.last_page || 1"
+        :total="resultat.total"
+        :per-page="resultat.per_page"
+        @update:model-value="charger"
+      />
     </section>
   </AppLayout>
 </template>
@@ -114,6 +116,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { API_BASE } from '@/config/api';
+import { useParametresStore } from '@/stores/parametres';
 import { getUser } from '@/services/Auth';
 import AppLayout from '@/components/template/AppLayout.vue';
 
@@ -199,7 +202,7 @@ async function charger(page = 1) {
   chargement.value = true;
   ouvert.value = null;
   try {
-    const params = { page, per_page: 50 };
+    const params = { page, per_page: (await useParametresStore().charger())['affichage.lignes_par_page'] };
     for (const k of ['q', 'action', 'user_id', 'date_debut', 'date_fin', 'objet_type', 'objet_id']) {
       if (filtres[k]) params[k] = filtres[k];
     }

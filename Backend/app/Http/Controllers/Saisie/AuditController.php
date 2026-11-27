@@ -51,7 +51,7 @@ class AuditController extends Controller
         }
 
         $page = $query->orderByDesc('date_action')->orderByDesc('id')
-            ->paginate($request->input('per_page', 50));
+            ->paginate($request->input('per_page', \App\Services\Parametres::get('affichage.lignes_par_page')));
 
         $page->getCollection()->transform(fn ($e) => [
             'id' => $e->id,

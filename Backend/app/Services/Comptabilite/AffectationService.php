@@ -54,7 +54,7 @@ class AffectationService
         return [
             'exercice' => $exercice->Annee_fiscale,
             'resultat' => $resultat,
-            'compte_resultat' => $benefice ? '120000' : '129000',
+            'compte_resultat' => \App\Services\Parametres::get($benefice ? 'systeme.compte_resultat_benefice' : 'systeme.compte_resultat_perte'),
             'destinations' => $motif && !$exercice->isClotureDefinitive() ? [] : collect($this->destinations($benefice))
                 ->map(fn ($c) => ['code' => $c->Code_sous_compte, 'libelle' => $c->Libelle])->values()->all(),
             'exercice_suivant' => $suivant ? [
@@ -100,7 +100,7 @@ class AffectationService
         }
         $total = round($lignes->sum('montant'), 2);
         $attendu = round(abs($prep['resultat']), 2);
-        if ($lignes->isEmpty() || abs($total - $attendu) >= EcritureGuard::TOLERANCE) {
+        if ($lignes->isEmpty() || abs($total - $attendu) >= EcritureGuard::tolerance()) {
             $this->refuser(sprintf('La répartition (%s) doit égaler le résultat à affecter (%s).',
                 number_format($total, 2, ',', ' '), number_format($attendu, 2, ',', ' ')));
         }

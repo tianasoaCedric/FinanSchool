@@ -8,6 +8,7 @@ use App\Models\Saisie\LigneEcriture; // ← Adapter le namespace si besoin
 use App\Models\notifications\Evenement;
 use App\Models\notifications\Notification;
 use App\Events\NotificationCreee;
+use App\Services\Parametres;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -18,19 +19,32 @@ class NotifClotureExerciceProche extends Command
 
     public function handle()
     {
+        if (!Parametres::get('notifications.cloture_active')) {
+            $this->info('Alertes de clôture désactivées dans les paramètres.');
+            return 0;
+        }
+
         // Récupérer tous les exercices ouverts
         $exercices = ExerciceComptable::where('Statut', 'OUVERT')->get();
         $now = Carbon::now();
 
+        // Jalons (jours avant la clôture) définis dans les paramètres ;
+        // l'urgence croît à mesure que la clôture approche (1 = faible, 3 = forte).
+        $jours = Parametres::get('notifications.cloture_jalons');
+        rsort($jours);
+        $jalons = array_map(fn ($d, $i) => [
+            'diff' => $d,
+            'message' => match (true) {
+                $d === 1 => 'demain',
+                $d === 7 => 'dans une semaine',
+                $d === 30 => 'dans un mois',
+                default => "dans {$d} jours",
+            },
+            'urgence' => min(3, max(1, 3 - (count($jours) - 1 - $i))),
+        ], $jours, array_keys($jours));
+
         foreach ($exercices as $exercice) {
             $dateCloture = Carbon::parse($exercice->Date_fin);
-
-            // Jalons : 1 mois (pour test 45j), 1 semaine, 1 jour
-            $jalons = [
-                ['diff' => 30, 'message' => 'dans un mois', 'urgence' => 1],
-                ['diff' => 7,  'message' => 'dans une semaine', 'urgence' => 2],
-                ['diff' => 1,  'message' => 'demain', 'urgence' => 3]
-            ];
 
             foreach ($jalons as $j) {
                 // Vérifier si aujourd'hui correspond au jalon
@@ -55,7 +69,7 @@ class NotifClotureExerciceProche extends Command
                                 'date_cloture' => $dateCloture->toDateString(),
                                 'exercice_id' => $exercice->Id_Exercice_comptable,
                                 'annee_fiscale' => $exercice->Annee_fiscale,
-                                'lien_redirection' => 'http://localhost:5173/ecritures-a-valider'
+                                'lien_redirection' => '/validation'
                             ]
                         ]);
 

@@ -3,89 +3,83 @@
     :user="user"
     icon="bi-journal-text"
     title="Écritures du journal"
-    subtitle="Mouvements enregistrés dans ce journal"
-    section="Saisie"
+    subtitle="Mouvements validés enregistrés dans ce journal"
+    section="Journaux"
+    back
+    back-label="Journaux"
     wide
+    @back="goBack"
   >
-<div class="card card-form">
-        <div class="p-6">
-          
-          <br>
+    <template #actions>
+      <UiButton icon="bi-file-earmark-spreadsheet" @click="exportToExcel">Excel</UiButton>
+      <UiButton variant="primary" icon="bi-file-earmark-pdf" @click="exportToPDF">Exporter en PDF</UiButton>
+    </template>
 
-          <!-- Bouton Retour -->
-          <div class="mb-4">
-            <UiButton @click="goBack">Retour aux Journaux</UiButton>
-          </div>
-          <br>
-
-          <!-- Filtre par date -->
-          <div class="filter-container mb-6">
-            <h2 class="text-xl mb-4">Filtrer les écritures</h2>
-            <form @submit.prevent="applyDateFilter" class="d-flex gap-4">
-              <div class="form-group">
-                <label class="form-label">Date de début</label>
-                <input v-model="dateFilter.date_debut" type="date" class="form-input" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Date de fin</label>
-                <input v-model="dateFilter.date_fin" type="date" class="form-input" />
-              </div>
-              <UiButton variant="primary" type="submit">Appliquer</UiButton>
-              <UiButton @click="resetDateFilter">Réinitialiser</UiButton>
-            </form>
-          </div>
-
-          <!-- Boutons d'exportation -->
-          <div class="export-container mb-6 d-flex gap-4">
-            <UiButton variant="primary" @click="exportToPDF">Exporter en PDF</UiButton>
-            <UiButton variant="primary" @click="exportToExcel">Exporter en Excel</UiButton>
-          </div>
-
-          <!-- Tableau des écritures -->
-          <div class="table-container mt-6">
-            <table class="table table-bordered table-striped w-full">
-              <thead>
-                <tr>
-                  <th class="text-base p-4">Date Mouvement</th>
-                  <th class="text-base p-4">N° Pièce</th>
-                  <th class="text-base p-4">Compte</th>
-                  <th class="text-base p-4">Libellé</th>
-                  <th class="text-base p-4">Référence</th>
-                  <th class="text-base p-4">Mode Paiement</th>
-                  <th class="text-base p-4" style="width: 120px;">Débit</th>
-                  <th class="text-base p-4" style="width: 120px;">Crédit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="ecriture in ecritures" :key="ecriture.Id_Ligne_ecriture">
-                  <td class="p-4 text-base" style="font-size:12px;">{{ ecriture.mouvement ? new Date(ecriture.mouvement.Date_mouvement).toLocaleDateString('fr-FR') : '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:10px; width: 110px;">{{ ecriture.mouvement ? ecriture.mouvement.Numero_piece : '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px;">{{ ecriture.sous_compte ? `${ecriture.sous_compte.Code_sous_compte}` : '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px;">{{ ecriture.Libelle || '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px;">{{ ecriture.Reference || '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px;">{{ ecriture.mode_paiement ? ecriture.mode_paiement.Libelle : '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px; text-align: end;">{{ ecriture.Debit ? formatNumber(ecriture.Debit) : '-' }}</td>
-                  <td class="p-4 text-base" style="font-size:12px; text-align: end;">{{ ecriture.Credit ? formatNumber(ecriture.Credit) : '-' }}</td>
-                </tr>
-                <tr v-if="ecritures.length">
-                  <td colspan="6" class="p-4 text-base font-bold text-right">Totaux :</td>
-                  <td class="p-4 text-base font-bold" style="font-size: 14px; text-align: right;">{{ formatNumber(totalDebit) }}</td>
-                  <td class="p-4 text-base font-bold" style="font-size: 14px; text-align: right;">{{ formatNumber(totalCredit) }}</td>
-                </tr>
-                <tr v-if="!ecritures.length">
-                  <td colspan="8" class="p-4 text-center text-base">Aucune écriture trouvée</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          
+    <div class="fs-stack">
+      <form class="fs-card fs-filters" aria-label="Filtrer les écritures" @submit.prevent="applyDateFilter">
+        <div class="fs-field">
+          <label class="fs-label" for="ej-debut">Date de début</label>
+          <input id="ej-debut" v-model="dateFilter.date_debut" type="date" class="fs-input" />
         </div>
-      </div>
+        <div class="fs-field">
+          <label class="fs-label" for="ej-fin">Date de fin</label>
+          <input id="ej-fin" v-model="dateFilter.date_fin" type="date" class="fs-input" />
+        </div>
+        <div class="fs-filters__actions">
+          <UiButton variant="primary" type="submit" icon="bi-funnel">Appliquer</UiButton>
+          <UiButton variant="ghost" @click="resetDateFilter">Réinitialiser</UiButton>
+        </div>
+      </form>
+
+      <section class="fs-card fs-table-card">
+        <div class="fs-table-card__head">
+          <h2 class="fs-table-card__title">Écritures</h2>
+          <UiBadge tone="primary">{{ ecritures.length }} ligne(s)</UiBadge>
+        </div>
+        <UiSkeleton v-if="loading" variant="table" :rows="8" :cols="8" />
+        <div v-else class="fs-table-wrap">
+          <table class="fs-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N° pièce</th>
+                <th>Compte</th>
+                <th>Libellé</th>
+                <th>Référence</th>
+                <th>Mode de paiement</th>
+                <th class="text-right">Débit</th>
+                <th class="text-right">Crédit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ecriture in ecritures" :key="ecriture.Id_Ligne_ecriture">
+                <td>{{ ecriture.mouvement ? new Date(ecriture.mouvement.Date_mouvement).toLocaleDateString('fr-FR') : '—' }}</td>
+                <td><UiBadge size="sm">{{ ecriture.mouvement ? ecriture.mouvement.Numero_piece : '—' }}</UiBadge></td>
+                <td class="font-bold">{{ ecriture.sous_compte ? ecriture.sous_compte.Code_sous_compte : '—' }}</td>
+                <td>{{ ecriture.Libelle || '—' }}</td>
+                <td>{{ ecriture.Reference || '—' }}</td>
+                <td>{{ ecriture.mode_paiement ? ecriture.mode_paiement.Libelle : '—' }}</td>
+                <td class="num">{{ ecriture.Debit ? formatNumber(ecriture.Debit) : '—' }}</td>
+                <td class="num">{{ ecriture.Credit ? formatNumber(ecriture.Credit) : '—' }}</td>
+              </tr>
+              <tr v-if="ecritures.length" class="total-row">
+                <td colspan="6" class="text-right">Totaux</td>
+                <td class="num">{{ formatNumber(totalDebit) }}</td>
+                <td class="num">{{ formatNumber(totalCredit) }}</td>
+              </tr>
+              <tr v-else>
+                <td colspan="8" class="fs-empty">Aucune écriture trouvée.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </AppLayout>
 </template>
 
 <script setup>
+import { useParametresStore } from '@/stores/parametres';
 import AppLayout from "@/components/template/AppLayout.vue";
 import { API_BASE } from '@/config/api';
 import { ref, onMounted, computed } from "vue";
@@ -102,8 +96,6 @@ const router = useRouter();
 const journalId = ref(route.params.id);
 const journal = ref(route.params.journal || route.params.journalLibelle);
 const ecritures = ref([]);
-const devises = ref([]);
-const defaultDevise = ref(null);
 const dateFilter = ref({
   date_debut: "",
   date_fin: "",
@@ -112,11 +104,14 @@ const dateFilter = ref({
 const showChat = ref(false);
 
 // Informations de l'établissement
+const parametresStore = useParametresStore();
+parametresStore.charger();
+// Coordonnées de l'entreprise (écran « Paramètres »), lues au moment de l'export
 const etablissement = {
-  nom: "RAITRA KIDZ",
-  adresse: "Antananarivo, Madagascar",
-  tel: "+261 XX XX XXX XX",
-  email: "contact@raitrakidz.mg"
+  get nom() { return parametresStore.societe.nom; },
+  get adresse() { return parametresStore.societe.adresse; },
+  get tel() { return parametresStore.societe.tel; },
+  get email() { return parametresStore.societe.email; },
 };
 
 const handleNavigation = (item) => {
@@ -140,7 +135,9 @@ const formatNumber = (number) => {
   }).replace(/\s/g, ' ');
 };
 
+const loading = ref(true);
 const fetchEcritures = async () => {
+  loading.value = true;
   try {
     const queryParams = new URLSearchParams({
       status: "valide",
@@ -153,21 +150,11 @@ const fetchEcritures = async () => {
   } catch (error) {
     console.error("Erreur lors du chargement des écritures:", error);
     ecritures.value = [];
+  } finally {
+    loading.value = false;
   }
 };
 
-const fetchDevises = async () => {
-  try {
-    const res = await axios.get(`${API_BASE}/devises`);
-    devises.value = res.data;
-    if (devises.value.length > 0) {
-      defaultDevise.value = devises.value[0];
-    }
-    console.log("Devises chargées:", devises.value);
-  } catch (error) {
-    console.error("Erreur lors du chargement des devises:", error);
-  }
-};
 
 const totalDebit = computed(() => {
   return ecritures.value.reduce((sum, ecriture) => sum + (Number(ecriture.Debit) || 0), 0);
@@ -228,7 +215,7 @@ const exportToPDF = async () => {
       <!-- En-tête -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #2980b9;">
         <div style="flex: 1;">
-          <img src="${logo}" alt="Logo" style="width: 100px; height: auto;" />
+          <img src="${parametresStore.get('societe.logo') || logo}" alt="Logo" style="width: 100px; height: auto;" />
           <div style="margin-top: 8px; font-size: 11px; color: #555;">
             <div style="font-weight: bold; font-size: 13px; color: #2c3e50;">${etablissement.nom}</div>
             <div>${etablissement.adresse}</div>
@@ -242,7 +229,7 @@ const exportToPDF = async () => {
           </h1>
         </div>
         <div style="flex: 1; text-align: right; font-size: 10px; color: #555;">
-          <div style="margin: 3px 0;"><strong>Devise:</strong> ${defaultDevise.value ? defaultDevise.value.Sigle : 'Ar'}</div>
+          <div style="margin: 3px 0;"><strong>Devise:</strong> ${parametresStore.devise.symbole}</div>
           <div style="margin: 3px 0;"><strong>Période:</strong> ${period}</div>
           <div style="margin: 3px 0;"><strong>Journal N°:</strong> ${journalId.value}</div>
         </div>
@@ -437,7 +424,7 @@ const exportToExcel = async () => {
   const info = [
     [''],
     [`Journal N°: ${journalId.value}`],
-    [`Devise: ${defaultDevise.value ? `${defaultDevise.value.Libelle} (${defaultDevise.value.Sigle})` : 'Ariary'}`],
+    [`Devise: ${parametresStore.devise.code} (${parametresStore.devise.symbole})`],
     [`Période: ${period}`],
     [`Date d'export: ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`],
     [`Plage: Du ${dateFilter.value.date_debut || '-'} au ${dateFilter.value.date_fin || '-'}`],
@@ -563,114 +550,7 @@ onMounted(async () => {
       window.location.href = "/";
       return;
     }
-    fetchDevises();
     fetchEcritures();
   }
 });
 </script>
-
-
-
-<style scoped>
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
-  background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
-}
-
-.filter-container, .export-container {
-  background: var(--fs-surface);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-title,
-.form-label,
-.form-input,
-.form-select,
-.btn,
-.table th,
-.table td {
-  font-family: var(--font-family); /* Use global Stara font from style.css */
-}
-
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 101;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 100;
-  background: var(--fs-surface);
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Animation d'apparition */
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-
-  .dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }
-}
-</style>

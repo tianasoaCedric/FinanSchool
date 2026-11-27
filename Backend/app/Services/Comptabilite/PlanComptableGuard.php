@@ -65,6 +65,45 @@ class PlanComptableGuard
         }
     }
 
+    // ---- Changement de code (le libellé reste toujours modifiable) ----------
+    // Les codes portent la hiérarchie (601001 → compte 601 → rubrique 60 →
+    // classe 6) et servent aux états financiers, aux catégories et aux comptes
+    // d'amortissement : on ne les change que sur un élément encore « vierge ».
+
+    public static function assertCodeClasseModifiable(Classe $classe, string $nouveau): void
+    {
+        if ($nouveau !== (string) $classe->Code && DB::table('rubriques')->where('Id_Classe', $classe->Id_Classe)->exists()) {
+            self::refuser("Le code de la classe {$classe->Code} ne peut plus changer : elle contient des rubriques. Seul le libellé est modifiable.");
+        }
+    }
+
+    public static function assertCodeRubriqueModifiable(Rubrique $rubrique, string $nouveau): void
+    {
+        if ($nouveau !== (string) $rubrique->Code_rubrique && DB::table('comptes')->where('Id_Rubrique', $rubrique->Id_Rubrique)->exists()) {
+            self::refuser("Le code de la rubrique {$rubrique->Code_rubrique} ne peut plus changer : elle contient des comptes. Seul le libellé est modifiable.");
+        }
+    }
+
+    public static function assertCodeCompteModifiable(Compte $compte, string $nouveau): void
+    {
+        if ($nouveau !== (string) $compte->Code_compte && DB::table('sous_comptes')->where('Id_Compte', $compte->Id_Compte)->exists()) {
+            self::refuser("Le code du compte {$compte->Code_compte} ne peut plus changer : il contient des sous-comptes. Seul le libellé est modifiable.");
+        }
+    }
+
+    public static function assertCodeSousCompteModifiable(SousCompte $sousCompte, string $nouveau): void
+    {
+        if ($nouveau === (string) $sousCompte->Code_sous_compte) {
+            return;
+        }
+        try {
+            // Mêmes usages que ceux qui interdisent la suppression
+            self::assertSousCompteSupprimable($sousCompte);
+        } catch (ValidationException) {
+            self::refuser("Le code du sous-compte {$sousCompte->Code_sous_compte} ne peut plus changer : il est déjà utilisé (écritures, journal, immobilisation ou états). Seul le libellé est modifiable.");
+        }
+    }
+
     public static function assertJournalSupprimable(Journal $journal): void
     {
         $utilise = DB::table('mouvement_ecritures')->where('Id_Journal', $journal->Id_Journal)->exists()

@@ -25,27 +25,34 @@
       @keydown.esc="fermer"
       @blur="onBlur"
     />
-    <ul v-if="ouvert && resultats.length" class="cs-liste" role="listbox">
-      <li
-        v-for="(c, i) in resultats"
-        :key="c.Id_Sous_compte"
-        role="option"
-        :aria-selected="i === actif"
-        class="cs-option"
-        :class="{ 'is-actif': i === actif }"
-        @mousedown.prevent="choisir(c)"
-        @mouseenter="actif = i"
-      >
-        <span class="cs-code">{{ c.Code_sous_compte }}</span>
-        <span class="cs-libelle">{{ c.Libelle }}</span>
-      </li>
-    </ul>
-    <div v-else-if="ouvert && recherche" class="cs-liste cs-vide">Aucun compte trouvé</div>
+    <!-- Rendue dans <body> en position fixe : ni l'en-tête du tableau ni la
+         barre des totaux (collants) ne peuvent la recouvrir. -->
+    <Teleport to="body">
+      <!-- Reprend les jetons de thème (définis sur .fs-page) hors de la page -->
+      <div v-if="ouvert" class="fs-page cs-portail" :data-theme="theme">
+      <ul v-if="ouvert && resultats.length" class="cs-liste" :style="position" role="listbox">
+        <li
+          v-for="(c, i) in resultats"
+          :key="c.Id_Sous_compte"
+          role="option"
+          :aria-selected="i === actif"
+          class="cs-option"
+          :class="{ 'is-actif': i === actif }"
+          @mousedown.prevent="choisir(c)"
+          @mouseenter="actif = i"
+        >
+          <span class="cs-code">{{ c.Code_sous_compte }}</span>
+          <span class="cs-libelle">{{ c.Libelle }}</span>
+        </li>
+      </ul>
+      <div v-else-if="ouvert && recherche" class="cs-liste cs-vide" :style="position">Aucun compte trouvé</div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
 const props = defineProps({
   modelValue: { type: [Number, String, null], default: null },
@@ -61,6 +68,40 @@ const champ = ref(null);
 const recherche = ref('');
 const ouvert = ref(false);
 const actif = ref(0);
+const position = ref({});
+const theme = ref('light');
+
+// Hauteur de la liste (8 options) + barre des totaux collée en bas de la saisie :
+// s'il n'y a pas cette place sous le champ, la liste s'ouvre vers le haut.
+const PLACE_NECESSAIRE = 420;
+function placer() {
+  const r = champ.value?.getBoundingClientRect();
+  if (!r) return;
+  theme.value = champ.value.closest('.fs-page')?.dataset.theme || 'light';
+  const dessous = window.innerHeight - r.bottom;
+  const haut = dessous < PLACE_NECESSAIRE && r.top > dessous;
+  position.value = {
+    left: `${r.left}px`,
+    minWidth: `${r.width}px`,
+    // Toujours positionnée par `top` (vers le haut : décalée de sa propre hauteur)
+    ...(haut ? { top: `${r.top - 4}px`, transform: 'translateY(-100%)' } : { top: `${r.bottom + 4}px` }),
+  };
+}
+// Suit le champ pendant le défilement / redimensionnement
+watch(ouvert, o => {
+  if (o) {
+    placer();
+    window.addEventListener('scroll', placer, true);
+    window.addEventListener('resize', placer);
+  } else {
+    window.removeEventListener('scroll', placer, true);
+    window.removeEventListener('resize', placer);
+  }
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', placer, true);
+  window.removeEventListener('resize', placer);
+});
 
 const normaliser = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const libelleDe = c => (c ? `${c.Code_sous_compte} — ${c.Libelle}` : '');
@@ -115,11 +156,8 @@ defineExpose({ focus: () => champ.value?.focus() });
 .cs-input--vide { color: var(--fs-text); }
 .cs-input.is-invalid { border-color: var(--fs-negative); }
 .cs-liste {
-  position: absolute;
-  z-index: 30;
-  top: calc(100% + 4px);
-  left: 0;
-  min-width: 100%;
+  position: fixed;
+  z-index: 1100;
   width: max-content;
   max-width: 460px;
   margin: 0;
@@ -130,6 +168,7 @@ defineExpose({ focus: () => champ.value?.focus() });
   border-radius: 10px;
   box-shadow: var(--fs-shadow-lg);
 }
+.fs-page.cs-portail { min-height: 0; background: none; }
 .cs-option {
   display: flex;
   gap: 10px;

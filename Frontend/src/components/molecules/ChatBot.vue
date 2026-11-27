@@ -225,7 +225,7 @@ async function envoyer(texte) {
   } finally {
     envoi.value = false;
     defiler();
-    zone.value?.focus();
+    zone.value?.focus({ preventScroll: true });
   }
 }
 function reessayer(m) {
@@ -256,7 +256,7 @@ function nouvelleConversation() {
   messages.value = [];
   suggestions.value = [];
   vue.value = 'conversation';
-  nextTick(() => zone.value?.focus());
+  nextTick(() => zone.value?.focus({ preventScroll: true }));
 }
 async function basculerHistorique() {
   if (vue.value === 'historique') { vue.value = 'conversation'; return; }
@@ -331,7 +331,7 @@ function basculerDictee() {
 onMounted(() => {
   // La conversation en cours est conservée d'une page à l'autre
   if (localStorage.getItem(CLE_SESSION)) chargerConversation(sessionId.value);
-  nextTick(() => zone.value?.focus());
+  nextTick(() => zone.value?.focus({ preventScroll: true }));
 });
 onBeforeUnmount(() => {
   arreterLecture();

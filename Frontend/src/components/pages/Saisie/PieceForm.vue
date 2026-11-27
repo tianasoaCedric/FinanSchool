@@ -33,7 +33,7 @@
       <UiButton v-if="piece" variant="primary" icon="bi-plus-lg" to="/ecriture">Nouvelle pièce</UiButton>
     </template>
 
-    <div v-if="chargement" class="fs-card fs-skeleton"><div v-for="n in 6" :key="n" class="fs-skeleton__row"></div></div>
+    <div v-if="chargement" class="pf-sk"><UiSkeleton variant="cards" :rows="4" /><div class="fs-card"><UiSkeleton variant="table" :rows="5" :cols="6" /></div></div>
 
     <form v-else class="pf" @submit.prevent="enregistrer('brouillon')" @keydown.ctrl.s.prevent="enregistrer('brouillon')" @keydown.ctrl.enter.prevent="peutValider && enregistrer('valider')">
       <!-- Messages -->
@@ -107,7 +107,7 @@
               <UiButton v-if="!lectureSeule" variant="ghost" size="sm" icon="bi-trash3" icon-only aria-label="Supprimer le justificatif" @click="justificatif.supprimer = true" />
             </template>
             <label v-else-if="!lectureSeule" class="pf-upload">
-              <i class="bi bi-cloud-arrow-up"></i> Joindre (PDF, image · 5 Mo max)
+              <i class="bi bi-cloud-arrow-up"></i> Joindre (PDF, image · {{ tailleMaxJustificatif }} Mo max)
               <input type="file" accept=".pdf,image/png,image/jpeg,image/webp" @change="choisirFichier" />
             </label>
             <span v-else class="pf-aide">Aucun</span>
@@ -129,6 +129,7 @@
             <tr>
               <th class="pf-col-n">#</th>
               <th class="pf-col-compte">Compte</th>
+              <th class="pf-col-tiers">Tiers</th>
               <th>Libellé</th>
               <th class="text-right pf-col-montant">Débit</th>
               <th class="text-right pf-col-montant">Crédit</th>
@@ -148,6 +149,24 @@
                   :aria-label="`Compte de la ligne ${i + 1}`"
                   @choisi="focusChamp(l.cle, 'debit')"
                 />
+              </td>
+              <td>
+                <template v-if="lectureSeule">
+                  <router-link v-if="l.tiers" :to="`/tiers/${l.tiers.id}`" class="pf-tiers-lien">{{ l.tiers.nom }}</router-link>
+                  <UiBadge v-if="l.lettrage" tone="success" size="sm" :title="`Lettrage ${l.lettrage}`">{{ l.lettrage }}</UiBadge>
+                </template>
+                <select
+                  v-else-if="accepteTiers(l)"
+                  :value="l.id_tiers ?? ''"
+                  class="fs-select pf-input"
+                  :class="{ 'is-invalide': tiersManquant(l) }"
+                  :aria-label="`Tiers de la ligne ${i + 1}`"
+                  @change="choisirTiers(l, $event.target)"
+                >
+                  <option value="">{{ exigeTiers(l) ? 'Choisir…' : '—' }}</option>
+                  <option v-for="t in tiersPour(l)" :key="t.id" :value="t.id">{{ t.nom }} ({{ t.code }})</option>
+                  <option value="__nouveau">＋ Nouveau tiers…</option>
+                </select>
               </td>
               <td>
                 <input v-model="l.Libelle" type="text" class="fs-input pf-input" :placeholder="lectureSeule ? '' : (form.Libelle || 'Libellé')" :disabled="lectureSeule" :aria-label="`Libellé de la ligne ${i + 1}`" />
@@ -181,6 +200,7 @@
             <tr v-if="ligneContrepartie" class="pf-contrepartie">
               <td class="pf-col-n"><i class="bi bi-magic" title="Calculée automatiquement"></i></td>
               <td><span class="pf-cp-compte">{{ libelleCompte(compteJournal) }}</span></td>
+              <td></td>
               <td class="pf-aide">Contrepartie automatique ({{ journal?.Code }})</td>
               <td class="text-right num">{{ ligneContrepartie.Debit ? formatMontant(ligneContrepartie.Debit) : '' }}</td>
               <td class="text-right num">{{ ligneContrepartie.Credit ? formatMontant(ligneContrepartie.Credit) : '' }}</td>
@@ -231,52 +251,43 @@
     </form>
 
     <!-- Contre-passation -->
-    <div v-if="modaleCp" class="modal-overlay" @click.self="modaleCp = false">
-      <div class="modal" role="dialog" aria-labelledby="pf-cp-titre">
-        <div class="modal-header">
-          <h2 id="pf-cp-titre" class="modal-title">Contre-passer la pièce {{ piece?.numero }}</h2>
-          <UiButton variant="ghost" icon="bi-x-lg" icon-only aria-label="Fermer" @click="modaleCp = false" />
+    <UiModal v-model="modaleCp" title="Contre-passer la pièce" :subtitle="piece?.numero" icon="bi-arrow-left-right" tone="warning">
+      <p class="pf-aide pf-cp-texte">
+        Une pièce inverse (débits et crédits permutés) sera passée et validée dans le même journal.
+        Saisissez ensuite l'écriture correcte.
+      </p>
+      <form id="pf-form-cp" class="ui-form ui-form--1" @submit.prevent="contrePasser">
+        <div class="ui-field">
+          <label for="pf-cp-date" class="required">Date de la contre-passation</label>
+          <input id="pf-cp-date" v-model="dateCp" type="date" :min="String(piece?.Date_mouvement || '').slice(0, 10)" required />
         </div>
-        <form class="modal-body pf-modele" @submit.prevent="contrePasser">
-          <p class="pf-aide pf-cp-texte">
-            Une pièce inverse (débits et crédits permutés) sera passée et validée dans le même journal.
-            Saisissez ensuite l'écriture correcte.
-          </p>
-          <div class="fs-field">
-            <label class="pf-label" for="pf-cp-date">Date de la contre-passation</label>
-            <input id="pf-cp-date" v-model="dateCp" type="date" class="fs-input" :min="String(piece?.Date_mouvement || '').slice(0, 10)" required />
-          </div>
-          <div class="modal-footer">
-            <UiButton variant="ghost" @click="modaleCp = false">Annuler</UiButton>
-            <UiButton variant="primary" type="submit" icon="bi-arrow-left-right" :loading="enregistrement === 'contrepasser'">Contre-passer</UiButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="modaleCp = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="pf-form-cp" icon="bi-arrow-left-right" :loading="enregistrement === 'contrepasser'">Contre-passer</UiButton>
+      </template>
+    </UiModal>
+
+    <!-- Création rapide d'un tiers depuis une ligne -->
+    <TiersFormModal v-model="modaleTiers.ouverte" :initial="modaleTiers.initial" @cree="tiersCree" />
 
     <!-- Enregistrer comme modèle -->
-    <div v-if="modaleModele" class="modal-overlay" @click.self="modaleModele = false">
-      <div class="modal" role="dialog" aria-labelledby="pf-modele-titre">
-        <div class="modal-header">
-          <h2 id="pf-modele-titre" class="modal-title">Enregistrer comme modèle</h2>
-          <UiButton variant="ghost" icon="bi-x-lg" icon-only aria-label="Fermer" @click="modaleModele = false" />
+    <UiModal v-model="modaleModele" title="Enregistrer comme modèle" icon="bi-bookmark-plus" size="sm">
+      <form id="pf-form-modele" class="ui-form ui-form--1" @submit.prevent="enregistrerModele">
+        <div class="ui-field">
+          <label for="pf-modele-nom" class="required">Nom du modèle</label>
+          <input id="pf-modele-nom" v-model="nomModele" type="text" maxlength="150" placeholder="Ex. Paie du mois" required />
         </div>
-        <form class="modal-body pf-modele" @submit.prevent="enregistrerModele">
-          <div class="fs-field">
-            <label class="pf-label" for="pf-modele-nom">Nom du modèle</label>
-            <input id="pf-modele-nom" v-model="nomModele" type="text" maxlength="150" class="fs-input" placeholder="Ex. Paie du mois" required />
-          </div>
-          <label class="pf-switch">
-            <input v-model="modeleAvecMontants" type="checkbox" />
-            <span>Mémoriser aussi les montants</span>
-          </label>
-          <div class="modal-footer">
-            <UiButton variant="ghost" @click="modaleModele = false">Annuler</UiButton>
-            <UiButton variant="primary" type="submit" :disabled="!nomModele.trim()">Enregistrer</UiButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        <label class="pf-switch">
+          <input v-model="modeleAvecMontants" type="checkbox" />
+          <span>Mémoriser aussi les montants</span>
+        </label>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="modaleModele = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="pf-form-modele" :disabled="!nomModele.trim()">Enregistrer</UiButton>
+      </template>
+    </UiModal>
   </AppLayout>
 </template>
 
@@ -285,9 +296,16 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { API_BASE } from '@/config/api';
+import { useParametresStore } from '@/stores/parametres';
 import { getUser } from '@/services/Auth';
 import AppLayout from '@/components/template/AppLayout.vue';
+
+const parametresStore = useParametresStore();
+parametresStore.charger();
+const tailleMaxJustificatif = computed(() => Number(parametresStore.get('saisie.justificatif_taille_max')) || 5);
 import CompteSelect from '@/components/molecules/saisie/CompteSelect.vue';
+import TiersFormModal from '@/components/molecules/tiers/TiersFormModal.vue';
+import { chargerTousLesTiers, typePourCompte } from '@/composables/useTiers';
 
 const route = useRoute();
 const router = useRouter();
@@ -302,7 +320,9 @@ const journaux = ref([]);
 const comptes = ref([]);
 const modesPaiement = ref([]);
 const modeles = ref([]);
-const exercice = ref(null);          // exercice ouvert le plus récent (date par défaut)
+const tiersListe = ref([]);
+const modaleTiers = reactive({ ouverte: false, initial: {}, ligne: null });
+const exercice = ref(null);         // exercice ouvert le plus récent (date par défaut)
 const exercicesOuverts = ref([]);    // N et N+1 peuvent être ouverts ensemble
 
 const piece = ref(null); // pièce existante (modification / consultation)
@@ -351,6 +371,40 @@ const equilibre = computed(() => Math.abs(ecart.value) < 0.01);
 
 const ligneEnErreur = l => (montantDe(l) > 0 && !l.Id_Sous_compte) || (Number(l.Debit) > 0 && Number(l.Credit) > 0);
 
+// ---------- Tiers (comptes de classe 4) ----------
+const codeCompte = l => comptes.value.find(c => c.Id_Sous_compte == l.Id_Sous_compte)?.Code_sous_compte || '';
+const accepteTiers = l => codeCompte(l).startsWith('4');
+const prefixesTiers = computed(() => parametresStore.get('tiers.obligatoire')
+  ? String(parametresStore.get('tiers.comptes') || '').split(',').map(s => s.trim()).filter(Boolean) : []);
+const exigeTiers = l => prefixesTiers.value.some(p => codeCompte(l).startsWith(p));
+const tiersManquant = l => exigeTiers(l) && !l.id_tiers && montantDe(l) > 0;
+function tiersPour(l) {
+  const type = typePourCompte(codeCompte(l));
+  const liste = type ? tiersListe.value.filter(t => t.type === type) : tiersListe.value;
+  // Tiers déjà choisi mais absent de la liste (désactivé, autre type) : gardé visible
+  if (l.id_tiers && !liste.some(t => t.id == l.id_tiers)) {
+    const t = tiersListe.value.find(x => x.id == l.id_tiers) || l.tiers;
+    if (t) return [t, ...liste];
+  }
+  return liste;
+}
+function choisirTiers(l, champ) {
+  const valeur = champ.value;
+  if (valeur === '__nouveau') {
+    champ.value = l.id_tiers ?? '';
+    modaleTiers.ligne = l;
+    modaleTiers.initial = { type: typePourCompte(codeCompte(l)) || 'client', Id_Sous_compte: l.Id_Sous_compte };
+    modaleTiers.ouverte = true;
+    return;
+  }
+  l.id_tiers = valeur ? Number(valeur) : null;
+}
+function tiersCree(t) {
+  tiersListe.value = [...tiersListe.value, t].sort((a, b) => a.nom.localeCompare(b.nom));
+  if (modaleTiers.ligne) modaleTiers.ligne.id_tiers = t.id;
+  succes.value = `Tiers ${t.code} — ${t.nom} créé.`;
+}
+
 const peutEnregistrer = computed(() =>
   !!form.Id_Journal && !!form.Date_mouvement && lignesSaisies.value.length > 0
   && lignesSaisies.value.every(l => l.Id_Sous_compte && !(Number(l.Debit) > 0 && Number(l.Credit) > 0)));
@@ -362,6 +416,8 @@ const raisonNonValidable = computed(() => {
   if (lignesSaisies.value.some(l => !l.Id_Sous_compte)) return 'Chaque ligne doit avoir un compte.';
   if (lignesSaisies.value.some(l => montantDe(l) <= 0)) return 'Chaque ligne doit avoir un montant au débit ou au crédit.';
   if (!equilibre.value) return `La pièce n'est pas équilibrée (écart de ${formatMontant(Math.abs(ecart.value))}).`;
+  const sansTiers = lignesSaisies.value.findIndex(tiersManquant);
+  if (sansTiers >= 0) return `Ligne ${sansTiers + 1} : indiquez le client ou le fournisseur du compte ${codeCompte(lignesSaisies.value[sansTiers])}.`;
   if (!String(form.Reference || '').trim()) return 'Indiquez la référence de la pièce justificative (n° de facture, reçu, relevé…).';
   if (exercicesOuverts.value.length && !exercicesOuverts.value.some(e => form.Date_mouvement >= e.saisieDes && form.Date_mouvement <= e.fin)) {
     return `La date doit tomber dans une période ouverte : ${aideExercices.value}.`;
@@ -403,7 +459,7 @@ function libelleCompte(id) {
   return c ? `${c.Code_sous_compte} — ${c.Libelle}` : '';
 }
 function nouvelleLigne(donnees = {}) {
-  return { cle: cleSuivante++, Id_Sous_compte: null, Libelle: '', Debit: null, Credit: null, ...donnees };
+  return { cle: cleSuivante++, Id_Sous_compte: null, id_tiers: null, tiers: null, lettrage: null, Libelle: '', Debit: null, Credit: null, ...donnees };
 }
 function messagesErreur(e) {
   const d = e?.response?.data;
@@ -443,13 +499,15 @@ function apresMontant(i) {
 
 // ---------- Chargement ----------
 async function chargerReferentiels() {
-  const [j, c, m, e, mod] = await Promise.all([
+  const [j, c, m, e, mod, t] = await Promise.all([
     axios.get(`${API_BASE}/journals`),
     axios.get(`${API_BASE}/sous-comptes`),
     axios.get(`${API_BASE}/mode-paiements`).catch(() => ({ data: [] })),
     axios.get(`${API_BASE}/exercices`).catch(() => ({ data: [] })),
     axios.get(`${API_BASE}/modeles-ecriture`).catch(() => ({ data: [] })),
+    chargerTousLesTiers().catch(() => []),
   ]);
+  tiersListe.value = t;
   journaux.value = j.data.data || j.data;
   comptes.value = (c.data.data || c.data).slice().sort((a, b) => a.Code_sous_compte.localeCompare(b.Code_sous_compte));
   modesPaiement.value = m.data.data || m.data || [];
@@ -485,6 +543,9 @@ function remplirDepuisPiece(p, { copie = false } = {}) {
   form.Id_Mode_paiement = p.lignes.find(l => l.Id_Mode_paiement)?.Id_Mode_paiement || '';
   lignes.value = p.lignes.map(l => nouvelleLigne({
     Id_Sous_compte: l.Id_Sous_compte,
+    id_tiers: l.id_tiers || null,
+    tiers: l.tiers || null,
+    lettrage: copie ? null : (l.lettrage || null),
     Libelle: l.Libelle === p.Libelle ? '' : l.Libelle,
     Debit: l.Debit || null,
     Credit: l.Credit || null,
@@ -546,6 +607,7 @@ async function enregistrer(action) {
   const lignesEnvoyees = [...lignesSaisies.value, ...(ligneContrepartie.value ? [ligneContrepartie.value] : [])]
     .map(l => ({
       Id_Sous_compte: l.Id_Sous_compte,
+      id_tiers: accepteTiers(l) ? (l.id_tiers || null) : null,
       Libelle: l.Libelle || null,
       Debit: Number(l.Debit || 0),
       Credit: Number(l.Credit || 0),
@@ -631,8 +693,8 @@ async function contrePasser() {
 function choisirFichier(e) {
   const f = e.target.files?.[0];
   if (!f) return;
-  if (f.size > 5 * 1024 * 1024) {
-    erreurs.value = ['Le justificatif ne doit pas dépasser 5 Mo.'];
+  if (f.size > tailleMaxJustificatif.value * 1024 * 1024) {
+    erreurs.value = [`Le justificatif ne doit pas dépasser ${tailleMaxJustificatif.value} Mo.`];
     e.target.value = '';
     return;
   }
@@ -741,7 +803,7 @@ function fermerMenu(e) {
 .pf-entete__extourne small { display: block; margin-top: 2px; }
 .pf-lecture__texte { flex: 1; min-width: 240px; }
 .pf-lecture a { color: var(--fs-primary-text); font-weight: 600; }
-.pf-cp-texte { margin: 0; font-size: 13.5px; line-height: 1.5; }
+.pf-cp-texte { margin: 0 0 16px; font-size: 13.5px; line-height: 1.5; }
 .pf-justif { display: flex; align-items: center; gap: 8px; min-height: 40px; flex-wrap: wrap; }
 .pf-upload {
   display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
@@ -757,7 +819,11 @@ function fermerMenu(e) {
 .pf-table tbody td { padding: 8px 10px; }
 .pf-table thead th { padding: 10px; }
 .pf-col-n { width: 40px; text-align: center; color: var(--fs-muted); font-size: 12.5px; }
-.pf-col-compte { width: 34%; }
+.pf-col-compte { width: 28%; }
+.pf-col-tiers { width: 18%; }
+.pf-input.is-invalide { border-color: var(--fs-negative); }
+.pf-tiers-lien { margin-right: 6px; color: var(--fs-primary-text); font-size: 13.5px; font-weight: 500; text-decoration: none; }
+.pf-tiers-lien:hover { text-decoration: underline; }
 .pf-col-montant { width: 15%; }
 .pf-col-action { width: 48px; text-align: center; }
 .pf-input { height: 36px; font-size: 13.5px; padding: 0 10px; }
@@ -826,7 +892,7 @@ kbd {
 .pf-menu__choix:disabled { opacity: 0.5; cursor: not-allowed; }
 .pf-menu__choix strong { font-size: 13.5px; font-weight: 600; }
 .pf-menu__choix span { font-size: 12px; color: var(--fs-muted); }
-.pf-modele { display: flex; flex-direction: column; gap: 16px; }
+.pf-sk { display: flex; flex-direction: column; gap: 20px; }
 
 @media (max-width: 1100px) {
   .pf-entete { grid-template-columns: repeat(2, minmax(0, 1fr)); }

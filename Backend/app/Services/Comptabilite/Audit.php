@@ -23,6 +23,7 @@ class Audit
     public const PIECE_VALIDATION = 'piece.validation';
     public const PIECE_CONTRE_PASSATION = 'piece.contre_passation';
     public const IMPORT_ECRITURES = 'import.ecritures';
+    public const IMPORT_ANNULATION = 'import.annulation';
 
     // Exercices et périodes
     public const EXERCICE_OUVERTURE = 'exercice.ouverture';
@@ -36,9 +37,27 @@ class Audit
     public const PLAN_CREATION = 'plan.creation';
     public const PLAN_MODIFICATION = 'plan.modification';
     public const PLAN_SUPPRESSION = 'plan.suppression';
+    public const PLAN_IMPORT = 'plan.import';
 
     // Utilisateurs
     public const UTILISATEUR_DROITS = 'utilisateur.droits';
+
+    // Immobilisations
+    public const IMMO_CREATION = 'immobilisation.creation';
+    public const IMMO_MODIFICATION = 'immobilisation.modification';
+    public const IMMO_SUPPRESSION = 'immobilisation.suppression';
+    public const IMMO_SORTIE = 'immobilisation.sortie';
+    public const IMMO_ANNULATION_SORTIE = 'immobilisation.annulation_sortie';
+
+    // Paramètres
+    public const PARAMETRES_MODIFICATION = 'parametres.modification';
+
+    // Tiers et lettrage
+    public const TIERS_CREATION = 'tiers.creation';
+    public const TIERS_MODIFICATION = 'tiers.modification';
+    public const TIERS_SUPPRESSION = 'tiers.suppression';
+    public const LETTRAGE = 'lettrage.creation';
+    public const DELETTRAGE = 'lettrage.suppression';
 
     /** Libellés affichés dans l'écran de consultation. */
     public const LIBELLES = [
@@ -48,6 +67,7 @@ class Audit
         self::PIECE_VALIDATION => 'Validation de pièce',
         self::PIECE_CONTRE_PASSATION => 'Contre-passation',
         self::IMPORT_ECRITURES => "Import d'écritures",
+        self::IMPORT_ANNULATION => "Annulation d'import",
         self::EXERCICE_OUVERTURE => "Ouverture d'exercice",
         self::EXERCICE_CLOTURE => "Clôture d'exercice",
         self::EXERCICE_ANNULATION_CLOTURE => 'Annulation de clôture',
@@ -57,7 +77,19 @@ class Audit
         self::PLAN_CREATION => 'Création (plan comptable)',
         self::PLAN_MODIFICATION => 'Modification (plan comptable)',
         self::PLAN_SUPPRESSION => 'Suppression (plan comptable)',
+        self::PLAN_IMPORT => 'Import du plan comptable',
         self::UTILISATEUR_DROITS => "Droits d'un utilisateur",
+        self::IMMO_CREATION => "Création d'immobilisation",
+        self::IMMO_MODIFICATION => "Modification d'immobilisation",
+        self::IMMO_SUPPRESSION => "Suppression d'immobilisation",
+        self::IMMO_SORTIE => "Sortie d'immobilisation",
+        self::IMMO_ANNULATION_SORTIE => "Annulation de sortie d'immobilisation",
+        self::PARAMETRES_MODIFICATION => 'Modification des paramètres',
+        self::TIERS_CREATION => 'Création de tiers',
+        self::TIERS_MODIFICATION => 'Modification de tiers',
+        self::TIERS_SUPPRESSION => 'Suppression de tiers',
+        self::LETTRAGE => 'Lettrage',
+        self::DELETTRAGE => 'Délettrage',
     ];
 
     public static function enregistrer(
@@ -91,7 +123,7 @@ class Audit
     /** État lisible d'une pièce (en-tête + lignes), pour l'avant / après. */
     public static function etatPiece(MouvementEcriture $piece): array
     {
-        $piece->load(['journal', 'lignes.sousCompte']);
+        $piece->load(['journal', 'lignes.sousCompte', 'lignes.tiers']);
         $lignes = $piece->lignes->sortBy('Id_Ligne_ecriture')->values();
         $validee = $lignes->isNotEmpty() && $lignes->every(fn ($l) => $l->statut === EcritureGuard::STATUT_VALIDE);
 
@@ -106,6 +138,7 @@ class Audit
             'total_credit' => round((float) $lignes->sum('Credit'), 2),
             'lignes' => $lignes->map(fn ($l) => [
                 'compte' => $l->sousCompte?->Code_sous_compte,
+                'tiers' => $l->tiers?->code,
                 'libelle' => $l->Libelle,
                 'debit' => (float) $l->Debit,
                 'credit' => (float) $l->Credit,

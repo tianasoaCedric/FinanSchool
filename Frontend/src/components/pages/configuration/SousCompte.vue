@@ -20,6 +20,8 @@ const sousComptes = ref([])
 const showModal = ref(false)
 const isEditing = ref(false)
 const currentPage = ref(1)
+const loading = ref(true)
+const saving = ref(false)
 
 // --- State Popups (Nouveau) ---
 const showSuccessModal = ref(false)
@@ -94,6 +96,8 @@ const loadSousComptes = async () => {
     sousComptes.value = res.data.data || res.data
   } catch (err) {
     console.error(err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -130,6 +134,7 @@ const openEditModal = async (sousCompte) => {
 }
 
 const saveSousCompte = async () => {
+  saving.value = true
   try {
     if (isEditing.value) {
       await axios.put(`${API_URL}/sous-comptes/${form.value.id}`, form.value)
@@ -152,6 +157,8 @@ const saveSousCompte = async () => {
     // MODIFIÉ : Utilisation du popup erreur
     errorModalMessage.value = error.response?.data?.message || 'Erreur lors de l\'enregistrement du sous-compte'
     showErrorModal.value = true
+  } finally {
+    saving.value = false
   }
 }
 
@@ -203,10 +210,6 @@ const paginatedSousComptes = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(filteredSousComptes.value.length / itemsPerPage)
 })
-
-const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
-const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
-const goToPage = (page) => { currentPage.value = page }
 </script>
 
 <template>
@@ -217,315 +220,102 @@ const goToPage = (page) => { currentPage.value = page }
     subtitle="Sous-comptes utilisés pour la saisie des écritures"
     section="Structure"
   >
-<div class="card card-form">
-        <!-- En-tête Carte -->
-        
+    <template #actions>
+      <UiButton variant="primary" icon="bi-plus-lg" @click="openCreateModal">Nouveau sous-compte</UiButton>
+    </template>
 
-        <div class="card-body">
-          <!-- Filtres -->
-          <div class="d-flex flex-column md:flex-row gap-3 mb-4">
-            <div class="form-group w-full">
-              <label for="compte" class="form-label">Compte</label>
-              <select v-model="filters.compte_id" class="form-select w-full">
-                <option value="">Tous les comptes</option>
-                <option v-for="compte in comptes" :key="compte.Id_Compte" :value="compte.Id_Compte">
-                  {{ compte.Code_compte }} - {{ compte.Libelle }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group w-full">
-              <label for="search" class="form-label">Recherche</label>
-              <input
-                type="text"
-                placeholder="Code ou libellé..."
-                :value="filters.search"
-                @input="debounceSearch($event.target.value)"
-                class="form-input w-full"
-              />
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <UiButton variant="primary" @click="openCreateModal" class="mb-4">
-            Nouveau sous-compte
-          </UiButton>
-
-          <!-- Tableau -->
-          <div class="table-container mt-5">
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-sm">Code</th>
-                  <th class="text-sm">Libellé</th>
-                  <th class="text-sm">Compte</th>
-                  <th class="text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="sc in paginatedSousComptes" :key="sc.Id_Sous_compte" class="fade-in">
-                  <td>{{ sc.Code_sous_compte }}</td>
-                  <td>{{ sc.Libelle }}</td>
-                  <td>{{ sc.compte?.Code_compte }}</td>
-                  <td class="d-flex gap-2">
-                    <UiButton variant="soft-primary" @click="openEditModal(sc)" size="sm">
-                      Modifier
-                    </UiButton>
-                    <UiButton variant="soft-danger" @click="deleteSousCompte(sc.Id_Sous_compte)" size="sm">
-                      Supprimer
-                    </UiButton>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination -->
-          <div v-if="totalPages > 1" class="d-flex justify-center mt-6 gap-2">
-            <UiButton variant="ghost" @click="prevPage" :disabled="currentPage === 1" size="sm">
-              <i class="bi bi-chevron-left"></i>
-            </UiButton>
-            <UiButton v-for="page in totalPages" :key="page" @click="goToPage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm" :aria-current="currentPage === page ? 'page' : undefined">
-              {{ page }}
-            </UiButton>
-            <UiButton variant="ghost" @click="nextPage" :disabled="currentPage === totalPages" size="sm">
-              <i class="bi bi-chevron-right"></i>
-            </UiButton>
-          </div>
+    <div class="fs-stack">
+      <section class="fs-card fs-filters" aria-label="Filtres">
+        <div class="fs-field">
+          <label for="f-compte" class="fs-label">Compte</label>
+          <select id="f-compte" v-model="filters.compte_id" class="fs-select">
+            <option value="">Tous les comptes</option>
+            <option v-for="compte in comptes" :key="compte.Id_Compte" :value="compte.Id_Compte">
+              {{ compte.Code_compte }} - {{ compte.Libelle }}
+            </option>
+          </select>
         </div>
-        
-        
-      </div>
-
-<div v-if="showModal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title">
-            {{ isEditing ? 'Modifier le sous-compte' : 'Nouveau sous-compte' }}
-          </h2>
-          <UiButton variant="ghost" @click="showModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
+        <div class="fs-field">
+          <label for="f-search" class="fs-label">Recherche</label>
+          <input id="f-search" type="search" placeholder="Code ou libellé…" :value="filters.search" @input="debounceSearch($event.target.value)" class="fs-input" />
         </div>
-        <form @submit.prevent="saveSousCompte" class="modal-body">
-          <div class="form-group">
-            <label class="form-label required">Compte</label>
-            <select v-model="form.Id_Compte" @change="updateCode" class="form-select w-full" required>
-              <option v-for="compte in comptes" :key="compte.Id_Compte" :value="compte.Id_Compte">
-                {{ compte.Code_compte }} - {{ compte.Libelle }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Suffixe</label>
-            <input type="text" v-model="form.suffixe" @input="updateCode" maxlength="3" placeholder="001" class="form-input w-full" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Code complet</label>
-            <input type="text" v-model="form.Code_sous_compte" readonly class="form-input w-full" />
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Libellé</label>
-            <input type="text" v-model="form.Libelle" class="form-input w-full" required />
-          </div>
-          <div class="modal-footer">
-            <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
-            <UiButton variant="primary" type="submit">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
-          </div>
-        </form>
-      </div>
+      </section>
+
+      <section class="fs-card fs-table-card">
+        <div class="fs-table-card__head">
+          <h2 class="fs-table-card__title">Liste des sous-comptes</h2>
+          <UiBadge tone="primary">{{ filteredSousComptes.length }} sous-compte(s)</UiBadge>
+        </div>
+        <UiSkeleton v-if="loading" variant="table" :rows="8" :cols="4" />
+        <div v-else class="fs-table-wrap">
+          <table class="fs-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Compte</th>
+                <th class="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sc in paginatedSousComptes" :key="sc.Id_Sous_compte">
+                <td class="font-bold">{{ sc.Code_sous_compte }}</td>
+                <td>{{ sc.Libelle }}</td>
+                <td><UiBadge size="sm">{{ sc.compte?.Code_compte }}</UiBadge></td>
+                <td class="actions">
+                  <div class="fs-row-actions">
+                    <UiButton variant="soft-primary" size="sm" icon="bi-pencil" @click="openEditModal(sc)">Modifier</UiButton>
+                    <UiButton variant="soft-danger" size="sm" icon="bi-trash" @click="deleteSousCompte(sc.Id_Sous_compte)">Supprimer</UiButton>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!paginatedSousComptes.length">
+                <td colspan="4" class="fs-empty">Aucun sous-compte ne correspond aux filtres.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <UiPagination v-model="currentPage" :total-pages="totalPages" :total="filteredSousComptes.length" :per-page="itemsPerPage" />
+      </section>
     </div>
 
-<div v-if="showSuccessModal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title text-green-600">Succès</h2>
-          <UiButton variant="ghost" @click="showSuccessModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
+    <UiModal v-model="showModal" :title="isEditing ? 'Modifier le sous-compte' : 'Nouveau sous-compte'" :icon="isEditing ? 'bi-pencil' : 'bi-plus-lg'">
+      <form id="form-sous-compte" class="ui-form" @submit.prevent="saveSousCompte">
+        <div class="ui-field ui-field--full">
+          <label class="required" for="m-compte">Compte</label>
+          <select id="m-compte" v-model="form.Id_Compte" @change="updateCode" required>
+            <option v-for="compte in comptes" :key="compte.Id_Compte" :value="compte.Id_Compte">
+              {{ compte.Code_compte }} - {{ compte.Libelle }}
+            </option>
+          </select>
         </div>
-        <div class="modal-body text-center">
-          <p class="text-lg">{{ successModalMessage }}</p>
-          <div class="modal-footer justify-center mt-4">
-            <UiButton variant="primary" @click="showSuccessModal = false">OK</UiButton>
-          </div>
+        <div class="ui-field">
+          <label class="required" for="m-suffixe">Suffixe</label>
+          <input id="m-suffixe" type="text" inputmode="numeric" pattern="[0-9]{1,3}" title="1 à 3 chiffres" v-model="form.suffixe" @input="updateCode" maxlength="3" placeholder="001" required />
         </div>
-      </div>
-    </div>
+        <div class="ui-field">
+          <label for="m-code">Code complet</label>
+          <input id="m-code" type="text" v-model="form.Code_sous_compte" readonly />
+        </div>
+        <div class="ui-field ui-field--full">
+          <label class="required" for="m-libelle">Libellé</label>
+          <input id="m-libelle" type="text" v-model="form.Libelle" required />
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="ghost" @click="showModal = false">Annuler</UiButton>
+        <UiButton variant="primary" type="submit" form="form-sous-compte" :loading="saving">{{ isEditing ? 'Modifier' : 'Enregistrer' }}</UiButton>
+      </template>
+    </UiModal>
 
-<div v-if="showErrorModal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title text-red-600">Erreur</h2>
-          <UiButton variant="ghost" @click="showErrorModal = false" aria-label="Fermer" icon-only><i class="bi bi-x-lg"></i></UiButton>
-        </div>
-        <div class="modal-body text-center">
-          <p class="text-lg">{{ errorModalMessage }}</p>
-          <div class="modal-footer justify-center mt-4">
-            <UiButton variant="primary" @click="showErrorModal = false">OK</UiButton>
-          </div>
-        </div>
-      </div>
-    </div>
+    <UiModal v-model="showSuccessModal" tone="success" title="Succès" size="sm">
+      <p class="ui-modal__message">{{ successModalMessage }}</p>
+      <template #footer><UiButton variant="primary" @click="showSuccessModal = false">OK</UiButton></template>
+    </UiModal>
+
+    <UiModal v-model="showErrorModal" tone="danger" title="Erreur" size="sm">
+      <p class="ui-modal__message">{{ errorModalMessage }}</p>
+      <template #footer><UiButton variant="primary" @click="showErrorModal = false">OK</UiButton></template>
+    </UiModal>
   </AppLayout>
 </template>
-
-<style scoped>
-/* --- Layout Global --- */
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.main-content {
-  margin-left: 278px;
-  padding: 32px;
-  flex: 1;
-  background: var(--fs-surface-2);
-  min-height: calc(100vh - 80px);
-}
-
-/* --- Typographie Globale --- */
-.card-title, .form-label, .form-input, .form-select, .btn, .table th, .table td {
-  font-family: var(--font-family);
-}
-
-/* --- Composants : Filtres --- */
-.filter-container {
-  background: var(--fs-surface);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* --- MODAL (Centré Fixe) --- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-  font-family: 'Manrope', sans-serif;
-}
-
-.modal {
-  background: var(--fs-surface);
-  width: 90%;
-  max-width: 500px;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  overflow-y: auto;
-  font-family: 'Manrope', sans-serif;
-}
-
-.modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--fs-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: 'Manrope', sans-serif;
-}
-
-.modal-body {
-  padding: 1.5rem;
-  font-family: 'Manrope', sans-serif;
-}
-
-.modal-footer {
-  padding: 1rem 1.5rem;
-  background-color: var(--fs-surface-2);
-  border-top: 1px solid var(--fs-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--fs-muted);
-}
-
-/* --- CHATBOT --- */
-.chatbot-float-btn {
-  position: fixed;
-  bottom: 55px;
-  right: 45px;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg,#1c45bd 0%,#011244 100%);
-  border-radius: 50%;
-  color: #fff;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  border: none;
-  box-shadow: 0 6px 16px rgba(102,126,234,0.22);
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-
-.chatbot-float-btn:hover {
-  box-shadow: 0 10px 22px rgba(102,126,234,0.32);
-  background: linear-gradient(135deg,#011244 0%,#1c45bd 100%);
-}
-
-.dashboard-chatbot-chatbox {
-  position: fixed;
-  bottom: 100px;
-  right: 40px;
-  width: 380px;
-  max-width: 99vw;
-  height: 520px;
-  max-height: 80vh;
-  z-index: 199;
-  background: var(--fs-surface);
-  border-radius: 15px;
-  box-shadow: 0 8px 36px rgba(90,60,130,0.14);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.chatbot-fade-enter-active, .chatbot-fade-leave-active {
-  transition: opacity 0.25s;
-}
-.chatbot-fade-enter, .chatbot-fade-leave-to {
-  opacity: 0;
-}
-
-/* --- Responsive Mobile --- */
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-  
-  .dashboard-chatbot-chatbox {
-    right: 5vw;
-    bottom: 80px;
-    width: 98vw;
-    height: 90vh;
-    border-radius: 8px;
-  }
-  
-  .chatbot-float-btn {
-    right: 8vw;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }
-}
-</style>

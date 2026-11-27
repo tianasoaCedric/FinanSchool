@@ -19,8 +19,14 @@ use Illuminate\Validation\ValidationException;
  */
 class EcritureGuard
 {
-    /** Tolérance d'arrondi pour l'équilibre débit / crédit. */
+    /** Tolérance d'arrondi par défaut pour l'équilibre débit / crédit. */
     public const TOLERANCE = 0.01;
+
+    /** Tolérance en vigueur (paramètre « compta.tolerance_equilibre »). */
+    public static function tolerance(): float
+    {
+        return (float) \App\Services\Parametres::get('compta.tolerance_equilibre');
+    }
 
     public const STATUT_VALIDE = 'valide';
     public const STATUT_BROUILLON = 'brouillon';
@@ -156,7 +162,7 @@ class EcritureGuard
 
         $totalDebit = round((float) $lignes->sum('Debit'), 2);
         $totalCredit = round((float) $lignes->sum('Credit'), 2);
-        if (abs($totalDebit - $totalCredit) >= self::TOLERANCE) {
+        if (abs($totalDebit - $totalCredit) >= self::tolerance()) {
             return sprintf(
                 'Pièce déséquilibrée : débit %s ≠ crédit %s',
                 self::formatMontant($totalDebit),
@@ -166,6 +172,11 @@ class EcritureGuard
 
         if (!self::aUneReference($mouvement)) {
             return 'Référence de la pièce justificative manquante (n° de facture, reçu, relevé…)';
+        }
+
+        // Comptes de tiers : client / fournisseur exigé sur les 40, 41…
+        if ($motif = TiersService::motifPiece($mouvement)) {
+            return $motif;
         }
 
         return self::motifDateFermee($mouvement->Date_mouvement);
@@ -239,6 +250,7 @@ class EcritureGuard
                 'Id_Mouvement_ecriture' => $piece->Id_Mouvement_ecriture,
                 'Id_Journal' => $origine->Id_Journal,
                 'Id_Sous_compte' => $l->Id_Sous_compte,
+                'id_tiers' => $l->id_tiers,
                 'statut' => self::STATUT_BROUILLON,
             ]);
         }
@@ -252,7 +264,8 @@ class EcritureGuard
     }
 
     /**
-     * Prochain numéro de pièce pour un journal et une année : {CODE}{AAAA}-{NNNN}.
+     * Prochain numéro de pièce pour un journal et une année : {CODE}{AAAA}{séparateur}{NNNN}
+     * (séparateur et nombre de chiffres : paramètres « saisie.* »).
      * Séquence propre au journal et à l'année, calculée sous verrou.
      * Réservé aux pièces validées : appelé par validerPiece() et par les
      * pièces système validées d'office (clôture, à-nouveaux).
@@ -260,7 +273,7 @@ class EcritureGuard
      */
     public static function prochainNumeroPiece(Journal $journal, int $annee): string
     {
-        $prefixe = $journal->Code . $annee . '-';
+        $prefixe = $journal->Code . $annee . \App\Services\Parametres::get('saisie.numero_separateur');
 
         // Verrou applicatif sur (journal, année) : deux saisies simultanées
         // attendent l'une l'autre au lieu d'obtenir le même numéro.
@@ -271,7 +284,7 @@ class EcritureGuard
             ->map(fn ($n) => (int) substr($n, strlen($prefixe)))
             ->max() ?? 0;
 
-        return $prefixe . str_pad((string) ($max + 1), 4, '0', STR_PAD_LEFT);
+        return $prefixe . str_pad((string) ($max + 1), (int) \App\Services\Parametres::get('saisie.numero_chiffres'), '0', STR_PAD_LEFT);
     }
 
     // ------------------------------------------------------------------

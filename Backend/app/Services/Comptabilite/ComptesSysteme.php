@@ -4,6 +4,7 @@ namespace App\Services\Comptabilite;
 
 use App\Models\PlanCompte\SousCompte;
 use App\Models\Saisie\Journal;
+use App\Services\Parametres;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -46,27 +47,27 @@ class ComptesSysteme
 
     public static function reportBeneficiaire(): SousCompte
     {
-        return self::sousCompte('110001', 'Report à nouveau (solde créditeur)');
+        return self::sousCompte(Parametres::get('systeme.compte_report_crediteur'), 'Report à nouveau (solde créditeur)');
     }
 
     public static function reportDeficitaire(): SousCompte
     {
-        return self::sousCompte('119001', 'Report à nouveau (solde débiteur)');
+        return self::sousCompte(Parametres::get('systeme.compte_report_debiteur'), 'Report à nouveau (solde débiteur)');
     }
 
     public static function resultatBenefice(): SousCompte
     {
-        return self::sousCompte('120000', "Résultat net de l'exercice (bénéfice)");
+        return self::sousCompte(Parametres::get('systeme.compte_resultat_benefice'), "Résultat net de l'exercice (bénéfice)");
     }
 
     public static function resultatPerte(): SousCompte
     {
-        return self::sousCompte('129000', "Résultat net de l'exercice (perte)");
+        return self::sousCompte(Parametres::get('systeme.compte_resultat_perte'), "Résultat net de l'exercice (perte)");
     }
 
     public static function dotationsAmortissements(): SousCompte
     {
-        return self::sousCompte('681000', 'Dotations aux amortissements des immobilisations');
+        return self::sousCompte(Parametres::get('systeme.compte_dotations'), 'Dotations aux amortissements des immobilisations');
     }
 
     /**
@@ -93,16 +94,16 @@ class ComptesSysteme
 
     public static function journalANouveaux(): Journal
     {
-        return self::journal('AN', 'Journal des à-nouveaux');
+        return self::journal(Parametres::get('systeme.journal_a_nouveaux'), 'Journal des à-nouveaux');
     }
 
     public static function journalCloture(): Journal
     {
-        return self::journal('CL', 'Écritures de clôture');
+        return self::journal(Parametres::get('systeme.journal_cloture'), 'Écritures de clôture');
     }
 
     public static function journalOperationsDiverses(): Journal
     {
-        return self::journal('OD', 'Opérations diverses');
+        return self::journal(Parametres::get('systeme.journal_od'), 'Opérations diverses');
     }
 }

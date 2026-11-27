@@ -37,7 +37,17 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('app-token')->plainTextToken;
+        if ($user->actif === false) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Votre compte est désactivé. Contactez un administrateur.',
+            ], 403);
+        }
+        $user->forceFill(['derniere_connexion' => now()])->save();
+
+        // Durée de session (minutes, 0 = illimitée) : paramètre « securite.duree_session »
+        $duree = (int) \App\Services\Parametres::get('securite.duree_session');
+        $token = $user->createToken('app-token', ['*'], $duree > 0 ? now()->addMinutes($duree) : null)->plainTextToken;
 
         return response()->json([
             'status' => 'success',
@@ -129,24 +139,35 @@ public function verifyCode(Request $request)
     // -------------------
     public function register(Request $request)
         {
+            // Inscription libre activable dans Paramètres › Sécurité
+            if (!\App\Services\Parametres::get('securite.inscription_ouverte')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Les inscriptions sont fermées. Demandez un compte à un administrateur.",
+                ], 403);
+            }
+            $min = (int) \App\Services\Parametres::get('securite.mot_de_passe_min');
+
             // Validation uniquement des champs nécessaires
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:6|confirmed',
+                'password' => "required|string|min:{$min}|confirmed",
             ], [
                 'name.required' => ErrorHelper::get(7) ?? 'Nom requis', // id 7 pour nom si tu veux
                 'email.required' => ErrorHelper::get(4),
                 'email.unique' => ErrorHelper::get(6),
                 'password.required' => ErrorHelper::get(5),
+                'password.min' => "Le mot de passe doit contenir au moins {$min} caractères.",
             ]);
 
-            // Création de l'utilisateur
+            // Création de l'utilisateur, avec le rôle par défaut des inscriptions
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
             ]);
+            $user->definirRole(\App\Services\Parametres::get('securite.role_inscription'))->save();
 
             return response()->json([
                 'status' => 'success',

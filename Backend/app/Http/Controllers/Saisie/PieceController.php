@@ -36,6 +36,7 @@ class PieceController extends Controller
             'date_fin' => 'nullable|date',
             'q' => 'nullable|string|max:100',
             'per_page' => 'nullable|integer|min:5|max:100',
+            'import' => 'nullable|integer',
         ]);
 
         $sousRequeteTotaux = LigneEcriture::select('Id_Mouvement_ecriture')
@@ -58,6 +59,9 @@ class PieceController extends Controller
         } elseif ($statut === 'brouillon') {
             $query->where(fn ($q) => $q->where('t.est_valide', false)->orWhereNull('t.est_valide'));
         }
+        if ($request->filled('import')) {
+            $query->where('mouvement_ecritures.id_import', $request->import);
+        }
         if ($request->filled('journal')) {
             $query->where('mouvement_ecritures.Id_Journal', $request->journal);
         }
@@ -79,7 +83,7 @@ class PieceController extends Controller
 
         $pieces = $query->orderByDesc('Date_mouvement')
             ->orderByDesc('mouvement_ecritures.Id_Mouvement_ecriture')
-            ->paginate($request->input('per_page', 25));
+            ->paginate($request->input('per_page', \App\Services\Parametres::get('affichage.lignes_par_page')));
 
         $valideurs = User::whereIn('id', $pieces->pluck('valide_par')->filter()->unique())->pluck('name', 'id');
 
@@ -93,7 +97,7 @@ class PieceController extends Controller
             'total_debit' => (float) $m->total_debit,
             'total_credit' => (float) $m->total_credit,
             'nb_lignes' => (int) $m->nb_lignes,
-            'equilibree' => $m->nb_lignes > 0 && abs((float) $m->total_debit - (float) $m->total_credit) < EcritureGuard::TOLERANCE,
+            'equilibree' => $m->nb_lignes > 0 && abs((float) $m->total_debit - (float) $m->total_credit) < EcritureGuard::tolerance(),
             'statut' => $m->est_valide ? 'valide' : 'brouillon',
             'type_piece' => $m->type_piece ?? MouvementEcriture::TYPE_NORMALE,
             'contre_passee' => (bool) $m->contre_passee,
@@ -268,6 +272,9 @@ class PieceController extends Controller
         if (in_array($piece->type_piece, MouvementEcriture::TYPES_TECHNIQUES, true)) {
             return 'Les écritures de clôture et d\'à-nouveaux se corrigent en annulant la clôture.';
         }
+        if ($piece->lignes->contains(fn ($l) => $l->id_lettrage)) {
+            return 'Une ligne de cette pièce est lettrée : délettrez-la avant de contre-passer la pièce.';
+        }
         if (in_array($piece->type_piece, [MouvementEcriture::TYPE_EXTOURNE, MouvementEcriture::TYPE_EXTOURNE_AUTO], true)) {
             return 'Une contre-passation ne se contre-passe pas : saisissez l\'écriture correcte.';
         }
@@ -307,7 +314,7 @@ class PieceController extends Controller
             'Reference' => 'nullable|string|max:100',
             'a_extourner' => 'nullable|boolean',
             'action' => 'nullable|in:brouillon,valider',
-            'justificatif' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'justificatif' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:' . (1024 * (int) \App\Services\Parametres::get('saisie.justificatif_taille_max')),
             'lignes' => 'required|array|min:1',
             'lignes.*.Id_Sous_compte' => 'required|exists:sous_comptes,Id_Sous_compte',
             'lignes.*.Libelle' => 'nullable|string|max:255',
@@ -315,13 +322,14 @@ class PieceController extends Controller
             'lignes.*.Credit' => 'nullable|numeric|min:0',
             'lignes.*.Id_Mode_paiement' => 'nullable|exists:mode_paiements,Id_Mode_paiement',
             'lignes.*.Quantite' => 'nullable|integer|min:0',
+            'lignes.*.id_tiers' => 'nullable|integer|exists:tiers,id',
         ], [
             'lignes.required' => 'La pièce doit comporter au moins une ligne.',
             'lignes.*.Id_Sous_compte.required' => 'Chaque ligne doit avoir un compte.',
             'lignes.*.Debit.min' => 'Les montants doivent être positifs.',
             'lignes.*.Credit.min' => 'Les montants doivent être positifs.',
             'justificatif.mimes' => 'Le justificatif doit être un PDF ou une image (jpg, png, webp).',
-            'justificatif.max' => 'Le justificatif ne doit pas dépasser 5 Mo.',
+            'justificatif.max' => 'Le justificatif ne doit pas dépasser ' . \App\Services\Parametres::get('saisie.justificatif_taille_max') . ' Mo.',
         ]);
 
         foreach ($donnees['lignes'] as $i => $ligne) {
@@ -351,6 +359,7 @@ class PieceController extends Controller
                 'Id_Mouvement_ecriture' => $piece->Id_Mouvement_ecriture,
                 'Id_Journal' => $piece->Id_Journal,
                 'Id_Sous_compte' => $ligne['Id_Sous_compte'],
+                'id_tiers' => $ligne['id_tiers'] ?? null,
                 'statut' => EcritureGuard::STATUT_BROUILLON,
             ]);
         }
@@ -433,6 +442,9 @@ class PieceController extends Controller
                 'Credit' => (float) $l->Credit,
                 'Id_Mode_paiement' => $l->Id_Mode_paiement,
                 'Quantite' => $l->Quantite,
+                'id_tiers' => $l->id_tiers,
+                'tiers' => $l->tiers ? ['id' => $l->tiers->id, 'code' => $l->tiers->code, 'nom' => $l->tiers->nom] : null,
+                'lettrage' => $l->lettrage?->code,
             ])->all(),
         ];
     }

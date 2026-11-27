@@ -21,9 +21,11 @@ class RubriqueController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'suffixe' => 'required|string|max:10',
+        'suffixe' => ['required', 'regex:/^\d$/'],
         'Libelle' => 'required|string|max:255',
         'Id_Classe' => 'required|exists:classes,Id_Classe',
+    ], [
+        'suffixe.regex' => 'Le suffixe doit comporter un seul chiffre (ex. 0 pour la rubrique 60).',
     ]);
 
     $classe = \App\Models\PlanCompte\Classe::findOrFail($request->Id_Classe);
@@ -48,9 +50,11 @@ class RubriqueController extends Controller
 public function update(Request $request, $id)
 {
     $request->validate([
-        'suffixe' => 'required|string|max:10',
+        'suffixe' => ['required', 'regex:/^\d$/'],
         'Libelle' => 'required|string|max:255',
         'Id_Classe' => 'required|exists:classes,Id_Classe',
+    ], [
+        'suffixe.regex' => 'Le suffixe doit comporter un seul chiffre (ex. 0 pour la rubrique 60).',
     ]);
 
     $rubrique = \App\Models\PlanCompte\Rubrique::findOrFail($id);
@@ -65,6 +69,7 @@ public function update(Request $request, $id)
         return response()->json(['message' => 'Cette rubrique existe déjà'], 422);
     }
 
+    PlanComptableGuard::assertCodeRubriqueModifiable($rubrique, $codeRubrique);
     $rubrique->Code_rubrique = $codeRubrique;
     $rubrique->Libelle = $request->Libelle;
     $rubrique->Id_Classe = $classe->Id_Classe;

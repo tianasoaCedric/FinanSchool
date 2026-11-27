@@ -12,6 +12,13 @@
       <UiButton variant="primary" icon="bi-plus-lg" to="/ecriture">Nouvelle pièce</UiButton>
     </template>
 
+    <!-- Filtre « pièces d'un import » (lien depuis l'historique des imports) -->
+    <div v-if="filtres.import" class="pl-import" role="status">
+      <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
+      <span>Pièces créées par l'import n° {{ filtres.import }}</span>
+      <UiButton size="sm" variant="ghost" icon="bi-x-lg" @click="retirerFiltreImport">Retirer ce filtre</UiButton>
+    </div>
+
     <!-- Filtres -->
     <section class="fs-card pl-filtres" aria-label="Filtres">
       <div class="pl-onglets" role="tablist" aria-label="Statut">
@@ -41,7 +48,7 @@
         <h2 class="fs-table-card__title">{{ resultat.total ?? 0 }} pièce(s)</h2>
         <span class="fs-table-card__hint">Cliquez sur une pièce pour l'ouvrir</span>
       </div>
-      <div v-if="chargement" class="fs-skeleton"><div v-for="n in 8" :key="n" class="fs-skeleton__row"></div></div>
+      <UiSkeleton v-if="chargement" variant="table" :rows="8" :cols="8" />
       <div v-else class="fs-table-wrap">
         <table class="fs-table">
           <thead>
@@ -53,7 +60,7 @@
               <th class="text-right">Débit</th>
               <th class="text-right">Crédit</th>
               <th>Statut</th>
-              <th class="text-right">Actions</th>
+              <th class="actions">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -78,9 +85,11 @@
                 <UiBadge v-else-if="!p.equilibree" tone="danger" dot>Déséquilibrée</UiBadge>
                 <UiBadge v-else tone="warning" dot>Brouillon</UiBadge>
               </td>
-              <td class="text-right pl-actions" @click.stop>
+              <td class="actions" @click.stop>
+                <div class="fs-row-actions">
                 <UiButton variant="ghost" size="sm" icon="bi-files" icon-only :aria-label="`Dupliquer ${p.numero}`" title="Dupliquer" :to="`/ecriture?depuis=${p.id}`" />
                 <UiButton v-if="p.statut !== 'valide'" variant="ghost" size="sm" icon="bi-trash3" icon-only :aria-label="`Supprimer ${p.numero}`" title="Supprimer" @click="supprimer(p)" />
+                </div>
               </td>
             </tr>
             <tr v-if="!resultat.data?.length">
@@ -89,20 +98,23 @@
           </tbody>
         </table>
       </div>
-      <div v-if="resultat.last_page > 1" class="pl-pagination">
-        <UiButton variant="ghost" size="sm" icon="bi-chevron-left" :disabled="resultat.current_page <= 1" @click="charger(resultat.current_page - 1)">Précédent</UiButton>
-        <span>Page {{ resultat.current_page }} / {{ resultat.last_page }}</span>
-        <UiButton variant="ghost" size="sm" icon-right="bi-chevron-right" :disabled="resultat.current_page >= resultat.last_page" @click="charger(resultat.current_page + 1)">Suivant</UiButton>
-      </div>
+      <UiPagination
+        :model-value="resultat.current_page || 1"
+        :total-pages="resultat.last_page || 1"
+        :total="resultat.total"
+        :per-page="resultat.per_page"
+        @update:model-value="charger"
+      />
     </section>
   </AppLayout>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { API_BASE } from '@/config/api';
+import { useParametresStore } from '@/stores/parametres';
 import { getUser } from '@/services/Auth';
 import AppLayout from '@/components/template/AppLayout.vue';
 
@@ -117,7 +129,16 @@ const onglets = [
   { valeur: 'brouillon', libelle: 'Brouillons' },
   { valeur: 'valide', libelle: 'Validées' },
 ];
-const filtres = reactive({ statut: 'brouillon', q: '', journal: '', date_debut: '', date_fin: '' });
+const route = useRoute();
+// ?import=ID : pièces d'un import donné (toutes dates, tous statuts)
+const filtreImport = /^\d+$/.test(String(route.query.import || '')) ? String(route.query.import) : '';
+const filtres = reactive({ statut: filtreImport ? 'tous' : 'brouillon', q: '', journal: '', date_debut: '', date_fin: '', import: filtreImport });
+
+function retirerFiltreImport() {
+  filtres.import = '';
+  router.replace({ query: { ...route.query, import: undefined } });
+  charger(1);
+}
 const TYPES = { a_nouveau: 'À-nouveaux', cloture: 'Clôture', dotation: 'Dotations', extourne: 'Contre-passation', extourne_auto: 'Extourne', affectation: 'Affectation' };
 
 const formatMontant = n => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -126,8 +147,8 @@ const formatDate = d => (d ? new Date(d).toLocaleDateString('fr-FR') : '');
 async function charger(page = 1) {
   chargement.value = true;
   try {
-    const params = { page, per_page: 25, statut: filtres.statut };
-    for (const k of ['q', 'journal', 'date_debut', 'date_fin']) if (filtres[k]) params[k] = filtres[k];
+    const params = { page, per_page: (await useParametresStore().charger())['affichage.lignes_par_page'], statut: filtres.statut };
+    for (const k of ['q', 'journal', 'date_debut', 'date_fin', 'import']) if (filtres[k]) params[k] = filtres[k];
     const { data } = await axios.get(`${API_BASE}/pieces`, { params });
     resultat.value = data;
   } catch {
@@ -165,7 +186,7 @@ onMounted(async () => {
   journaux.value = j.data.data || j.data;
   // Par défaut : les exercices ouverts (N et N+1 le cas échéant) ; le watch relance le chargement
   const ouverts = (ex.data || []).filter(e => e.Statut === 'OUVERT');
-  if (ouverts.length) {
+  if (ouverts.length && !filtres.import) {
     filtres.date_debut = ouverts.map(e => e.Date_debut.slice(0, 10)).sort()[0];
     filtres.date_fin = ouverts.map(e => e.Date_fin.slice(0, 10)).sort().at(-1);
   } else {
@@ -175,11 +196,17 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.pl-import {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 8px 8px 8px 14px;
+  border-radius: var(--fs-radius-sm); background: var(--fs-primary-soft); color: var(--fs-primary-text);
+  font-size: var(--fs-text-sm); font-weight: 500;
+}
+.pl-import span { flex: 1; }
 .pl-filtres { display: flex; flex-direction: column; gap: 14px; padding: 16px 20px; margin-bottom: 20px; }
 .pl-onglets { display: inline-flex; gap: 4px; padding: 4px; width: fit-content; border-radius: 10px; background: var(--fs-surface-3); }
 .pl-onglet {
   border: 0; background: transparent; padding: 7px 14px; border-radius: 7px; cursor: pointer;
-  font: 500 13.5px var(--fs-font); color: var(--fs-text-2);
+  font: 500 var(--fs-text-sm) var(--fs-font); color: var(--fs-text-2);
 }
 .pl-onglet.is-actif { background: var(--fs-surface); color: var(--fs-text); box-shadow: var(--fs-shadow); }
 .pl-onglet:focus-visible { outline: 2px solid var(--fs-primary); outline-offset: 2px; }
@@ -191,10 +218,9 @@ onMounted(async () => {
 .pl-ligne:focus-visible td { background: var(--fs-row-hover); outline: none; }
 .pl-numero { font-weight: 600; color: var(--fs-text); white-space: nowrap; }
 .pl-numero .bi { color: var(--fs-muted); margin-left: 4px; }
-.pl-libelle small { display: block; color: var(--fs-muted); font-size: 12px; }
-.pl-actions { white-space: nowrap; }
+.pl-libelle small { display: block; color: var(--fs-muted); font-size: var(--fs-text-xs); }
+.pl-statut { white-space: nowrap; }
 .pl-statut > * + * { margin-left: 6px; }
-.pl-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px; border-top: 1px solid var(--fs-border); font-size: 13px; color: var(--fs-muted); }
 .num { font-variant-numeric: tabular-nums; }
 @media (max-width: 900px) { .pl-champs { grid-template-columns: 1fr 1fr; } }
 </style>

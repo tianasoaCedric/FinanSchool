@@ -24,9 +24,11 @@ class CompteController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'suffixe' => 'required|string|max:10',
+        'suffixe' => ['required', 'regex:/^\d$/'],
         'Libelle' => 'required|string|max:255',
         'Id_Rubrique' => 'required|exists:rubriques,Id_Rubrique',
+    ], [
+        'suffixe.regex' => 'Le suffixe doit comporter un seul chiffre (ex. 1 pour le compte 601).',
     ]);
 
     $rubrique = Rubrique::findOrFail($request->Id_Rubrique);
@@ -51,9 +53,11 @@ class CompteController extends Controller
 public function update(Request $request, $id)
 {
     $request->validate([
-        'suffixe' => 'required|string|max:10',
+        'suffixe' => ['required', 'regex:/^\d$/'],
         'Libelle' => 'required|string|max:255',
         'Id_Rubrique' => 'required|exists:rubriques,Id_Rubrique',
+    ], [
+        'suffixe.regex' => 'Le suffixe doit comporter un seul chiffre (ex. 1 pour le compte 601).',
     ]);
 
     $compte = Compte::findOrFail($id);
@@ -69,6 +73,7 @@ public function update(Request $request, $id)
         return response()->json(['message' => 'Ce code compte existe déjà'], 422);
     }
 
+    PlanComptableGuard::assertCodeCompteModifiable($compte, $codeCompte);
     $compte->Code_compte = $codeCompte;
     $compte->Libelle = $request->Libelle;
     $compte->Id_Rubrique = $rubrique->Id_Rubrique;

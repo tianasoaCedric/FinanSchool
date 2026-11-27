@@ -17,10 +17,13 @@ const routes = [
   { path: "/compte", name: "Compte", component: () => import("@/components/pages/configuration/Compte.vue") },
   { path: "/souscompte", name: "SousCompte", component: () => import("@/components/pages/configuration/SousCompte.vue") },
   { path: "/rubrique", name: "Rubrique", component: () => import("@/components/pages/configuration/Rubrique.vue") },
+  { path: "/plan-comptable/import", name: "ImportPlanComptable", component: () => import("@/components/pages/configuration/ImportPlanComptable.vue") },
   { path: "/type-journal", name: "TypeJournal", component: () => import("@/components/pages/configuration/TypeJournal.vue") },
-  { path: "/devise", name: "Devise", component: () => import("@/components/pages/configuration/Devise.vue") },
+  // Ancien référentiel des devises : la devise se règle dans Paramètres › Comptabilité
+  { path: "/devise", redirect: { path: "/reglages", query: { section: "compta" } } },
   { path: "/journal", name: "Journal", component: () => import("@/components/pages/configuration/Journal.vue") },
-  { path: "/paiement-mode", name: "ModePaiement", component: () => import("@/components/pages/configuration/ModePaiement.vue") },
+  // Modes de paiement : désormais dans Paramètres
+  { path: "/paiement-mode", redirect: { path: "/reglages", query: { section: "paiement" } } },
   { path: "/amortissement", name: "Amortissement", component: () => import("@/components/pages/configuration/Amortissement.vue") },
   { path: "/ecritures-journal/:id", name: "EcritureJournal", component: () => import("@/components/pages/configuration/EcritureJournal.vue"), props: true },
 
@@ -35,6 +38,12 @@ const routes = [
   { path: "/validation", name: "Validation", component: () => import("@/components/pages/Saisie/Validation.vue") },
   { path: "/import", name: "Import", component: () => import("@/components/pages/import/Import.vue") },
   { path: "/cloture", name: "Cloture", component: () => import("@/components/pages/Saisie/ClotureExercice.vue") },
+
+  // Tiers et lettrage
+  { path: "/tiers", name: "Tiers", component: () => import("@/components/pages/tiers/TiersList.vue") },
+  { path: "/tiers/:id(\\d+)", name: "TiersReleve", component: () => import("@/components/pages/tiers/TiersReleve.vue") },
+  { path: "/lettrage", name: "Lettrage", component: () => import("@/components/pages/tiers/Lettrage.vue") },
+  { path: "/balance-agee", name: "BalanceAgee", component: () => import("@/components/pages/tiers/BalanceAgee.vue") },
 
   // Analytique
   { path: "/type-centre", name: "TypeCentre", component: () => import("@/components/pages/configAnalytique/TypeCentre.vue") },
@@ -54,6 +63,12 @@ const routes = [
 
   // Simulation
   { path: "/simulations", name: "Simulations", component: () => import("@/components/pages/Simulation/SimulationList.vue") },
+
+  // Centre de notifications
+  { path: "/notifications", name: "Notifications", component: () => import("@/components/pages/notifications/Notifications.vue") },
+
+  // Paramètres de l'application (« /parametres » est réservé au module d'analyse)
+  { path: "/reglages", name: "Reglages", component: () => import("@/components/pages/parametres/Reglages.vue") },
 ];
 
 const router = createRouter({

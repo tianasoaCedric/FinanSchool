@@ -16,7 +16,8 @@
     </template>
 
     <!-- Synthèse -->
-    <section class="va-tuiles" aria-label="Synthèse">
+    <UiSkeleton v-if="chargement && synthese.total == null" variant="cards" :rows="3" class="va-tuiles-sk" />
+    <section v-else class="va-tuiles" aria-label="Synthèse">
       <div class="fs-card va-tuile">
         <span class="va-tuile__label">En attente de validation</span>
         <span class="va-tuile__valeur">{{ synthese.total ?? '—' }}</span>
@@ -90,7 +91,7 @@
         Les {{ synthese.affichees }} pièces les plus anciennes sont affichées sur {{ synthese.total }} : réduisez la période pour voir les autres.
       </p>
 
-      <div v-if="chargement" class="fs-skeleton"><div v-for="n in 6" :key="n" class="fs-skeleton__row"></div></div>
+      <UiSkeleton v-if="chargement" variant="table" :rows="6" :cols="8" />
       <div v-else class="fs-table-wrap">
         <table class="fs-table">
           <thead>
@@ -108,7 +109,7 @@
               <th>Libellé</th>
               <th class="text-right">Montant</th>
               <th>Contrôle</th>
-              <th class="text-right">Actions</th>
+              <th class="actions">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -136,12 +137,14 @@
                   <UiBadge v-if="!p.motif" tone="success" dot>Prête</UiBadge>
                   <span v-else class="va-motif"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i> {{ p.motif }}</span>
                 </td>
-                <td class="text-right va-actions" @click.stop>
-                  <UiButton variant="ghost" size="sm" icon="bi-pencil" icon-only :to="`/ecriture/${p.id}`" :aria-label="`Ouvrir ${p.numero}`" title="Ouvrir / corriger" />
-                  <UiButton
-                    v-if="!p.motif" variant="soft-success" size="sm" icon="bi-check2"
-                    :loading="validation === p.id" :disabled="!!validation" @click="validerUne(p)"
-                  >Valider</UiButton>
+                <td class="actions" @click.stop>
+                  <div class="fs-row-actions">
+                    <UiButton variant="ghost" size="sm" icon="bi-pencil" icon-only :to="`/ecriture/${p.id}`" :aria-label="`Ouvrir ${p.numero}`" title="Ouvrir / corriger" />
+                    <UiButton
+                      v-if="!p.motif" variant="soft-success" size="sm" icon="bi-check2"
+                      :loading="validation === p.id" :disabled="!!validation" @click="validerUne(p)"
+                    >Valider</UiButton>
+                  </div>
                 </td>
               </tr>
               <tr v-if="ouverte === p.id" class="va-detail">

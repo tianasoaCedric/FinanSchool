@@ -49,11 +49,14 @@ class ClotureService
             ->where('l.statut', EcritureGuard::STATUT_VALIDE)
             ->whereBetween('m.Date_mouvement', [$debut, $fin])
             ->groupBy('l.Id_Mouvement_ecriture')
-            ->havingRaw('ABS(SUM(l."Debit") - SUM(l."Credit")) >= ?', [EcritureGuard::TOLERANCE])
+            ->havingRaw('ABS(SUM(l."Debit") - SUM(l."Credit")) >= ?', [EcritureGuard::tolerance()])
             ->select('l.Id_Mouvement_ecriture')->get()->count();
 
         $plan = $this->dotations->calcul($exercice);
-        $dotationsOk = $plan['total'] <= 0 || ($plan['piece'] && $plan['piece']['validee']);
+        // Dotations comptabilisées (générées, saisies ou importées) et validées
+        $brouillonDot = $plan['piece'] && !$plan['piece']['validee'];
+        $dotationsOk = $plan['reste_a_passer'] < 0.01 && !$brouillonDot;
+        $ecartsRegistre = $plan['rapprochement'];
         $suivant = $this->suivant($exercice);
         $precedent = ExerciceComptable::where('Annee_fiscale', $exercice->Annee_fiscale - 1)->first();
         $precedentOk = !$precedent || $precedent->isCloture();
@@ -68,9 +71,14 @@ class ClotureService
             ['cle' => 'equilibre', 'libelle' => 'Toutes les pièces validées sont équilibrées', 'ok' => $desequilibrees === 0, 'bloquant' => true,
              'detail' => $desequilibrees ? "{$desequilibrees} pièce(s) déséquilibrée(s)" : null],
             ['cle' => 'dotations', 'libelle' => 'Dotations aux amortissements passées', 'ok' => $dotationsOk, 'bloquant' => false,
-             'detail' => $dotationsOk ? null : ($plan['piece']
+             'detail' => $dotationsOk ? null : ($brouillonDot
                 ? "Pièce {$plan['piece']['numero']} à valider"
-                : 'Dotations de ' . number_format($plan['total'], 2, ',', ' ') . ' Ar à générer')],
+                : 'Dotations de ' . number_format($plan['reste_a_passer'], 2, ',', ' ') . ' Ar à générer')],
+            // Informatif : n'empêche pas la clôture
+            ['cle' => 'registre', 'libelle' => 'Registre des immobilisations conforme à la comptabilité', 'ok' => !$ecartsRegistre, 'bloquant' => false,
+             'informatif' => true, 'lien' => $ecartsRegistre ? '/amortissement' : null,
+             'detail' => $ecartsRegistre ? collect($ecartsRegistre)->map(fn ($e) => "{$e['compte']} : registre "
+                . number_format($e['registre'], 2, ',', ' ') . ' / comptabilité ' . number_format($e['comptabilite'], 2, ',', ' '))->implode(' ; ') : null],
         ];
 
         $resultat = $this->etats->resultatNet($debut, $fin);
@@ -101,7 +109,7 @@ class ClotureService
     {
         $prep = $this->preparation($exercice);
         foreach ($prep['controles'] as $c) {
-            if (!$c['ok'] && ($c['bloquant'] || !$ignorerDotations)) {
+            if (!$c['ok'] && empty($c['informatif']) && ($c['bloquant'] || !$ignorerDotations)) {
                 throw ValidationException::withMessages(['cloture' => ["Clôture impossible : {$c['libelle']} — {$c['detail']}."]]);
             }
         }
@@ -131,6 +139,11 @@ class ClotureService
             $codes = array_map('strval', array_keys($soldes));
             $ids = SousCompte::whereIn('Code_sous_compte', $codes)->pluck('Id_Sous_compte', 'Code_sous_compte');
 
+            // Comptes de tiers : à-nouveaux détaillés par tiers (suivi et lettrage en N+1)
+            $parTiers = collect(TiersService::soldesParTiers($fin))
+                ->groupBy('Id_Sous_compte')
+                ->filter(fn ($g) => $g->contains(fn ($r) => $r['id_tiers'] !== null));
+
             $lignes = [];
             $aReporter = 0.0; // résultats antérieurs jamais clôturés (débit − crédit)
             foreach ($soldes as $code => $s) {
@@ -140,6 +153,19 @@ class ClotureService
                 }
                 if (in_array($code[0], ['6', '7'], true)) {
                     $aReporter += $s;
+                    continue;
+                }
+                if ($code[0] === '4' && $parTiers->has($ids[$code])) {
+                    foreach ($parTiers[$ids[$code]] as $r) {
+                        if (abs($r['solde']) < 0.005) {
+                            continue;
+                        }
+                        $lignes[] = [
+                            'Id_Sous_compte' => $ids[$code], 'id_tiers' => $r['id_tiers'],
+                            'Debit' => $r['solde'] > 0 ? $r['solde'] : 0, 'Credit' => $r['solde'] < 0 ? -$r['solde'] : 0,
+                            'Libelle' => 'À-nouveau',
+                        ];
+                    }
                     continue;
                 }
                 if (in_array($code[0], ['1', '2', '3', '4', '5'], true)) {
@@ -161,7 +187,7 @@ class ClotureService
             }
             $totalD = round(array_sum(array_column($lignes, 'Debit')), 2);
             $totalC = round(array_sum(array_column($lignes, 'Credit')), 2);
-            if (abs($totalD - $totalC) >= EcritureGuard::TOLERANCE) {
+            if (abs($totalD - $totalC) >= EcritureGuard::tolerance()) {
                 throw ValidationException::withMessages(['cloture' => ["À-nouveaux déséquilibrés ({$totalD} ≠ {$totalC}) : des écritures portent sur des comptes hors classes 1 à 7."]]);
             }
 
@@ -266,6 +292,8 @@ class ClotureService
                         ->orderBy('Id_Mouvement_ecriture')->get()->map->numeroAffiche()->all(),
                 ]);
 
+            // Lettrages portant sur des lignes supprimées : défaits
+            LettrageService::liberer(LigneEcriture::whereIn('Id_Mouvement_ecriture', $aSupprimer)->pluck('Id_Ligne_ecriture')->all());
             foreach ($aSupprimer as $id) {
                 LigneEcriture::where('Id_Mouvement_ecriture', $id)->delete();
                 MouvementEcriture::whereKey($id)->delete();

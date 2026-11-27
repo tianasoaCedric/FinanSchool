@@ -34,7 +34,7 @@ class DefinirAdministrateur extends Command
         }
 
         DB::transaction(function () use ($user, $admin) {
-            $user->forceFill(['is_admin' => $admin])->save();
+            $user->definirRole($admin ? User::ROLE_ADMIN : User::ROLE_COMPTABLE)->save();
             Audit::enregistrer(Audit::UTILISATEUR_DROITS, 'utilisateur', $user->id, $user->name,
                 ['administrateur' => !$admin], ['administrateur' => $admin], ['origine' => 'commande utilisateur:admin']);
         });

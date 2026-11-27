@@ -21,17 +21,22 @@ class ClasseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'Code' => 'required|string|unique:classes,Code',
+            'Code' => ['required', 'regex:/^\d$/', 'unique:classes,Code'],
             'Libelle' => 'required|string|max:255',
         ]);
 
-        return Classe::create($request->all());
+        return Classe::create($request->only(['Code', 'Libelle']));
     }
 
     public function update(Request $request, $id)
     {
         $classe = Classe::findOrFail($id);
-        $classe->update($request->all());
+        $data = $request->validate([
+            'Code' => ['required', 'regex:/^\d$/', "unique:classes,Code,{$id},Id_Classe"],
+            'Libelle' => 'required|string|max:255',
+        ], ['Code.regex' => 'Le code d\'une classe est un chiffre (1 à 9).']);
+        PlanComptableGuard::assertCodeClasseModifiable($classe, $data['Code']);
+        $classe->update($data);
 
         return $classe;
     }

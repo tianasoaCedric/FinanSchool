@@ -97,7 +97,7 @@ class PeriodesService
             ->where('l.statut', EcritureGuard::STATUT_VALIDE)
             ->whereBetween('m.Date_mouvement', [$m['debut'], $m['fin']])
             ->groupBy('l.Id_Mouvement_ecriture')
-            ->havingRaw('ABS(SUM(l."Debit") - SUM(l."Credit")) >= ?', [EcritureGuard::TOLERANCE])
+            ->havingRaw('ABS(SUM(l."Debit") - SUM(l."Credit")) >= ?', [EcritureGuard::tolerance()])
             ->select('l.Id_Mouvement_ecriture')->get()->count();
         if ($desequilibrees > 0) {
             $this->refuser("{$m['libelle']} contient {$desequilibrees} pièce(s) déséquilibrée(s).");

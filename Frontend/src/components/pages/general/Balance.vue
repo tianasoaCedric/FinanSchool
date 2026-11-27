@@ -88,7 +88,8 @@ import FinancialStatementLayout from "@/components/template/FinancialStatementLa
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import html2pdf from 'html2pdf.js'
+import { exporterEtatPdf } from '@/utils/exportEtatPdf';
+import { parametres } from '@/stores/parametres';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx-js-style';
@@ -110,17 +111,6 @@ const filters = ref({
 });
 
 // LOGO EN BASE64
-const logoBase64 = ref(null);
-async function fetchImageAsBase64(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 const getClasseLibelle = (classe) => ({
   '1': 'Capitaux',
@@ -279,8 +269,9 @@ const exportToExcel = async () => {
 
   const now = new Date();
   // En-tête informations
-  const title = [[`BALANCE GÉNÉRALE – RAITRA KIDZ`]];
-  const etablissement = ["RAITRA KIDZ", "Antananarivo, Madagascar", "+261 XX XX XXX XX", "contact@raitrakidz.mg"];
+  const soc = (await parametres()).societe;
+  const title = [[`BALANCE GÉNÉRALE – ${soc.nom}`]];
+  const etablissement = [soc.nom, soc.adresse, soc.tel, soc.email];
   const info = [
     [`Édité le : ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`],
     [`Période : ${filters.value.date_debut || "N/A"} à ${filters.value.date_fin || "N/A"}`],
@@ -400,102 +391,37 @@ const exportToExcel = async () => {
   XLSX.writeFile(wb, `balance_generale_${now.toISOString().split("T")[0]}.xlsx`);
 };
 
-const exportToPDF = async () => {
-  if (!Object.keys(groupedComptes.value).length) {
-    alert("Aucune donnée à exporter");
-    return;
-  }
-
-  const now = new Date();
+const exportToPDF = () => {
+  if (!Object.keys(groupedComptes.value).length) { alert("Aucune donnée à exporter"); return; }
   const exercice = exercices.value.find(ex => ex.id == selectedExercice.value);
-
-  // Branding header infos
-  const htmlContent = `
-    <div style="font-family: 'Helvetica', Arial, sans-serif; max-width: 950px; padding: 0 15px; margin: 0;">
-      <div style="display: flex; align-items: flex-start; margin-bottom: 22px; padding-bottom: 15px; border-bottom: 3px solid #2980b9;">
-        <div style="flex: 1;">
-          <img src="${logoBase64.value || ''}" alt="Logo" style="width: 100px; height: auto;" />
-          <div style="margin-top: 8px; font-size: 11px; color: #555;">
-            <div style="font-weight: bold; font-size: 13px; color: #2c3e50;">RAITRA KIDZ</div>
-            <div>Antananarivo, Madagascar</div>
-            <div>+261 XX XX XXX XX</div>
-            <div>contact@raitrakidz.mg</div>
-          </div>
-        </div>
-        <div style="flex: 3; text-align: center;">
-          <h1 style="font-size: 22px; font-weight: bold; color: #1c45bd; margin: 0;">Balance Générale</h1>
-          <div style="font-size: 12px; margin: 4px 0;">
-            Exercice : ${exercice ? exercice.nom : "Tous"}
-          </div>
-          <div style="font-size: 11px;">
-            Période : ${filters.value.date_debut || "N/A"} à ${filters.value.date_fin || "N/A"}
-          </div>
-          <div style="font-size: 10px;">
-            Classe de compte : ${getClasseLibelle(filters.value.classe_compte) || "Toutes"}
-          </div>
-        </div>
-        <div style="flex: 1; text-align: right; font-size: 10px; color: #555;">
-          <div style="margin: 3px 0;"><strong>Date édition:</strong> ${now.toLocaleDateString('fr-FR')} ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
-        </div>
-      </div>
-      <table style="width:1060px; border-collapse: collapse; margin-top: 15px;">
-        <thead>
-          <tr style="background: #1c45bd; color: white;">
-            <th rowspan="2" style="padding: 8px 3px; font-size: 10px; border: 1px solid #2980b9; text-align: left;">Compte</th>
-            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Soldes d'ouverture</th>
-            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Mouvements</th>
-            <th colspan="2" style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9;">Soldes de fin</th>
-          </tr>
-          <tr style="background: #1c45bd; color: white;">
-            ${['Débit', 'Crédit', 'Débit', 'Crédit', 'Débit', 'Crédit'].map(t => `<th style="padding: 6px 3px; font-size: 10px; border: 1px solid #2980b9; text-align: right;">${t}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${Object.entries(groupedComptes.value).map(([mainCode, mainAccount]) => `
-            <tr style="font-weight: bold; background-color: #f4f8fd;">
-              <td style="padding:7px; font-size:10px; border:1px solid #eee;">${mainCode} - ${mainAccount.libelle}</td>
-              ${COLONNES.map(c => `<td style="padding:7px; font-size:10px; border:1px solid #eee; text-align:right;">${vide(mainAccount[c])}</td>`).join('')}
-            </tr>
-            ${mainAccount.subAccounts.map(sub =>
-              `<tr>
-                <td style="padding:6px 6px 6px 22px; font-size:9px; border:1px solid #f5f7fa;">${sub.code_sous_compte} - ${sub.libelle_sous_compte}</td>
-                ${COLONNES.map(c => `<td style="padding:6px; font-size:9px; border:1px solid #f5f7fa; text-align:right;">${vide(sub[c])}</td>`).join('')}
-              </tr>`
-            ).join('')}
-          `).join('')}
-        </tbody>
-        <tfoot>
-          <tr style="background: #2980b9; color: white; font-weight: bold;">
-            <td style="padding:8px; font-size: 10px; text-align:right; border:1px solid #2980b9;">TOTAUX :</td>
-            ${COLONNES.map(c => `<td style="padding:8px; font-size: 10px; text-align:right; border:1px solid #2980b9;">${formatNumber(totaux.value[c])}</td>`).join('')}
-          </tr>
-        </tfoot>
-      </table>
-      <div style="margin-top:18px; text-align:center; font-size:10px; color:#888;">
-        RAITRA KIDZ © ${now.getFullYear()} | Export PDF
-      </div>
-    </div>
-  `;
-
-  const element = document.createElement('div');
-  element.innerHTML = htmlContent;
-  element.style.width = '297mm';
-  document.body.appendChild(element);
-  await html2pdf()
-    .set({
-      margin: [10, 5, 15, 5],
-      filename: `Balance_Generale_${now.toISOString().split("T")[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-    })
-    .from(element)
-    .save();
-  document.body.removeChild(element);
+  const lignes = [];
+  Object.entries(groupedComptes.value).forEach(([code, compte]) => {
+    lignes.push({ type: 'title', cellules: [`${code} - ${compte.libelle}`, ...COLONNES.map(c => vide(compte[c]))] });
+    compte.subAccounts.forEach(sub => lignes.push({
+      type: 'detail',
+      cellules: [`${sub.code_sous_compte} - ${sub.libelle_sous_compte}`, ...COLONNES.map(c => vide(sub[c]))],
+    }));
+  });
+  lignes.push({ type: 'total', cellules: ['Totaux', ...COLONNES.map(c => formatNumber(totaux.value[c]))] });
+  const dc = [{ label: 'Débit', align: 'right' }, { label: 'Crédit', align: 'right' }];
+  return exporterEtatPdf({
+    titre: 'Balance générale',
+    infos: [
+      ['Exercice', exercice ? exercice.nom : 'Tous'],
+      ['Période', `${filters.value.date_debut || 'N/A'} → ${filters.value.date_fin || 'N/A'}`],
+      ['Classe', getClasseLibelle(filters.value.classe_compte) || 'Toutes'],
+    ],
+    entetes: [
+      [{ label: 'Compte', rowspan: 2 }, { label: "Soldes d'ouverture", colspan: 2 }, { label: 'Mouvements', colspan: 2 }, { label: 'Soldes de fin', colspan: 2 }],
+      [...dc, ...dc, ...dc],
+    ],
+    lignes,
+    orientation: 'landscape',
+    fichier: 'Balance_Generale',
+  });
 };
 
 onMounted(async () => {
-  logoBase64.value = await fetchImageAsBase64("/01Raitra kidz 300px.png");
   if (!token) {
     window.location.href = "/";
   } else {

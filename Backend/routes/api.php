@@ -65,7 +65,7 @@ Route::middleware('api')->group(function () {
     // =====================================================================
     // Routes protégées : utilisateur connecté obligatoire
     // =====================================================================
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'acces'])->group(function () {
 
         // ---- Assistant (chatbot) : il lit des données comptables ----
         Route::post('/chat/sending', [AssistantController::class, 'comptabilite']);
@@ -78,6 +78,9 @@ Route::middleware('api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         // ---- Plan comptable et référentiels ----
+        // Import / export du plan comptable (classes, rubriques, comptes, sous-comptes)
+        Route::post('/plan-comptable/import', [\App\Http\Controllers\PlanCompte\ImportPlanComptableController::class, 'import']);
+        Route::get('/plan-comptable/export', [\App\Http\Controllers\PlanCompte\ImportPlanComptableController::class, 'export']);
         Route::apiResource('comptes', CompteController::class);
         Route::apiResource('sous-comptes', SousCompteController::class);
         Route::apiResource('rubriques', RubriqueController::class);
@@ -93,6 +96,17 @@ Route::middleware('api')->group(function () {
         Route::apiResource('mode-paiements', ModePaiementController::class);
         Route::get('journals/{id}/ecritures', [JournalController::class, 'ecritures']);
         Route::apiResource('journals', JournalController::class);
+
+        // ---- Tiers (clients, fournisseurs…) et lettrage ----
+        Route::get('/tiers/prochain-code', [\App\Http\Controllers\Tiers\TiersController::class, 'prochainCode']);
+        Route::get('/tiers-balance-agee', [\App\Http\Controllers\Tiers\TiersController::class, 'balanceAgee']);
+        Route::get('/tiers/{id}/releve', [\App\Http\Controllers\Tiers\TiersController::class, 'releve'])->whereNumber('id');
+        Route::apiResource('tiers', \App\Http\Controllers\Tiers\TiersController::class)->parameters(['tiers' => 'id']);
+        Route::get('/lettrage/comptes', [\App\Http\Controllers\Tiers\LettrageController::class, 'comptes']);
+        Route::get('/lettrage/lignes', [\App\Http\Controllers\Tiers\LettrageController::class, 'lignes']);
+        Route::post('/lettrage/auto', [\App\Http\Controllers\Tiers\LettrageController::class, 'automatique']);
+        Route::post('/lettrage', [\App\Http\Controllers\Tiers\LettrageController::class, 'store']);
+        Route::delete('/lettrage/{id}', [\App\Http\Controllers\Tiers\LettrageController::class, 'destroy'])->whereNumber('id');
 
         // ---- Saisie par pièce complète et modèles d'écriture ----
         Route::get('/pieces/{id}/justificatif', [PieceController::class, 'justificatif']);
@@ -134,6 +148,9 @@ Route::middleware('api')->group(function () {
         Route::get('/ecritures/imports/historique', [ImportEcritureController::class, 'historique']);
         Route::post('/ecritures/import', [ImportEcritureController::class, 'import']);
         Route::post('/ecritures/import/validate', [ImportEcritureController::class, 'validateImport']);
+        Route::post('/ecritures/import/analyse', [ImportEcritureController::class, 'analyse']);
+        Route::post('/ecritures/import/lignes', [ImportEcritureController::class, 'importLignes']);
+        Route::post('/ecritures/imports/{id}/annuler', [ImportEcritureController::class, 'annuler'])->whereNumber('id');
 
         // ---- Grand livre et balance ----
         Route::get('/grand-livre', [GrandLivreController::class, 'index']);
@@ -183,6 +200,21 @@ Route::middleware('api')->group(function () {
         Route::get('/variations-capitaux', [VariationsCapitauxController::class, 'index']);
         Route::get('/etats-financiers/controles', [\App\Http\Controllers\general\ControlesEtatsController::class, 'index']);
 
+        // ---- Mon profil ----
+        Route::get('/profil', [\App\Http\Controllers\ProfilController::class, 'show']);
+        Route::put('/profil', [\App\Http\Controllers\ProfilController::class, 'update']);
+        Route::put('/profil/mot-de-passe', [\App\Http\Controllers\ProfilController::class, 'motDePasse']);
+        Route::delete('/profil/sessions', [\App\Http\Controllers\ProfilController::class, 'fermerSessions']);
+
+        // ---- Utilisateurs et rôles (administrateurs) ----
+        Route::get('/utilisateurs', [\App\Http\Controllers\UtilisateursController::class, 'index']);
+        Route::post('/utilisateurs', [\App\Http\Controllers\UtilisateursController::class, 'store']);
+        Route::put('/utilisateurs/{id}', [\App\Http\Controllers\UtilisateursController::class, 'update'])->whereNumber('id');
+
+        // ---- Paramètres de l'application ----
+        Route::get('/reglages', [\App\Http\Controllers\ParametresController::class, 'index']);
+        Route::put('/reglages', [\App\Http\Controllers\ParametresController::class, 'update']);
+
         // ---- Tableau de bord ----
         Route::prefix('dashboard')->group(function () {
             Route::get('/evolution-ca', [DashboardController::class, 'evolutionCA']);
@@ -190,11 +222,27 @@ Route::middleware('api')->group(function () {
             Route::get('/composition-bilan', [DashboardController::class, 'compositionBilan']);
             Route::get('/decomposition-resultat', [DashboardController::class, 'decompositionResultat']);
             Route::get('/resume', [DashboardController::class, 'resumeDashboard']);
+            Route::get('/synthese', [DashboardController::class, 'synthese']);
         });
 
         // ---- Immobilisations et amortissements ----
         Route::get('/taux-amortissement', [AmortissementController::class, 'getTaux']);
+        Route::post('/taux-amortissement', [AmortissementController::class, 'storeTaux']);
+        Route::put('/taux-amortissement/{id}', [AmortissementController::class, 'updateTaux']);
+        Route::delete('/taux-amortissement/{id}', [AmortissementController::class, 'destroyTaux']);
+        Route::post('/amortissement/{id}/sortie', [AmortissementController::class, 'sortie']);
+        Route::delete('/amortissement/{id}/sortie', [AmortissementController::class, 'annulerSortie']);
         Route::apiResource('amortissement', AmortissementController::class);
+
+        // ---- Centre de notifications (interface comptable) ----
+        Route::prefix('centre-notifications')->controller(\App\Http\Controllers\notifications\CentreNotificationsController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::post('/tout-lire', 'toutLire');
+            Route::delete('/lues', 'supprimerLues');
+            Route::patch('/{id}/lue', 'marquerLue')->whereNumber('id');
+            Route::patch('/{id}/non-lue', 'marquerNonLue')->whereNumber('id');
+            Route::delete('/{id}', 'supprimer')->whereNumber('id');
+        });
 
         // ---- Notifications ----
         Route::apiResource('evenements', EvenementController::class);

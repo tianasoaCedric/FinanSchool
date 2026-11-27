@@ -3,430 +3,170 @@
 namespace App\Http\Controllers\import;
 
 use App\Http\Controllers\Controller;
+use App\Models\import\ImportHistory;
+use App\Models\Saisie\MouvementEcriture;
+use App\Services\Comptabilite\ImportEcritures;
+use App\Services\Parametres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Saisie\MouvementEcriture;
-use App\Models\Saisie\LigneEcriture;
-use App\Models\Saisie\Journal;
-use App\Models\PlanCompte\SousCompte;
-use Illuminate\Support\Facades\Auth;
-use App\Models\import\ImportHistory;
-use App\Models\exercice\ExerciceComptable;
-use App\Services\Comptabilite\Audit;
-use App\Services\Comptabilite\EcritureGuard;
-use Exception;
-use App\Console\Commands\NotificationImport;
 
+/**
+ * Import d'écritures.
+ *
+ * Interface actuelle : le navigateur lit le fichier (CSV / XLSX / XLS), fait
+ * correspondre les colonnes, puis envoie les lignes :
+ *   POST /ecritures/import/analyse  { lignes }            → aperçu détaillé
+ *   POST /ecritures/import/lignes   { lignes, fichier }   → import (tout ou rien)
+ * Historique : GET /ecritures/imports/historique, annulation d'un import
+ * réussi dont aucune pièce n'est validée : POST /ecritures/imports/{id}/annuler.
+ *
+ * Les anciennes routes à fichier CSV (import, import/validate) restent
+ * disponibles et passent par le même service.
+ */
 class ImportEcritureController extends Controller
 {
+    public function __construct(private ImportEcritures $service) {}
+
+    private function reglesLignes(): array
+    {
+        return [
+            'lignes' => 'required|array|min:1|max:' . ImportEcritures::MAX_LIGNES,
+            'lignes.*' => 'array',
+        ];
+    }
+
+    private const MESSAGES = [
+        'lignes.required' => 'Le fichier ne contient aucune ligne.',
+        'lignes.max' => 'Le fichier dépasse ' . ImportEcritures::MAX_LIGNES . ' lignes.',
+    ];
+
+    public function analyse(Request $request)
+    {
+        $data = $request->validate($this->reglesLignes(), self::MESSAGES);
+        return response()->json($this->service->analyser($data['lignes']));
+    }
+
+    public function importLignes(Request $request)
+    {
+        $data = $request->validate($this->reglesLignes() + ['fichier' => 'nullable|string|max:255'], self::MESSAGES);
+        return $this->repondre(...$this->service->importer($data['lignes'], $data['fichier'] ?? 'Import'));
+    }
+
+    // ---- Anciennes routes : fichier CSV ----------------------------------
+
+    private function regleFichier(): array
+    {
+        return ['file_ecritures' => 'required|file|mimes:csv,txt|max:' . (1024 * (int) Parametres::get('import.taille_max'))];
+    }
+
+    private function lignesCsv(Request $request): array
+    {
+        $s = Parametres::get('import.separateur_csv');
+        return ImportEcritures::lignesDepuisCsv($request->file('file_ecritures')->getRealPath(), $s === 'tab' ? "\t" : $s);
+    }
+
     public function import(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'file_ecritures' => 'required|file|mimes:csv,txt|max:10240',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Fichier invalide',
-                'messages' => $validator->errors()
-            ], 422);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $stats = $this->processImport($request->file('file_ecritures'));
-
-            // Si des erreurs sont détectées, annuler tout
-            if (!empty($stats['errors'])) {
-                DB::rollBack();
-                
-                ImportHistory::create([
-                    'nom_fichier'       => $request->file('file_ecritures')->getClientOriginalName(),
-                    'imported_by'       => Auth::id(),
-                    'nombre_mouvements' => 0,
-                    'nombre_lignes'     => 0,
-                    'statut'            => 'échec',
-                    'erreur'            => implode("\n", $stats['errors']),
-                ]);
-
-                 NotificationImport::notifyImportError(
-                    Auth::id(),
-                    $request->file('file_ecritures')->getClientOriginalName(),
-                    implode(', ', $stats['errors'])
-                );
-
-                return response()->json([
-                    'error' => 'Erreurs détectées lors de l\'importation',
-                    'errors' => $stats['errors'],
-                    'message' => 'Aucune donnée n\'a été importée'
-                ], 422);
-            }
-
-            $nomFichier = $request->file('file_ecritures')->getClientOriginalName();
-            Audit::enregistrer(Audit::IMPORT_ECRITURES, 'import', null, "Import {$nomFichier}", null, null, [
-                'fichier' => $nomFichier,
-                'pieces' => $stats['mouvements'],
-                'lignes' => $stats['lignes'],
-                'statut' => 'brouillon',
-            ]);
-
-            DB::commit();
-
-            ImportHistory::create([
-                'nom_fichier'       => $request->file('file_ecritures')->getClientOriginalName(),
-                'imported_by'       => Auth::id(),
-                'nombre_mouvements' => $stats['mouvements'],
-                'nombre_lignes'     => $stats['lignes'],
-                'statut'            => 'réussi',
-                'erreur'            => null,
-            ]);
-
-            NotificationImport::notifyImportSuccess(
-                Auth::id(),
-                $request->file('file_ecritures')->getClientOriginalName(),
-                $stats['mouvements'],
-                $stats['lignes']
-            );
-
-            return response()->json([
-                'message' => "Importation réussie : {$stats['mouvements']} mouvements et {$stats['lignes']} lignes importés.",
-                'data' => $stats
-            ]);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            ImportHistory::create([
-                'nom_fichier'       => $request->file('file_ecritures')->getClientOriginalName(),
-                'imported_by'       => Auth::id(),
-                'nombre_mouvements' => 0,
-                'nombre_lignes'     => 0,
-                'statut'            => 'échec',
-                'erreur'            => $e->getMessage(),
-            ]);
-
-            NotificationImport::notifyImportError(
-                Auth::id(),
-                $request->file('file_ecritures')->getClientOriginalName(),
-                $e->getMessage()
-            );
-            return response()->json([
-                'error' => 'Erreur lors de l\'importation',
-                'message' => config('app.debug') ? $e->getMessage() : 'Erreur serveur'
-            ], 500);
-        }
+        $request->validate($this->regleFichier());
+        return $this->repondre(...$this->service->importer($this->lignesCsv($request), $request->file('file_ecritures')->getClientOriginalName()));
     }
 
     public function validateImport(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'file_ecritures' => 'required|file|mimes:csv,txt|max:10240',
+        $request->validate($this->regleFichier());
+        $analyse = $this->service->analyser($this->lignesCsv($request));
+        return response()->json($analyse + [
+            'total_lignes' => $analyse['resume']['lignes'],
+            'preview' => array_slice($analyse['lignes'], 0, 5),
+            'format_valide' => $analyse['resume']['erreurs'] === 0,
         ]);
+    }
 
-        if ($validator->fails()) {
+    private function repondre(array $analyse, ImportHistory $historique)
+    {
+        $r = $analyse['resume'];
+        if ($historique->statut !== 'réussi') {
             return response()->json([
-                'error' => 'Fichier invalide',
-                'messages' => $validator->errors()
+                'message' => $r['lignes'] === 0 ? 'Le fichier ne contient aucune écriture.' : "{$r['erreurs']} erreur(s) : aucune écriture n'a été importée.",
+                'errors' => ['import' => $historique->details['erreurs'] ?? []],
+                'analyse' => $analyse,
+                'historique' => $this->presenter($historique),
             ], 422);
         }
-
-        try {
-            $path = $request->file('file_ecritures')->getRealPath();
-            $handle = fopen($path, 'r');
-            
-            $header = fgetcsv($handle, 0, ';');
-            
-            $preview = [];
-            $count = 0;
-            while (($row = fgetcsv($handle, 0, ';')) !== false && $count < 5) {
-                $preview[] = [
-                    'date' => $row[0] ?? '',
-                    'sous_compte' => $row[1] ?? '',
-                    'libelle' => $row[2] ?? '',
-                    'debit' => $row[3] ?? '',
-                    'credit' => $row[4] ?? '',
-                    'reference' => $row[5] ?? '',
-                    'code_journal' => $row[6] ?? '',
-                ];
-                $count++;
-            }
-            
-            $totalLignes = $count;
-            while (fgetcsv($handle, 0, ';') !== false) {
-                $totalLignes++;
-            }
-            
-            fclose($handle);
-            
-            return response()->json([
-                'total_lignes' => $totalLignes,
-                'preview' => $preview,
-                'format_valide' => true,
-                'header' => $header
-            ]);
-            
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la validation',
-                'message' => $e->getMessage(),
-                'format_valide' => false
-            ], 500);
-        }
+        return response()->json([
+            'message' => "Import réussi : {$r['pieces']} pièce(s) et {$r['lignes']} ligne(s) créées en brouillon.",
+            'analyse' => $analyse,
+            'historique' => $this->presenter($historique),
+            'data' => ['mouvements' => $r['pieces'], 'lignes' => $r['lignes']],
+        ]);
     }
 
-    public function historique()
-    {
-        try {
-            $historique = ImportHistory::with('user')
-                ->orderBy('created_at', 'desc')
-                ->paginate(30);
+    // ---- Historique ------------------------------------------------------
 
-            return response()->json($historique);
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors du chargement de l\'historique',
-                'message' => $e->getMessage()
-            ], 500);
-        }
+    public function historique(Request $request)
+    {
+        $request->validate([
+            'statut' => 'nullable|in:réussi,échec,annulé',
+            'q' => 'nullable|string|max:100',
+            'per_page' => 'nullable|integer|min:5|max:100',
+        ]);
+
+        // Pièces encore en brouillon / validées par import (annulation possible ?)
+        $etat = DB::table('mouvement_ecritures as m')
+            ->join('ligne_ecritures as l', 'l.Id_Mouvement_ecriture', '=', 'm.Id_Mouvement_ecriture')
+            ->whereNotNull('m.id_import')
+            ->groupBy('m.id_import')
+            ->selectRaw("m.id_import, COUNT(DISTINCT m.\"Id_Mouvement_ecriture\") as pieces, COUNT(DISTINCT m.\"Id_Mouvement_ecriture\") FILTER (WHERE l.statut = 'valide') as validees");
+
+        $page = ImportHistory::with(['user:id,name', 'annulePar:id,name'])
+            ->leftJoinSub($etat, 'e', 'e.id_import', '=', 'import_histories.id')
+            ->select('import_histories.*', 'e.pieces as pieces_actuelles', 'e.validees as pieces_validees')
+            ->when($request->filled('statut'), fn ($q) => $q->where('statut', $request->statut))
+            ->when($request->filled('q'), fn ($q) => $q->where('nom_fichier', 'ILIKE', '%' . $request->q . '%'))
+            ->orderByDesc('import_histories.created_at')
+            ->orderByDesc('import_histories.id')
+            ->paginate($request->input('per_page', Parametres::get('affichage.lignes_par_page')));
+
+        $page->getCollection()->transform(fn ($h) => $this->presenter($h));
+
+        $compteurs = ImportHistory::selectRaw('statut, COUNT(*) as n')->groupBy('statut')->pluck('n', 'statut');
+        return response()->json($page->toArray() + ['compteurs' => $compteurs]);
     }
 
-    private function processImport($file)
+    public function annuler(int $id)
     {
-        $path = $file->getRealPath();
-        $handle = fopen($path, 'r');
-        $header = fgetcsv($handle, 0, ';');
+        $import = ImportHistory::findOrFail($id);
+        $n = $this->service->annuler($import);
+        return response()->json([
+            'message' => "Import annulé : {$n} pièce(s) brouillon supprimée(s).",
+            'historique' => $this->presenter($import->fresh(['user:id,name', 'annulePar:id,name'])),
+        ]);
+    }
 
-        $data = [];
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
-            $data[] = $row;
-        }
-        fclose($handle);
-
-        // ÉTAPE 1 : contrôle de chaque ligne
-        $errors = $this->validateData($data);
-        if (!empty($errors)) {
-            return ['mouvements' => 0, 'lignes' => 0, 'errors' => $errors];
-        }
-
-        // ÉTAPE 2 : regroupement en pièces, puis contrôle de l'équilibre de chacune
-        $pieces = $this->regrouperEnPieces($data);
-        foreach ($pieces as $piece) {
-            $totalDebit = round(array_sum(array_column($piece['lignes'], 'debit')), 2);
-            $totalCredit = round(array_sum(array_column($piece['lignes'], 'credit')), 2);
-            $lignesFichier = implode(', ', array_column($piece['lignes'], 'numero'));
-            $libelle = "Pièce du " . date('d/m/Y', strtotime($piece['date']))
-                . ($piece['reference'] !== '' ? " réf. {$piece['reference']}" : '')
-                . " (lignes {$lignesFichier})";
-
-            if (count($piece['lignes']) < 2) {
-                $errors[] = "{$libelle} : une pièce doit comporter au moins deux lignes";
-            } elseif (abs($totalDebit - $totalCredit) >= EcritureGuard::TOLERANCE) {
-                $errors[] = sprintf('%s : débit %s ≠ crédit %s', $libelle,
-                    number_format($totalDebit, 2, ',', ' '), number_format($totalCredit, 2, ',', ' '));
-            }
-        }
-        if (!empty($errors)) {
-            return ['mouvements' => 0, 'lignes' => 0, 'errors' => $errors];
-        }
-
-        // ÉTAPE 3 : insertion (la transaction est ouverte par import())
-        $journaux = Journal::all()->keyBy('Code');
-        $sousComptes = SousCompte::pluck('Id_Sous_compte', 'Code_sous_compte');
-        $mouvementCount = 0;
-        $ligneCount = 0;
-
-        foreach ($pieces as $piece) {
-            $journal = $journaux[$piece['journal']];
-            $mouvement = MouvementEcriture::create([
-                'Date_mouvement' => $piece['date'],
-                'Id_Journal'     => $journal->Id_Journal,
-                // Référence de la pièce justificative (exigée à la validation)
-                'Reference'      => $piece['reference'] !== '' ? $piece['reference'] : null,
-            ]);
-            $mouvementCount++;
-
-            foreach ($piece['lignes'] as $ligne) {
-                LigneEcriture::create([
-                    'Libelle'                => $ligne['libelle'],
-                    'Debit'                  => $ligne['debit'],
-                    'Credit'                 => $ligne['credit'],
-                    'Reference'              => $piece['reference'] !== '' ? $piece['reference'] : null,
-                    'Quantite'               => null,
-                    'Id_Mode_paiement'       => null,
-                    'Id_Mouvement_ecriture'  => $mouvement->Id_Mouvement_ecriture,
-                    'Id_Journal'             => $journal->Id_Journal,
-                    'Id_Sous_compte'         => $sousComptes[$ligne['sous_compte']],
-                    'statut'                 => EcritureGuard::STATUT_BROUILLON,
-                ]);
-                $ligneCount++;
-            }
-        }
-
+    private function presenter(ImportHistory $h): array
+    {
+        $pieces = (int) ($h->pieces_actuelles ?? MouvementEcriture::where('id_import', $h->id)->count());
+        $validees = (int) ($h->pieces_validees ?? 0);
         return [
-            'mouvements' => $mouvementCount,
-            'lignes' => $ligneCount,
-            'errors' => []
+            'id' => $h->id,
+            'nom_fichier' => $h->nom_fichier,
+            'date' => ($h->created_at ?? $h->imported_at)?->toIso8601String(),
+            'par' => $h->user?->name,
+            'statut' => $h->statut,
+            'nombre_pieces' => $h->nombre_mouvements,
+            'nombre_lignes' => $h->nombre_lignes,
+            'total' => $h->total_debit,
+            'date_min' => $h->date_min?->toDateString(),
+            'date_max' => $h->date_max?->toDateString(),
+            'erreur' => $h->erreur,
+            'erreurs' => $h->details['erreurs'] ?? ($h->erreur ? array_values(array_filter(explode("\n", $h->erreur))) : []),
+            'pieces_restantes' => $pieces,
+            'pieces_validees' => $validees,
+            // Traçabilité par pièce : imports réalisés depuis cette version
+            'tracable' => $h->statut === 'réussi' && $pieces > 0,
+            'annulable' => $h->statut === 'réussi' && $pieces > 0 && $validees === 0,
+            'annule_le' => $h->annule_le?->toIso8601String(),
+            'annule_par' => $h->annulePar?->name,
         ];
-    }
-
-    /**
-     * Regroupe les lignes du fichier en pièces comptables.
-     *  - avec une référence : même date + même référence + même journal ;
-     *  - sans référence : lignes consécutives de même date et même journal, une
-     *    nouvelle pièce commençant dès que la précédente est équilibrée (évite de
-     *    fusionner toute une journée en une seule pièce).
-     */
-    private function regrouperEnPieces(array $data): array
-    {
-        $pieces = [];
-        $index = [];       // clé => position dans $pieces (lignes avec référence)
-        $blocOuvert = [];  // date|journal => position de la pièce sans référence en cours
-
-        foreach ($data as $i => $row) {
-            if ($this->ligneVide($row)) {
-                continue;
-            }
-            $date = $this->parseDate(trim($row[0]));
-            $journal = trim($row[6]);
-            $reference = trim($row[5] ?? '');
-            $ligne = [
-                'numero' => $i + 2, // +1 pour l'en-tête, +1 car les lignes commencent à 1
-                'sous_compte' => trim($row[1]),
-                'libelle' => trim($row[2] ?? ''),
-                'debit' => $this->parseMontant($row[3] ?? ''),
-                'credit' => $this->parseMontant($row[4] ?? ''),
-            ];
-
-            if ($reference !== '') {
-                $cle = "{$date}|{$reference}|{$journal}";
-                if (!isset($index[$cle])) {
-                    $index[$cle] = count($pieces);
-                    $pieces[] = ['date' => $date, 'journal' => $journal, 'reference' => $reference, 'lignes' => []];
-                }
-                $pieces[$index[$cle]]['lignes'][] = $ligne;
-                continue;
-            }
-
-            $cle = "{$date}|{$journal}";
-            $pos = $blocOuvert[$cle] ?? null;
-            if ($pos !== null) {
-                $lignes = $pieces[$pos]['lignes'];
-                $equilibree = count($lignes) >= 2
-                    && abs(array_sum(array_column($lignes, 'debit')) - array_sum(array_column($lignes, 'credit'))) < EcritureGuard::TOLERANCE;
-                if ($equilibree) {
-                    $pos = null;
-                }
-            }
-            if ($pos === null) {
-                $pos = count($pieces);
-                $blocOuvert[$cle] = $pos;
-                $pieces[] = ['date' => $date, 'journal' => $journal, 'reference' => '', 'lignes' => []];
-            }
-            $pieces[$pos]['lignes'][] = $ligne;
-        }
-
-        return $pieces;
-    }
-
-    /**
-     * Valide chaque ligne AVANT insertion.
-     */
-    private function validateData($data)
-    {
-        $errors = [];
-        $codesSousComptes = SousCompte::pluck('Id_Sous_compte', 'Code_sous_compte');
-        $codesJournaux = Journal::pluck('Id_Journal', 'Code');
-
-        foreach ($data as $i => $row) {
-            $lineNumber = $i + 2;
-            if ($this->ligneVide($row)) {
-                continue;
-            }
-
-            // Colonnes obligatoires
-            if (empty($row[0])) {
-                $errors[] = "Ligne {$lineNumber}: Date manquante";
-            }
-            if (empty($row[1])) {
-                $errors[] = "Ligne {$lineNumber}: Sous-compte manquant";
-            }
-            if (empty($row[6])) {
-                $errors[] = "Ligne {$lineNumber}: Code journal manquant";
-            }
-
-            // Date et exercice
-            $date = !empty($row[0]) ? $this->parseDate(trim($row[0])) : false;
-            if (!empty($row[0]) && !$date) {
-                $errors[] = "Ligne {$lineNumber}: Format de date invalide ({$row[0]})";
-            } elseif ($date) {
-                // Exercice ouvert et mois non clôturé
-                if ($motif = EcritureGuard::motifDateFermee($date)) {
-                    $errors[] = "Ligne {$lineNumber}: {$motif}";
-                }
-            }
-
-            // Sous-compte et journal
-            if (!empty($row[1]) && !isset($codesSousComptes[trim($row[1])])) {
-                $errors[] = "Ligne {$lineNumber}: Sous-compte {$row[1]} introuvable";
-            }
-            if (!empty($row[6]) && !isset($codesJournaux[trim($row[6])])) {
-                $errors[] = "Ligne {$lineNumber}: Journal {$row[6]} introuvable";
-            }
-
-            // Montants : positifs, un seul côté renseigné
-            $debit = $this->parseMontant($row[3] ?? '');
-            $credit = $this->parseMontant($row[4] ?? '');
-            if ($debit === null || $credit === null) {
-                $errors[] = "Ligne {$lineNumber}: montant illisible (débit « " . ($row[3] ?? '') . " », crédit « " . ($row[4] ?? '') . " »)";
-            } elseif ($debit < 0 || $credit < 0) {
-                $errors[] = "Ligne {$lineNumber}: les montants doivent être positifs";
-            } elseif (($debit > 0) === ($credit > 0)) {
-                $errors[] = "Ligne {$lineNumber}: renseigner soit le débit, soit le crédit (un seul des deux)";
-            }
-        }
-
-        return $errors;
-    }
-
-    private function ligneVide($row): bool
-    {
-        return !is_array($row) || count(array_filter($row, fn ($v) => trim((string) $v) !== '')) === 0;
-    }
-
-    /**
-     * Lit un montant au format français ou international : "1 234,56", "1234.56",
-     * "1,234.56". Vide => 0. Retourne null si illisible.
-     */
-    private function parseMontant($valeur): ?float
-    {
-        $v = str_replace(["\u{00A0}", "\u{202F}", ' '], '', trim((string) $valeur));
-        if ($v === '') {
-            return 0.0;
-        }
-        if (str_contains($v, ',') && str_contains($v, '.')) {
-            $v = str_replace(',', '', $v);        // 1,234.56
-        } else {
-            $v = str_replace(',', '.', $v);       // 1234,56
-        }
-        return is_numeric($v) ? round((float) $v, 2) : null;
-    }
-
-    private function parseDate($dateString)
-    {
-        if (is_numeric($dateString)) {
-            $unixTimestamp = ($dateString - 25569) * 86400;
-            return date('Y-m-d', $unixTimestamp);
-        }
-
-        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $dateString, $matches)) {
-            return $matches[3] . '-' . $matches[2] . '-' . $matches[1];
-        }
-
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateString)) {
-            return $dateString;
-        }
-
-        return false;
     }
 }

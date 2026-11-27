@@ -1,5 +1,6 @@
 <template>
   <div class="fs-page" :data-theme="theme">
+    <Transition name="fs-fade"><div v-if="chargementGlobal" class="fs-progress" role="progressbar" aria-label="Chargement en cours"></div></Transition>
     <Sidebar />
     <Header v-if="user" :user="user" />
 
@@ -46,17 +47,27 @@
     <transition name="fs-fade">
       <div v-if="showChat"><ChatBot /></div>
     </transition>
+
+    <!-- Action refusée par le serveur (droits insuffisants) -->
+    <transition name="fs-fade">
+      <div v-if="accesRefuse" class="fs-acces-refuse" role="alert">
+        <i class="bi bi-lock-fill" aria-hidden="true"></i>
+        <span>{{ accesRefuse }}</span>
+        <button type="button" aria-label="Fermer" @click="accesRefuse = ''"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
 import '@/assets/styles/app-theme.css';
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import Header from '@/components/molecules/Header.vue';
 import Sidebar from '@/components/molecules/Sidebar.vue';
 import AppFooter from '@/components/molecules/Footer.vue';
 import ChatBot from '@/components/molecules/ChatBot.vue';
 import { useTheme } from '@/composables/useTheme';
+import { useLoadingBar } from '@/composables/useLoadingBar';
 
 defineProps({
   user: { type: Object, default: null },
@@ -74,5 +85,17 @@ defineProps({
 defineEmits(['back']);
 
 const { theme } = useTheme();
+const { actif: chargementGlobal } = useLoadingBar();
 const showChat = ref(false);
+
+// Message « action non autorisée » (émis par config/http.js sur une réponse 403)
+const accesRefuse = ref('');
+let minuteurAcces = null;
+function surAccesRefuse(e) {
+  accesRefuse.value = e.detail;
+  clearTimeout(minuteurAcces);
+  minuteurAcces = setTimeout(() => { accesRefuse.value = ''; }, 5000);
+}
+onMounted(() => window.addEventListener('fs:acces-refuse', surAccesRefuse));
+onBeforeUnmount(() => { window.removeEventListener('fs:acces-refuse', surAccesRefuse); clearTimeout(minuteurAcces); });
 </script>

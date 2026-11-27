@@ -33,7 +33,17 @@ class LigneEcriture extends Model
         'statut',
         'date_validation',
         'valide_par',
+        'id_tiers',
+        'id_lettrage',
     ];
+
+    public function tiers() {
+        return $this->belongsTo(\App\Models\Tiers\Tiers::class, 'id_tiers');
+    }
+
+    public function lettrage() {
+        return $this->belongsTo(\App\Models\Tiers\Lettrage::class, 'id_lettrage');
+    }
 
 
     public function modePaiement() {

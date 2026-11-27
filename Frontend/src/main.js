@@ -10,6 +10,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import UiButton from './components/ui/UiButton.vue'
 import UiBadge from './components/ui/UiBadge.vue'
+import UiModal from './components/ui/UiModal.vue'
+import UiPagination from './components/ui/UiPagination.vue'
+import UiSkeleton from './components/ui/UiSkeleton.vue'
+import UiLoader from './components/ui/UiLoader.vue'
 import { installerIntercepteursHttp } from './config/http'
 
 // Jeton envoyé à chaque appel API ; retour à la connexion si la session expire
@@ -22,6 +26,10 @@ const app = createApp(App)
 // Atomes d'interface communs (boutons et badges de statut uniformes)
 app.component('UiButton', UiButton);
 app.component('UiBadge', UiBadge);
+app.component('UiModal', UiModal);
+app.component('UiPagination', UiPagination);
+app.component('UiSkeleton', UiSkeleton);
+app.component('UiLoader', UiLoader);
 
 // <apexchart> reste disponible partout, mais la librairie (~580 kB) n'est
 // téléchargée que lorsqu'une page affiche réellement un graphique.

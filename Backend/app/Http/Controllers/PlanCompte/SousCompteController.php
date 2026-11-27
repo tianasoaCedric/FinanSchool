@@ -22,9 +22,11 @@ class SousCompteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'suffixe' => 'required|string|max:10',
+            'suffixe' => ['required', 'regex:/^\d{1,3}$/'],
             'Libelle' => 'required|string|max:255',
             'Id_Compte' => 'required|exists:comptes,Id_Compte',
+        ], [
+            'suffixe.regex' => 'Le suffixe doit comporter 1 à 3 chiffres (ex. 1 → 601001).',
         ]);
 
         $compte = \App\Models\PlanCompte\Compte::findOrFail($request->Id_Compte);
@@ -47,9 +49,11 @@ class SousCompteController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'suffixe' => 'required|string|max:10',
+            'suffixe' => ['required', 'regex:/^\d{1,3}$/'],
             'Libelle' => 'required|string|max:255',
             'Id_Compte' => 'required|exists:comptes,Id_Compte',
+        ], [
+            'suffixe.regex' => 'Le suffixe doit comporter 1 à 3 chiffres (ex. 1 → 601001).',
         ]);
 
         $sousCompte = SousCompte::findOrFail($id);
@@ -63,6 +67,7 @@ class SousCompteController extends Controller
             return response()->json(['message' => 'Ce code sous-compte existe déjà'], 422);
         }
 
+        PlanComptableGuard::assertCodeSousCompteModifiable($sousCompte, $codeSousCompte);
         $sousCompte->Code_sous_compte = $codeSousCompte;
         $sousCompte->Libelle = $request->Libelle;
         $sousCompte->Id_Compte = $request->Id_Compte;
